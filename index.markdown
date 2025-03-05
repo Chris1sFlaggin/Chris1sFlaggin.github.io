@@ -12,7 +12,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #0a192f;
+    background: #252a34;
     overflow: hidden;
   }
 
