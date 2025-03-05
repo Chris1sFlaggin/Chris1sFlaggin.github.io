@@ -20,6 +20,7 @@
 
 # Site settings
 title: Your Site Title
+img: /chris.jpg
 email: your-email@example.com
 description: >- # this means to ignore newlines until "baseurl:"
   Your site description here
