@@ -37,7 +37,8 @@ plugins:
   - jekyll-feed
 
 # Theme settings
-background_color: "#0a192f"
+minima:
+  skin: dark # optional: use dark theme
 # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to
