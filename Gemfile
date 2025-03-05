@@ -7,7 +7,7 @@ source "https://rubygems.org"
 gem "github-pages", group: :jekyll_plugins
 
 # Theme gem
-gem "minima", "~> 2.5"
+gem "jekyll-include-cache", group: :jekyll_plugins
 
 # Plugins
 group :jekyll_plugins do

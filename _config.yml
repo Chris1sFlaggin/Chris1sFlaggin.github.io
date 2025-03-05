@@ -32,12 +32,10 @@ url: "https://chris1sflaggin.github.io" # update this to your GitHub Pages URL
 github_username: chris1sflaggin
 
 # Build settings
-theme: minima
+remote_theme: "mmistakes/minimal-mistakes@4.26.2"
 plugins:
   - jekyll-feed
-
-# Theme settings
-background_color: "#0a192f"
+  - jekyll-include-cache
 # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to
