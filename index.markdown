@@ -7,6 +7,7 @@
 </div>
 
 <style>
+  @import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
   .hero-section {
     height: 100vh;
     display: flex;
