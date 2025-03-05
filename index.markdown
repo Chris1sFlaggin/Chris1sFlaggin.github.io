@@ -1,5 +1,3 @@
-layout: home
-
 <div class="hero-section">
   <div class="logo-container">
     <div class="rays"></div>
@@ -39,7 +37,7 @@ layout: home
     position: absolute;
     width: 100%;
     height: 100%;
-    background: conic-gradient(from 0deg, transparent 0%, #64ffda 50%, transparent 100%);
+    background: conic-gradient(from 0deg, #0a192f 0%, #64ffda 50%, #0a192f 100%);
     animation: rotate 4s linear infinite;
   }
 
