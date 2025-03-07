@@ -15,10 +15,13 @@ layout: home
   <div class="category-grid">
     {% for category in site.categories %}
       {% assign category_name = category | first %}
-      <div class="category-card">
-        <h3>{{ category_name }}</h3>
-        <p>{{ site.categories[category_name].size }} posts</p>
-        <a href="{{ site.baseurl }}/categories/{{ category_name | slugify }}/" class="category-link">View Posts</a>
+      <div class="category-card" data-category="{{ category_name | slugify }}">
+        <div class="category-overlay"></div>
+        <div class="category-content">
+          <h3>{{ category_name }}</h3>
+          <p>{{ site.categories[category_name].size }} posts</p>
+          <a href="{{ site.baseurl }}/categories/{{ category_name | slugify }}/" class="category-link">View Posts</a>
+        </div>
       </div>
     {% endfor %}
   </div>
@@ -107,23 +110,61 @@ layout: home
   }
 
   .category-card {
-    background: #252a34;
+    position: relative;
+    height: 200px;
     border-radius: 8px;
-    padding: 1.5rem;
+    overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid #333;
+    background-size: cover;
+    background-position: center;
+  }
+
+  .category-card[data-category="writeups"] {
+    background-image: url('/images/writeups.jpg');
+  }
+
+  .category-card[data-category="projects"] {
+    background-image: url('/images/projects.jpg');
+  }
+
+  .category-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(37, 42, 52, 0.7);
+    transition: background 0.3s ease;
+  }
+
+  .category-content {
+    position: relative;
+    z-index: 1;
+    padding: 1.5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 
   .category-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    border-color: #64ffda;
+  }
+
+  .category-card:hover .category-overlay {
+    background: rgba(37, 42, 52, 0.5);
   }
 
   .category-card h3 {
     margin-top: 0;
     color: #64ffda;
+  }
+
+  .category-card p {
+    color: white;
   }
 
   .category-link {
