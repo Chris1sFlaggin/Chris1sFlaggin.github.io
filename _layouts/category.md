@@ -3,7 +3,9 @@ layout: default
 ---
 
 <div class="category-page">
-  <h1>{{ page.title }}</h1>
+  <div class="category-header" style="background-image: url('{{ page.background_image | default: "/assets/images/default-category.jpg" }}')">
+    <h1>{{ page.title }}</h1>
+  </div>
   
   <div class="post-list">
     {% for post in site.categories[page.category] %}
@@ -15,28 +17,54 @@ layout: default
         {% endif %}
       </div>
     {% endfor %}
-  </div>
 </div>
 
 <style>
   .category-page {
-    padding: 2rem;
+    padding: 0;
   }
   
-  .post-list {
-    margin-top: 2rem;
+  .category-header {
+    padding: 4rem 2rem;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    color: white;
+    text-align: center;
   }
-  
-  .post-card {
-    margin-bottom: 2rem;
-    padding: 1.5rem;
-    background: #252a34;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .post-date {
-    color: #64ffda;
-    font-size: 0.9rem;
-  }
+
+.category-header::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: rgba(0, 0, 0, 0.5);
+}
+
+.category-header h1 {
+position: relative;
+z-index: 1;
+}
+padding: 2rem;
+}
+
+.post-list {
+margin-top: 2rem;
+}
+
+.post-card {
+margin-bottom: 2rem;
+padding: 1.5rem;
+background: #252a34;
+border-radius: 8px;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.post-date {
+color: #64ffda;
+font-size: 0.9rem;
+}
 </style>
