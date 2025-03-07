@@ -17,6 +17,7 @@ layout: default
         {% endif %}
       </div>
     {% endfor %}
+  </div>
 </div>
 
 <style>
@@ -34,37 +35,35 @@ layout: default
     text-align: center;
   }
 
-.category-header::before {
-content: '';
-position: absolute;
-top: 0;
-left: 0;
-right: 0;
-bottom: 0;
-background: rgba(0, 0, 0, 0.5);
-}
+  .category-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+  }
 
-.category-header h1 {
-position: relative;
-z-index: 1;
-}
-padding: 2rem;
-}
+  .category-header h1 {
+    position: relative;
+    z-index: 1;
+  }
 
-.post-list {
-margin-top: 2rem;
-}
+  .post-list {
+    margin-top: 2rem;
+  }
 
-.post-card {
-margin-bottom: 2rem;
-padding: 1.5rem;
-background: #252a34;
-border-radius: 8px;
-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+  .post-card {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #252a34;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
 
-.post-date {
-color: #64ffda;
-font-size: 0.9rem;
-}
+  .post-date {
+    color: #64ffda;
+    font-size: 0.9rem;
+  }
 </style>
