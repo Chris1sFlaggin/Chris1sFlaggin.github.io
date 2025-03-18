@@ -141,4 +141,64 @@ layout: home
   .category-link:hover {
     background: #4cd3a7;
   }
+  
+  .category-card p {
+    color: white;
+  }
+</style>
+
+<div class="recent-posts-section">
+  <h2>Recent Posts</h2>
+  <div class="posts-grid">
+    {% for post in site.posts limit:2 %}
+      <div class="post-card">
+        <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
+        <p>{{ post.excerpt | strip_html | truncatewords: 30 }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-content">
+    <p>© 2025 Chris1sFlaggin. Powered by Jekyll & Minimal Mistakes.</p>
+  </div>
+</footer>
+
+<style>
+  .recent-posts-section {
+    padding: 2rem;
+    background: #252a34;
+    text-align: center;
+  }
+  
+  .posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+  
+  .post-card {
+    background: #1a1e25;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: left;
+  }
+  
+  .post-card h3 a {
+    color: #64ffda;
+    text-decoration: none;
+  }
+  
+  .post-card p {
+    color: #ccc;
+  }
+  
+  .site-footer {
+    padding: 2rem;
+    background: #1a1e25;
+    text-align: center;
+    color: #ccc;
+  }
 </style>
