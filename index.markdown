@@ -35,12 +35,20 @@ layout: home
     align-items: center;
     background: #252a34;
     overflow: hidden;
+    padding: 2rem;
   }
 
   .logo-container {
     position: relative;
     width: 200px;
     height: 200px;
+  }
+
+  @media (min-width: 768px) {
+    .logo-container {
+      width: 250px;
+      height: 250px;
+    }
   }
 
   .animated-logo {
@@ -87,19 +95,31 @@ layout: home
       transform: scale(1.5);
       opacity: 0;
     }
-  }
-
-  @keyframes glow {
-    0% { box-shadow: 0 0 10px #64ffda; }
-    50% { box-shadow: 0 0 20px #64ffda, 0 0 30px #64ffda; }
-    100% { box-shadow: 0 0 10px #64ffda; }
-  }
-
   /* Category styles */
   .category-section {
     padding: 2rem;
     background: #1a1e25;
     text-align: center;
+  }
+
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  @media (min-width: 992px) {
+    .category-section {
+      padding: 4rem 2rem;
+    }
+    .category-grid {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+  }
   }
 
   .category-grid {
@@ -159,10 +179,26 @@ layout: home
   }
 
   .category-card h3 {
-    margin-top: 0;
-    color: #64ffda;
+  .category-link:hover {
+    background: #4cd3a7;
   }
 
+  /* Desktop specific adjustments */
+  @media (min-width: 1200px) {
+    .hero-section {
+      height: 80vh;
+    }
+    
+    body {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    
+    .category-card {
+      height: 250px;
+    }
+  }
+</style>
   .category-card p {
     color: white;
   }
