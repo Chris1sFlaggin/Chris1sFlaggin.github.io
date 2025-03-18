@@ -27,7 +27,26 @@ layout: home
   </div>
 </div>
 
+<div class="recent-posts-section">
+  <h2>Recent Posts</h2>
+  <div class="posts-grid">
+    {% for post in site.posts limit:2 %}
+      <div class="post-card">
+        <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
+        <p>{{ post.excerpt | strip_html | truncatewords: 30 }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-content">
+    <p>© 2025 Chris1sFlaggin. Powered by Jekyll & Minimal Mistakes.</p>
+  </div>
+</footer>
+
 <style>
+  /* Hero Section Styles */
   .hero-section {
     height: 100vh;
     display: flex;
@@ -95,6 +114,14 @@ layout: home
       transform: scale(1.5);
       opacity: 0;
     }
+  }
+  
+  @keyframes glow {
+    0% { box-shadow: 0 0 5px rgba(100, 255, 218, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(100, 255, 218, 0.8); }
+    100% { box-shadow: 0 0 5px rgba(100, 255, 218, 0.5); }
+  }
+
   /* Category styles */
   .category-section {
     padding: 2rem;
@@ -110,23 +137,6 @@ layout: home
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
-  }
-
-  @media (min-width: 992px) {
-    .category-section {
-      padding: 4rem 2rem;
-    }
-    .category-grid {
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    }
-  }
-  }
-
-  .category-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
   }
 
   .category-card {
@@ -179,26 +189,10 @@ layout: home
   }
 
   .category-card h3 {
-  .category-link:hover {
-    background: #4cd3a7;
+    color: #64ffda;
+    margin-bottom: 0.5rem;
   }
 
-  /* Desktop specific adjustments */
-  @media (min-width: 1200px) {
-    .hero-section {
-      height: 80vh;
-    }
-    
-    body {
-      max-width: 100%;
-      overflow-x: hidden;
-    }
-    
-    .category-card {
-      height: 250px;
-    }
-  }
-</style>
   .category-card p {
     color: white;
   }
@@ -218,31 +212,8 @@ layout: home
   .category-link:hover {
     background: #4cd3a7;
   }
-  
-  .category-card p {
-    color: white;
-  }
-</style>
 
-<div class="recent-posts-section">
-  <h2>Recent Posts</h2>
-  <div class="posts-grid">
-    {% for post in site.posts limit:2 %}
-      <div class="post-card">
-        <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
-        <p>{{ post.excerpt | strip_html | truncatewords: 30 }}</p>
-      </div>
-    {% endfor %}
-  </div>
-</div>
-
-<footer class="site-footer">
-  <div class="footer-content">
-    <p>© 2025 Chris1sFlaggin. Powered by Jekyll & Minimal Mistakes.</p>
-  </div>
-</footer>
-
-<style>
+  /* Recent Posts Section */
   .recent-posts-section {
     padding: 2rem;
     background: #252a34;
@@ -254,6 +225,9 @@ layout: home
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 2rem;
     margin-top: 2rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
   }
   
   .post-card {
@@ -272,10 +246,27 @@ layout: home
     color: #ccc;
   }
   
+  /* Footer */
   .site-footer {
     padding: 2rem;
     background: #1a1e25;
     text-align: center;
     color: #ccc;
+  }
+
+  /* Desktop specific adjustments */
+  @media (min-width: 1200px) {
+    .hero-section {
+      height: 80vh;
+    }
+    
+    body {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    
+    .category-card {
+      height: 250px;
+    }
   }
 </style>
