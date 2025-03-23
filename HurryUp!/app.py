@@ -27,7 +27,7 @@ def save_data(data, filename):
 
 # Funzione per geocodificare un indirizzo
 def geocode_address(address):
-    MAPBOX_TOKEN = 'pk.eyJ1IjoiY2hpZWZrZWVmIiwiYSI6ImNtOGs5b21paTB3NGcybHM1YnNlcGdyM3MifQ.p4ZV0xye8mRFfOEyc4-_KQ'
+    MAPBOX_TOKEN = 'YOUR_MAPBOX'
     url = f"https://api.mapbox.com/geocoding/v5/mapbox.places/{address}.json"
     params = {
         'access_token': MAPBOX_TOKEN,
