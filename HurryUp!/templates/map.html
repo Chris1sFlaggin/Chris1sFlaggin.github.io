@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="utf-8">
+    <title>Pizza Map - PizzaExpress</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
+    
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    
+</head>
+<body>
+    <!-- Include Header -->
+    {% include 'components/header.html' %}
+    
+    <div class="map-container">
+        <div id="map"></div>
+    </div>
+    
+    <!-- Include Footer -->
+    {% include 'components/footer.html' %}
+    
+    <!-- Scripts -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+    <script src="/static/js/map.js"></script>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiY2hpZWZrZWVmIiwiYSI6ImNtOGs5b21paTB3NGcybHM1YnNlcGdyM3MifQ.p4ZV0xye8mRFfOEyc4-_KQ';
+        const italyBounds = [
+            [6.6, 36.6],
+            [18.5, 47.1]
+        ];
+        
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/dark-v11',
+            center: [12.5, 41.9],
+            zoom: 6,
+            pitch: 45,
+            bearing: 0,
+            maxBounds: italyBounds
+        });
+
+        // Try to get user location and center the map
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(position => {
+                const userLng = position.coords.longitude;
+                const userLat = position.coords.latitude;
+
+                if (userLng >= italyBounds[0][0] && userLng <= italyBounds[1][0] &&
+                    userLat >= italyBounds[0][1] && userLat <= italyBounds[1][1]) {
+                    map.flyTo({
+                        center: [userLng, userLat],
+                        zoom: 13,
+                        essential: true
+                    });
+                }
+            }, error => {
+                console.log('Error getting location:', error.message);
+            });
+        }
+        
+        // Add 3D terrain and buildings when map loads
+        map.on('load', () => {
+            map.addSource('mapbox-dem', {
+                'type': 'raster-dem',
+                'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+                'tileSize': 512,
+                'maxzoom': 14
+            });
+            map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+            map.addLayer({
+                'id': '3d-buildings',
+                'source': 'composite',
+                'source-layer': 'building',
+                'filter': ['==', 'extrude', 'true'],
+                'type': 'fill-extrusion',
+                'minzoom': 15,
+                'paint': {
+                    'fill-extrusion-color': '#aaa',
+                    'fill-extrusion-height': [
+                        'interpolate', ['linear'], ['zoom'],
+                        15, 0,
+                        15.05, ['get', 'height']
+                    ],
+                    'fill-extrusion-base': ['get', 'min_height'],
+                    'fill-extrusion-opacity': 0.6
+                }
+            });
+            
+            // Load delivery points from API
+            loadDeliveryPoints();
+        });
+
+        // Function to load delivery points from API
+        function loadDeliveryPoints() {
+            fetch('/api/delivery_points')
+                .then(response => response.json())
+                .then(data => {
+                    // Filter to only show points with an order_id (actual orders)
+                    const orderPoints = data.filter(point => point.order_id);
+                    
+                    orderPoints.forEach(point => {
+                        addMarkerToMap(point);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading delivery points:', error);
+                });
+        }
+        
+        // Function to add a marker to the map
+        function addMarkerToMap(point) {
+            // Choose color based on status
+            let color = getMarkerColor(point.status);
+            
+            // Create popup content using the common function from map.js
+            const popupContent = createMarkerPopupHTML(point);
+            
+            // Add marker to map
+            const marker = new mapboxgl.Marker({ color: color })
+                .setLngLat([point.lng, point.lat]);
+            
+            // Only add popup to points with order_id
+            if (point.order_id) {
+                marker.setPopup(new mapboxgl.Popup().setHTML(popupContent));
+            }
+            
+            marker.addTo(map);
+        }
+    </script>
+</body>
+</html>

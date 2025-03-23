@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizza Express - Consegna a domicilio</title>
+    
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
+    
+    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Include Header -->
+    {% include 'components/header.html' %}
+    
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container" style="display: flex; align-items: center; justify-content: space-between;">
+                <div class="hero-content">
+                    <h2>La tua pizza preferita a domicilio</h2>
+                    <p>Ordina online e ricevi la tua pizza calda e fragrante direttamente a casa tua.</p>
+                    <div class="hero-buttons">
+                        <button id="orderNowBtn" class="btn btn-primary">Ordina Ora</button>
+                        <a href="/map" class="btn btn-secondary">Visualizza Mappa</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="/static/img/pizza-delivery.svg" alt="Pizza Delivery" />
+                </div>
+            </div>
+        </section>
+        
+        <!-- Dashboard Section -->
+        <section class="dashboard">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Dashboard</h2>
+                    <button class="btn btn-secondary" onclick="updateStats()">
+                        <i class="fas fa-sync-alt"></i> Aggiorna
+                    </button>
+                </div>
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Ordini in attesa</h3>
+                            <div class="stat-number" id="pendingOrdersCount">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-motorcycle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>In consegna</h3>
+                            <div class="stat-number" id="inDeliveryCount">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Consegnati oggi</h3>
+                            <div class="stat-number" id="deliveredTodayCount">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-stopwatch"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Tempo medio consegna</h3>
+                            <div class="stat-number" id="avgDeliveryTime">0 min</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Recent Orders Section -->
+        <section class="recent-orders">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Ordini Recenti</h2>
+                    <a href="/orders" class="btn-text">
+                        Vedi tutti <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="orders-container">
+                    <div id="recentOrdersList">
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i> Caricamento ordini...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Delivery Map Section -->
+        <section class="delivery-map">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Mappa Consegne</h2>
+                    <a href="/map" class="btn-text">
+                        Vista completa <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="map-preview">
+                    <div id="map-preview" style="width: 100%; height: 400px;"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Include Footer -->
+    {% include 'components/footer.html' %}
+    
+    <!-- Order Modal -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nuovo Ordine</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="orderForm">
+                    <div class="form-group">
+                        <label for="name">Nome e Cognome:</label>
+                        <input type="text" id="name" name="customer_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Indirizzo:</label>
+                        <input type="text" id="address" name="address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Telefono:</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="desiredDeliveryTime">Orario di Consegna Desiderato:</label>
+                        <input type="datetime-local" id="desiredDeliveryTime" name="desired_delivery_time">
+                        <small>Lascia vuoto per consegna il prima possibile</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Pizze:</label>
+                        <div id="pizzaItems">
+                            <div class="order-item">
+                                <select name="pizza[]" required>
+                                    <option value="">Seleziona una pizza</option>
+                                    <option value="margherita">Margherita</option>
+                                    <option value="diavola">Diavola</option>
+                                    <option value="quattro_formaggi">Quattro Formaggi</option>
+                                </select>
+                                <input type="number" name="quantity[]" min="1" value="1">
+                                <button type="button" class="btn-remove-item"><i class="fas fa-minus-circle"></i></button>
+                            </div>
+                        </div>
+                        <button type="button" id="addPizzaBtn" class="btn-add-item">
+                            <i class="fas fa-plus-circle"></i> Aggiungi Pizza
+                        </button>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Conferma Ordine</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+    <script src="/static/js/map.js"></script>
+    <script>
+        // Update stats from API
+        function updateStats() {
+            fetch('/api/stats')
+                .then(response => response.json())
+                .then(stats => {
+                    document.getElementById('pendingOrdersCount').textContent = stats.pending;
+                    document.getElementById('inDeliveryCount').textContent = stats.in_delivery;
+                    document.getElementById('deliveredTodayCount').textContent = stats.delivered_today;
+                    document.getElementById('avgDeliveryTime').textContent = stats.avg_delivery_time + ' min';
+                })
+                .catch(error => console.error('Error fetching stats:', error));
+        }
+        
+        // Load recent orders
+        function loadRecentOrders() {
+            fetch('/api/orders?limit=5')
+                .then(response => response.json())
+                .then(orders => {
+                    const container = document.getElementById('recentOrdersList');
+                    container.innerHTML = '';
+                    
+                    if (orders.length === 0) {
+                        container.innerHTML = '<div class="empty-state">Nessun ordine recente.</div>';
+                        return;
+                    }
+                    
+                    orders.forEach(order => {
+                        const orderElement = document.createElement('div');
+                        orderElement.className = `order-item status-${order.status}`;
+                        
+                        const createdAt = new Date(order.created_at).toLocaleString('it-IT');
+                        let statusText;
+                        
+                        switch (order.status) {
+                            case 'pending': statusText = 'In attesa'; break;
+                            case 'in_delivery': statusText = 'In consegna'; break;
+                            case 'delivered': statusText = 'Consegnato'; break;
+                            case 'cancelled': statusText = 'Annullato'; break;
+                            default: statusText = order.status;
+                        }
+                        
+                        orderElement.innerHTML = `
+                            <div class="order-info">
+                                <span class="order-id">#${order.id.substring(0, 8)}</span>
+                                <span class="order-customer">${order.customer_name}</span>
+                                <span class="order-address">${order.address}</span>
+                            </div>
+                            <div class="order-status">
+                                <span class="status-badge ${order.status}">${statusText}</span>
+                                <span class="order-date">${createdAt}</span>
+                            </div>
+                        `;
+                        
+                        container.appendChild(orderElement);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading recent orders:', error);
+                    document.getElementById('recentOrdersList').innerHTML = 
+                        '<div class="error-state">Errore nel caricamento degli ordini recenti.</div>';
+                });
+        }
+        
+        // Initialize map preview
+        function initMapPreview() {
+            mapboxgl.accessToken = 'pk.eyJ1IjoiY2hpZWZrZWVmIiwiYSI6ImNtOGs5b21paTB3NGcybHM1YnNlcGdyM3MifQ.p4ZV0xye8mRFfOEyc4-_KQ';
+            const mapPreview = new mapboxgl.Map({
+                container: 'map-preview',
+                style: 'mapbox://styles/mapbox/dark-v11',
+                center: [12.5, 41.9],
+                zoom: 5,
+                interactive: false
+            });
+            
+            // Carica i punti di consegna per la mappa di anteprima
+            fetch('/api/delivery_points')
+                .then(response => response.json())
+                .then(points => {
+                    // Filter to only show points with an order_id (actual orders)
+                    const orderPoints = points.filter(point => point.order_id);
+                    
+                    orderPoints.forEach(point => {
+                        const marker = new mapboxgl.Marker({ color: getMarkerColor(point.status) })
+                            .setLngLat([point.lng, point.lat]);
+                        
+                        // Create popup with order time
+                        if (point.created_at) {
+                            const popupContent = createMarkerPopupHTML(point);
+                            marker.setPopup(new mapboxgl.Popup().setHTML(popupContent));
+                        }
+                        
+                        marker.addTo(mapPreview);
+                    });
+                })
+                .catch(error => {
+                    console.error('Errore nel caricamento dei punti di consegna:', error);
+                });
+        }
+        
+        // Handle order form submission
+        function handleOrderSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            // Extract pizza items
+            const pizzas = formData.getAll('pizza[]');
+            const quantities = formData.getAll('quantity[]');
+            const items = [];
+            
+            for (let i = 0; i < pizzas.length; i++) {
+                if (pizzas[i]) {
+                    items.push({
+                        item_id: pizzas[i],
+                        quantity: parseInt(quantities[i])
+                    });
+                }
+            }
+            
+            const orderData = {
+                customer_name: formData.get('customer_name'),
+                address: formData.get('address'),
+                phone: formData.get('phone'),
+                desired_delivery_time: formData.get('desired_delivery_time') || null,
+                items: items
+            };
+            
+            fetch('/api/orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Ordine effettuato con successo!');
+                document.getElementById('orderModal').style.display = 'none';
+                form.reset();
+                updateStats();
+                loadRecentOrders();
+                // Reload the map preview to show the new marker
+                initMapPreview();
+            })
+            .catch(error => {
+                console.error('Error submitting order:', error);
+                alert('Si è verificato un errore durante l\'invio dell\'ordine. Riprova più tardi.');
+            });
+        }
+        
+        // DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize data
+            updateStats();
+            loadRecentOrders();
+            initMapPreview();
+            
+            // Setup modal
+            const orderModal = document.getElementById('orderModal');
+            const orderNowBtn = document.getElementById('orderNowBtn');
+            const newOrderBtn = document.getElementById('new-order-btn');
+            const closeButtons = document.querySelectorAll('.close-modal');
+            
+            // Open modal
+            orderNowBtn.addEventListener('click', () => {
+                orderModal.style.display = 'block';
+            });
+            
+            if (newOrderBtn) {
+                newOrderBtn.addEventListener('click', () => {
+                    orderModal.style.display = 'block';
+                });
+            }
+            
+            // Close modal
+            closeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    orderModal.style.display = 'none';
+                });
+            });
+            
+            // Close when clicking outside
+            window.addEventListener('click', (event) => {
+                if (event.target === orderModal) {
+                    orderModal.style.display = 'none';
+                }
+            });
+            
+            // Add pizza button
+            document.getElementById('addPizzaBtn').addEventListener('click', () => {
+                const container = document.getElementById('pizzaItems');
+                const newRow = document.createElement('div');
+                newRow.className = 'order-item';
+                newRow.innerHTML = `
+                    <select name="pizza[]" required>
+                        <option value="">Seleziona una pizza</option>
+                        <option value="margherita">Margherita</option>
+                        <option value="diavola">Diavola</option>
+                        <option value="quattro_formaggi">Quattro Formaggi</option>
+                    </select>
+                    <input type="number" name="quantity[]" min="1" value="1">
+                    <button type="button" class="btn-remove-item"><i class="fas fa-minus-circle"></i></button>
+                `;
+                
+                container.appendChild(newRow);
+                
+                // Add remove event
+                newRow.querySelector('.btn-remove-item').addEventListener('click', function() {
+                    container.removeChild(newRow);
+                });
+            });
+            
+            // Handle form submission
+            document.getElementById('orderForm').addEventListener('submit', handleOrderSubmit);
+        });
+    </script>
+</body>
+</html>
