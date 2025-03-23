@@ -12,7 +12,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
-    
 </head>
 <body>
     <!-- Include Header -->
@@ -58,6 +57,31 @@
                         zoom: 13,
                         essential: true
                     });
+                    
+                    // Add pizzeria marker at user's location
+                    const el = document.createElement('div');
+                    el.className = 'pizzeria-marker';
+                    el.style.backgroundImage = 'url(/static/img/pizza.png)';
+                    el.style.width = '40px';
+                    el.style.height = '40px';
+                    el.style.backgroundSize = '100%';
+                    
+                    // Create a popup for the pizzeria
+                    const popup = new mapboxgl.Popup({ offset: 25 })
+                        .setHTML(`
+                            <div class="marker-popup">
+                                <h4>PizzaExpress</h4>
+                                <p>La nostra pizzeria</p>
+                                <p>Orari: 11:00 - 23:00</p>
+                                <p>Tel: +39 123 456 7890</p>
+                            </div>
+                        `);
+                    
+                    // Add marker to the map
+                    new mapboxgl.Marker(el)
+                        .setLngLat([userLng, userLat])
+                        .setPopup(popup)
+                        .addTo(map);
                 }
             }, error => {
                 console.log('Error getting location:', error.message);
@@ -104,6 +128,7 @@
                     // Filter to only show points with an order_id (actual orders)
                     const orderPoints = data.filter(point => point.order_id);
                     
+                    // Add markers for each delivery point
                     orderPoints.forEach(point => {
                         addMarkerToMap(point);
                     });
@@ -111,6 +136,20 @@
                 .catch(error => {
                     console.error('Error loading delivery points:', error);
                 });
+        }
+        
+        // Function to get marker color based on status
+        function getMarkerColor(status) {
+            switch(status) {
+                case 'delivered':
+                    return '#28a745'; // Green
+                case 'in_progress':
+                    return '#ffc107'; // Yellow
+                case 'pending':
+                    return '#dc3545'; // Red
+                default:
+                    return '#007bff'; // Blue
+            }
         }
         
         // Function to add a marker to the map

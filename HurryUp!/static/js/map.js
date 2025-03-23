@@ -9,7 +9,7 @@ function initMapPreview() {
     const mapPreviewElement = document.getElementById('map-preview');
     if (!mapPreviewElement) return;
     
-    mapboxgl.accessToken = 'YOUR_MAPBOX';
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY2hpZWZrZWVmIiwiYSI6ImNtOGs5b21paTB3NGcybHM1YnNlcGdyM3MifQ.p4ZV0xye8mRFfOEyc4-_KQ';
     const mapPreview = new mapboxgl.Map({
         container: 'map-preview',
         style: 'mapbox://styles/mapbox/dark-v11',
