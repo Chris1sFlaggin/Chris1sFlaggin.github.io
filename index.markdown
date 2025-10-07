@@ -55,24 +55,6 @@ layout: home
   </div>
 </div>
 
-<div class="recent-posts-section">
-  <h2>Recent Posts</h2>
-  <div class="posts-grid">
-    {% for post in site.posts limit:2 %}
-      <div class="post-card">
-        <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
-        <p>{{ post.excerpt | strip_html | truncatewords: 30 }}</p>
-      </div>
-    {% endfor %}
-  </div>
-</div>
-
-<footer class="site-footer">
-  <div class="footer-content">
-    <p>© 2025 Chris1sFlaggin. Powered by Jekyll & Minimal Mistakes.</p>
-  </div>
-</footer>
-
 <style>
   /* Layout generale */
   .social-section { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
