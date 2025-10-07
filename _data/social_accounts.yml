@@ -3,11 +3,6 @@
   logo: "https://cdn.simpleicons.org/github/181717"
   alt: "Profilo GitHub"
 
-- name: "LinkedIn"
-  url: "https://www.linkedin.com/in/loris-marongiu-485b302ab"
-  logo: "https://cdn.simpleicons.org/linkedin/0A66C2"
-  alt: "Profilo LinkedIn"
-
 - name: "Pwn.College"
   url: "https://pwn.college/hacker/135565"
   logo: "/Images/pwncollege.svg"
