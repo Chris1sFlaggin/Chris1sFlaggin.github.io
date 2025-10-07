@@ -11,7 +11,7 @@ layout: home
 </div>
 
 <div class="social-section">
-  <h2>Seguimi anche su</h2>
+  <h2>I miei profili</h2>
   <div class="social-grid">
     {% for account in site.data.social_accounts %}
       <a
