@@ -10,6 +10,34 @@ layout: home
   </div>
 </div>
 
+<div class="social-section">
+  <h2>Seguimi anche su</h2>
+  <div class="social-grid">
+    {% for account in site.data.social_accounts %}
+      <a
+        class="social-card"
+        href="{{ account.url }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Apri {{ account.name }} (si apre in una nuova scheda)">
+
+        <div class="logo-wrap">
+          {% if account.logo %}
+            <img src="{{ account.logo }}" alt="{{ account.alt | default: account.name }}" loading="lazy">
+          {% else %}
+            <!-- Fallback: simple SVG badge con iniziali -->
+            <div class="fallback">{{ account.name | slice: 0,1 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="social-meta">
+          <span class="social-name">{{ account.name }}</span>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
 <div class="category-section">
   <h2>Categories</h2>
   <div class="category-grid">
@@ -46,6 +74,48 @@ layout: home
 </footer>
 
 <style>
+  /* Layout generale */
+  .social-section { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+  .social-section h2 { font-size: 1.5rem; margin-bottom: 1rem; }
+
+  /* Grid responsivo */
+  .social-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+
+  .social-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4));
+    border-radius: 12px;
+    padding: 0.9rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    color: inherit;
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+
+  .social-card:focus,
+  .social-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
+
+  .logo-wrap { width: 64px; height: 64px; display: grid; place-items: center; margin-bottom: 0.6rem; }
+  .logo-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+
+  /* Fallback badge */
+  .fallback {
+    width: 64px; height: 64px; border-radius: 12px; display: grid; place-items: center; font-weight: 700; font-size: 1.2rem;
+    background: linear-gradient(135deg, #f3f4f6, #e5e7eb); color: #111827;
+  }
+
+  .social-meta { text-align: center; }
+  .social-name { display: block; font-size: 0.95rem; font-weight: 600; }
+
+  /* Small screens */
+  @media (max-width: 480px) {
+    .logo-wrap { width: 52px; height: 52px; }
+    .social-name { font-size: 0.9rem; }
+  }
+
   /* Hero Section Styles */
   .hero-section {
     height: 100vh;
