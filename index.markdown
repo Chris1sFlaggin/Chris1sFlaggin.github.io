@@ -3,13 +3,13 @@ layout: home
 ---
 
 <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-9B7PERQ37Y"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BL2501MC35"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', 'G-9B7PERQ37Y');
+  gtag('config', 'G-BL2501MC35');
 </script>
 
 <div class="hero-section">
