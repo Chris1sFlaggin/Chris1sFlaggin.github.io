@@ -10,6 +10,13 @@ layout: default
 <div class="posts-list">
   {% for post in site.categories[page.category] %}
   <div class="post-item">
+    {% if post.image %}
+    <div class="post-image">
+      <a href="{{ post.url | relative_url }}">
+        <img src="{{ post.image | relative_url }}" alt="{{ post.title }}">
+      </a>
+    </div>
+    {% endif %}
     <h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
     <p class="post-date">{{ post.date | date: "%B %d, %Y" }}</p>
     <div class="post-excerpt">
@@ -33,11 +40,28 @@ layout: default
     color: #64ffda;
     margin-bottom: 0.5rem;
   }
+  .post-item {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #333;
+  }
   
-  .posts-list {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 0 1rem;
+  .post-image {
+    margin-bottom: 1rem;
+  }
+  
+  .post-image img {
+    width: 100%;
+    max-width: 300px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: opacity 0.3s ease;
+  }
+  
+  .post-image img:hover {
+    opacity: 0.8;
+  }
   }
   
   .post-item {
