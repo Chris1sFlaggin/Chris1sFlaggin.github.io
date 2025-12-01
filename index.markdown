@@ -343,100 +343,128 @@ layout: home
       height: 250px;
     }
   }
-  /* Star Alert Styles */
+
   .star-alert {
     position: fixed;
-    top: 20px;
-    right: 20px;
-    background: linear-gradient(135deg, #64ffda, #4cd3a7);
-    color: #252a34;
-    padding: 15px 20px;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(100, 255, 218, 0.3);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
     z-index: 10000;
-    max-width: 350px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    animation: slideIn 0.5s ease-out;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.5s ease-out;
     transition: all 0.3s ease;
   }
   
   .star-alert.hidden {
-    animation: slideOut 0.3s ease-in forwards;
+    animation: fadeOut 0.3s ease-in forwards;
   }
   
   .star-alert-content {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+    background: linear-gradient(135deg, #64ffda, #4cd3a7);
+    color: #252a34;
+    padding: 2rem 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(100, 255, 218, 0.4);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+    transform: scale(0.8);
+    animation: popIn 0.5s ease-out 0.2s forwards;
   }
   
   .star-icon {
-    font-size: 1.2em;
+    font-size: 3em;
+    display: block;
+    margin-bottom: 1rem;
     animation: sparkle 2s infinite;
   }
   
   .star-text {
-    flex: 1;
     font-weight: 600;
-    font-size: 0.9em;
-    min-width: 150px;
+    font-size: 1.1em;
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
   }
   
   .star-button {
     background: #252a34;
     color: #64ffda;
-    padding: 8px 16px;
-    border-radius: 8px;
+    padding: 12px 24px;
+    border-radius: 12px;
     text-decoration: none;
     font-weight: bold;
-    font-size: 0.85em;
-    transition: all 0.2s ease;
-    border: 2px solid transparent;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+    display: inline-block;
+    margin-bottom: 1rem;
   }
   
   .star-button:hover {
     background: #1a1e25;
     border-color: #252a34;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(37, 42, 52, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(37, 42, 52, 0.4);
   }
   
   .close-button {
-    background: none;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: rgba(37, 42, 52, 0.1);
     border: none;
-    font-size: 1.5em;
+    font-size: 1.8em;
     cursor: pointer;
     color: #252a34;
     opacity: 0.7;
-    transition: opacity 0.2s ease;
-    padding: 0;
-    margin-left: 5px;
+    transition: all 0.3s ease;
+    padding: 5px;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .close-button:hover {
     opacity: 1;
+    background: rgba(37, 42, 52, 0.2);
+    transform: rotate(90deg);
   }
   
-  @keyframes slideIn {
+  @keyframes fadeIn {
     from {
-      transform: translateX(100%);
       opacity: 0;
     }
     to {
-      transform: translateX(0);
       opacity: 1;
     }
   }
   
-  @keyframes slideOut {
+  @keyframes fadeOut {
     from {
-      transform: translateX(0);
       opacity: 1;
     }
     to {
-      transform: translateX(100%);
       opacity: 0;
+    }
+  }
+  
+  @keyframes popIn {
+    from {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
     }
   }
   
@@ -444,31 +472,35 @@ layout: home
     0%, 100% {
       transform: scale(1) rotate(0deg);
     }
+    25% {
+      transform: scale(1.1) rotate(-5deg);
+    }
     50% {
-      transform: scale(1.1) rotate(10deg);
+      transform: scale(1.2) rotate(0deg);
+    }
+    75% {
+      transform: scale(1.1) rotate(5deg);
     }
   }
   
   /* Mobile responsive */
   @media (max-width: 768px) {
-    .star-alert {
-      position: fixed;
-      top: auto;
-      bottom: 20px;
-      right: 20px;
-      left: 20px;
-      max-width: none;
+    .star-alert-content {
+      padding: 1.5rem 2rem;
+      margin: 1rem;
     }
     
-    .star-alert-content {
-      justify-content: space-between;
+    .star-icon {
+      font-size: 2.5em;
     }
     
     .star-text {
-      min-width: auto;
-      flex: none;
-      width: 100%;
-      margin-bottom: 10px;
+      font-size: 1em;
+    }
+    
+    .star-button {
+      padding: 10px 20px;
+      font-size: 0.9em;
     }
   }
 </style>
