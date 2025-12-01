@@ -16,7 +16,10 @@ layout: home
 <div id="star-alert" class="star-alert">
   <div class="star-alert-content">
     <span class="star-icon">⭐</span>
-    <span class="star-text">Ti piace il sito? Lascia una stella su GitHub!</span>
+    <span class="star-text">Ti piace il sito?</span>
+    <br>
+    <span class="star-text">Lascia una stella su GitHub!</span>
+    <br>
     <a href="https://github.com/Chris1sFlaggin/Chris1sFlaggin.github.io" target="_blank" class="star-button">
       ⭐ Stella
     </a>
