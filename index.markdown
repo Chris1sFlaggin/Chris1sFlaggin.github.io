@@ -558,4 +558,3 @@ layout: home
   }
 })();
 </script>
-</style>
