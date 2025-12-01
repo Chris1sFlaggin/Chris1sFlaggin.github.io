@@ -12,6 +12,18 @@ layout: home
   gtag('config', 'G-BL2501MC35');
 </script>
 
+<!-- Star Repository Alert -->
+<div id="star-alert" class="star-alert">
+  <div class="star-alert-content">
+    <span class="star-icon">⭐</span>
+    <span class="star-text">Ti piace il sito? Lascia una stella su GitHub!</span>
+    <a href="https://github.com/Chris1sFlaggin/Chris1sFlaggin.github.io" target="_blank" class="star-button">
+      ⭐ Stella
+    </a>
+    <button id="close-star-alert" class="close-button">&times;</button>
+  </div>
+</div>
+
 <div class="hero-section">
   <div class="logo-container">
     <div class="rays"></div>
@@ -331,4 +343,186 @@ layout: home
       height: 250px;
     }
   }
+  /* Star Alert Styles */
+  .star-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #64ffda, #4cd3a7);
+    color: #252a34;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(100, 255, 218, 0.3);
+    z-index: 10000;
+    max-width: 350px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    animation: slideIn 0.5s ease-out;
+    transition: all 0.3s ease;
+  }
+  
+  .star-alert.hidden {
+    animation: slideOut 0.3s ease-in forwards;
+  }
+  
+  .star-alert-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .star-icon {
+    font-size: 1.2em;
+    animation: sparkle 2s infinite;
+  }
+  
+  .star-text {
+    flex: 1;
+    font-weight: 600;
+    font-size: 0.9em;
+    min-width: 150px;
+  }
+  
+  .star-button {
+    background: #252a34;
+    color: #64ffda;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.85em;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+  }
+  
+  .star-button:hover {
+    background: #1a1e25;
+    border-color: #252a34;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 42, 52, 0.3);
+  }
+  
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #252a34;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    padding: 0;
+    margin-left: 5px;
+  }
+  
+  .close-button:hover {
+    opacity: 1;
+  }
+  
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideOut {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+  
+  @keyframes sparkle {
+    0%, 100% {
+      transform: scale(1) rotate(0deg);
+    }
+    50% {
+      transform: scale(1.1) rotate(10deg);
+    }
+  }
+  
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    .star-alert {
+      position: fixed;
+      top: auto;
+      bottom: 20px;
+      right: 20px;
+      left: 20px;
+      max-width: none;
+    }
+    
+    .star-alert-content {
+      justify-content: space-between;
+    }
+    
+    .star-text {
+      min-width: auto;
+      flex: none;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+  }
+
+  // ...existing code...
+</style>
+
+<script>
+(function() {
+  const STORAGE_KEY = 'star-alert-dismissed';
+  const SHOW_DELAY = 5000; // 5 seconds after page load
+  
+  function showStarAlert() {
+    // Check if user has already dismissed the alert
+    if (localStorage.getItem(STORAGE_KEY) === 'true') {
+      return;
+    }
+    
+    const alert = document.getElementById('star-alert');
+    const closeButton = document.getElementById('close-star-alert');
+    
+    if (!alert || !closeButton) return;
+    
+    // Show alert after delay
+    setTimeout(() => {
+      alert.style.display = 'block';
+    }, SHOW_DELAY);
+    
+    // Handle close button
+    closeButton.addEventListener('click', function() {
+      alert.classList.add('hidden');
+      localStorage.setItem(STORAGE_KEY, 'true');
+      
+      setTimeout(() => {
+        alert.style.display = 'none';
+      }, 300);
+    });
+    
+    // Auto-hide after 10 seconds if not interacted with
+    setTimeout(() => {
+      if (alert.style.display !== 'none' && !alert.classList.contains('hidden')) {
+        alert.classList.add('hidden');
+        setTimeout(() => {
+          alert.style.display = 'none';
+        }, 300);
+      }
+    }, 15000);
+  }
+  
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', showStarAlert);
+  } else {
+    showStarAlert();
+  }
+})();
+</script>
 </style>
