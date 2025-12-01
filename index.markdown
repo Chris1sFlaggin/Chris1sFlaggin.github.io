@@ -471,8 +471,6 @@ layout: home
       margin-bottom: 10px;
     }
   }
-
-  // ...existing code...
 </style>
 
 <script>
@@ -482,9 +480,9 @@ layout: home
   
   function showStarAlert() {
     // Check if user has already dismissed the alert
-    if (localStorage.getItem(STORAGE_KEY) === 'true') {
-      return;
-    }
+    // if (localStorage.getItem(STORAGE_KEY) === 'true') {
+    //   return;
+    // }
     
     const alert = document.getElementById('star-alert');
     const closeButton = document.getElementById('close-star-alert');
