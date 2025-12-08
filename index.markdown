@@ -83,10 +83,10 @@ layout: home
 <style>
   /* Layout generale */
   .social-section { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
-  .social-section h2 { font-size: 1.5rem; margin-bottom: 1rem; }
+  .social-section h2 { font-size: clamp(1.25rem, 4vw, 1.5rem); margin-bottom: 1rem; }
 
   /* Grid responsivo */
-  .social-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .social-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr)); }
 
   .social-card {
     display: flex;
@@ -95,15 +95,21 @@ layout: home
     text-decoration: none;
     background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4));
     border-radius: 12px;
-    padding: 0.9rem;
+    padding: clamp(0.7rem, 2vw, 0.9rem);
     box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     color: inherit;
     border: 1px solid rgba(0,0,0,0.04);
+    min-height: 44px;
   }
 
   .social-card:focus,
-  .social-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
+  .social-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
+
+  @media (hover: none) and (pointer: coarse) {
+    .social-card:hover { transform: none; }
+    .social-card:active { transform: scale(0.98); }
+  }
 
   .logo-wrap { width: 64px; height: 64px; display: grid; place-items: center; margin-bottom: 0.6rem; }
   .logo-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
@@ -115,35 +121,37 @@ layout: home
   }
 
   .social-meta { text-align: center; }
-  .social-name { display: block; font-size: 0.95rem; font-weight: 600; }
+  .social-name { display: block; font-size: clamp(0.85rem, 2vw, 0.95rem); font-weight: 600; }
 
   /* Small screens */
   @media (max-width: 480px) {
+    .social-grid { gap: 0.75rem; }
     .logo-wrap { width: 52px; height: 52px; }
-    .social-name { font-size: 0.9rem; }
+    .social-card { padding: 0.7rem; }
   }
 
   /* Hero Section Styles */
   .hero-section {
-    height: 100vh;
+    min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     justify-content: center;
     align-items: center;
     background: #252a34;
     overflow: hidden;
-    padding: 2rem;
+    padding: clamp(1rem, 4vw, 2rem);
   }
 
   .logo-container {
     position: relative;
-    width: 200px;
-    height: 200px;
+    width: clamp(180px, 40vw, 200px);
+    height: clamp(180px, 40vw, 200px);
   }
 
   @media (min-width: 768px) {
     .logo-container {
-      width: 250px;
-      height: 250px;
+      width: clamp(220px, 30vw, 250px);
+      height: clamp(220px, 30vw, 250px);
     }
   }
 
@@ -201,15 +209,20 @@ layout: home
 
   /* Category styles */
   .category-section {
-    padding: 2rem;
+    padding: clamp(1.5rem, 4vw, 2rem);
     background: #1a1e25;
     text-align: center;
   }
 
+  .category-section h2 {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    margin-bottom: 1rem;
+  }
+
   .category-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr));
+    gap: clamp(1rem, 3vw, 2rem);
     margin-top: 2rem;
     max-width: 1200px;
     margin-left: auto;
@@ -218,13 +231,19 @@ layout: home
 
   .category-card {
     position: relative;
-    height: 200px;
+    height: clamp(180px, 30vw, 200px);
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     background-size: cover;
     background-position: center;
+  }
+
+  @media (min-width: 768px) {
+    .category-card {
+      height: 200px;
+    }
   }
 
   .category-card[data-category="writeups"] {
@@ -248,7 +267,7 @@ layout: home
   .category-content {
     position: relative;
     z-index: 1;
-    padding: 1.5rem;
+    padding: clamp(1rem, 3vw, 1.5rem);
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -257,8 +276,17 @@ layout: home
   }
 
   .category-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-5px) scale(1.02);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    .category-card:hover {
+      transform: none;
+    }
+    .category-card:active {
+      transform: scale(0.98);
+    }
   }
 
   .category-card:hover .category-overlay {
@@ -268,39 +296,56 @@ layout: home
   .category-card h3 {
     color: #64ffda;
     margin-bottom: 0.5rem;
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
   }
 
   .category-card p {
     color: white;
+    font-size: clamp(0.9rem, 2vw, 1rem);
   }
 
   .category-link {
     display: inline-block;
     margin-top: 1rem;
-    padding: 0.5rem 1rem;
+    padding: clamp(0.4rem, 2vw, 0.5rem) clamp(0.8rem, 3vw, 1rem);
     background: #64ffda;
     color: #252a34;
     border-radius: 4px;
     text-decoration: none;
     font-weight: bold;
-    transition: background 0.3s ease;
+    font-size: clamp(0.85rem, 2vw, 1rem);
+    transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s ease;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .category-link:hover {
     background: #4cd3a7;
+    transform: translateY(-2px);
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    .category-link:hover {
+      transform: none;
+    }
+    .category-link:active {
+      transform: scale(0.95);
+    }
   }
 
   /* Recent Posts Section */
   .recent-posts-section {
-    padding: 2rem;
+    padding: clamp(1.5rem, 4vw, 2rem);
     background: #252a34;
     text-align: center;
   }
   
   .posts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+    gap: clamp(1.5rem, 3vw, 2rem);
     margin-top: 2rem;
     max-width: 1200px;
     margin-left: auto;
@@ -310,8 +355,19 @@ layout: home
   .post-card {
     background: #1a1e25;
     border-radius: 8px;
-    padding: 1.5rem;
+    padding: clamp(1rem, 3vw, 1.5rem);
     text-align: left;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .post-card:hover {
+    transform: translateY(-3px);
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    .post-card:hover {
+      transform: none;
+    }
   }
   
   .post-card h3 a {
@@ -325,7 +381,7 @@ layout: home
   
   /* Footer */
   .site-footer {
-    padding: 2rem;
+    padding: clamp(1.5rem, 4vw, 2rem);
     background: #1a1e25;
     text-align: center;
     color: #ccc;
@@ -334,7 +390,8 @@ layout: home
   /* Desktop specific adjustments */
   @media (min-width: 1200px) {
     .hero-section {
-      height: 80vh;
+      min-height: 80vh;
+      min-height: 80dvh;
     }
     
     body {
@@ -344,6 +401,17 @@ layout: home
     
     .category-card {
       height: 250px;
+    }
+  }
+
+  /* Tablet adjustments */
+  @media (min-width: 768px) and (max-width: 1199px) {
+    .social-grid {
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+    
+    .category-grid {
+      gap: 1.5rem;
     }
   }
 
@@ -370,10 +438,10 @@ layout: home
   .star-alert-content {
     background: linear-gradient(135deg, #64ffda, #4cd3a7);
     color: #252a34;
-    padding: 2rem 2.5rem;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
     border-radius: 20px;
     box-shadow: 0 20px 60px rgba(100, 255, 218, 0.4);
-    max-width: 400px;
+    max-width: min(400px, 90vw);
     width: 90%;
     text-align: center;
     position: relative;
@@ -382,7 +450,7 @@ layout: home
   }
   
   .star-icon {
-    font-size: 3em;
+    font-size: clamp(2.5em, 8vw, 3em);
     display: block;
     margin-bottom: 1rem;
     animation: sparkle 2s infinite;
@@ -390,7 +458,7 @@ layout: home
   
   .star-text {
     font-weight: 600;
-    font-size: 1.1em;
+    font-size: clamp(1em, 3vw, 1.1em);
     margin-bottom: 1.5rem;
     line-height: 1.4;
   }
@@ -398,15 +466,19 @@ layout: home
   .star-button {
     background: #252a34;
     color: #64ffda;
-    padding: 12px 24px;
+    padding: clamp(10px, 3vw, 12px) clamp(20px, 5vw, 24px);
     border-radius: 12px;
     text-decoration: none;
     font-weight: bold;
-    font-size: 1em;
-    transition: all 0.3s ease;
+    font-size: clamp(0.9em, 2.5vw, 1em);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 3px solid transparent;
     display: inline-block;
     margin-bottom: 1rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .star-button:hover {
@@ -415,25 +487,36 @@ layout: home
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(37, 42, 52, 0.4);
   }
+
+  @media (hover: none) and (pointer: coarse) {
+    .star-button:hover {
+      transform: none;
+    }
+    .star-button:active {
+      transform: scale(0.95);
+    }
+  }
   
   .close-button {
     position: absolute;
-    top: 15px;
-    right: 20px;
+    top: clamp(10px, 3vw, 15px);
+    right: clamp(15px, 4vw, 20px);
     background: rgba(37, 42, 52, 0.1);
     border: none;
-    font-size: 1.8em;
+    font-size: clamp(1.5em, 4vw, 1.8em);
     cursor: pointer;
     color: #252a34;
     opacity: 0.7;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 5px;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: clamp(36px, 10vw, 40px);
+    height: clamp(36px, 10vw, 40px);
     display: flex;
     align-items: center;
     justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
   }
   
   .close-button:hover {
@@ -489,21 +572,8 @@ layout: home
   /* Mobile responsive */
   @media (max-width: 768px) {
     .star-alert-content {
-      padding: 1.5rem 2rem;
+      padding: clamp(1.2rem, 4vw, 1.5rem);
       margin: 1rem;
-    }
-    
-    .star-icon {
-      font-size: 2.5em;
-    }
-    
-    .star-text {
-      font-size: 1em;
-    }
-    
-    .star-button {
-      padding: 10px 20px;
-      font-size: 0.9em;
     }
   }
 </style>
