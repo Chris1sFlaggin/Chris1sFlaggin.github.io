@@ -27,52 +27,50 @@ layout: home
   </div>
 </div>
 
-<div class="hero-section">
-  <div class="hero-left">
+<div class="main-container">
+  <div class="sidebar-left">
     <div class="logo-container">
       <div class="rays"></div>
       <img src="/images/chris.jpg" alt="Security Specialist" class="animated-logo">
       <div class="pulse-ring"></div>
     </div>
-  </div>
-  <div class="hero-right">
     <div class="intro-content">
       <h1 class="intro-title">{{ site.title }}</h1>
       <p class="intro-description">{{ site.description }}</p>
       <div class="intro-divider"></div>
     </div>
   </div>
-</div>
 
-<div class="social-section">
-  <h2>I miei profili</h2>
-  <div class="social-grid">
-    {% for account in site.data.social_accounts %}
-      <a
-        class="social-card"
-        href="{{ account.url }}"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Apri {{ account.name }} (si apre in una nuova scheda)">
+  <div class="main-content">
+    <div class="social-section">
+      <h2>I miei profili</h2>
+      <div class="social-grid">
+        {% for account in site.data.social_accounts %}
+          <a
+            class="social-card"
+            href="{{ account.url }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Apri {{ account.name }} (si apre in una nuova scheda)">
 
-        <div class="logo-wrap">
-          {% if account.logo %}
-            <img src="{{ account.logo }}" alt="{{ account.alt | default: account.name }}" loading="lazy">
-          {% else %}
-            <!-- Fallback: simple SVG badge con iniziali -->
-            <div class="fallback">{{ account.name | slice: 0,1 }}</div>
-          {% endif %}
-        </div>
+            <div class="logo-wrap">
+              {% if account.logo %}
+                <img src="{{ account.logo }}" alt="{{ account.alt | default: account.name }}" loading="lazy">
+              {% else %}
+                <!-- Fallback: simple SVG badge con iniziali -->
+                <div class="fallback">{{ account.name | slice: 0,1 }}</div>
+              {% endif %}
+            </div>
 
-        <div class="social-meta">
-          <span class="social-name">{{ account.name }}</span>
-        </div>
-      </a>
-    {% endfor %}
-  </div>
-</div>
+            <div class="social-meta">
+              <span class="social-name">{{ account.name }}</span>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
 
-<div class="category-section">
+    <div class="category-section">
   <h2>Categories</h2>
   <div class="category-grid">
     {% for category in site.categories %}
@@ -89,13 +87,107 @@ layout: home
   </div>
 </div>
 
+  </div><!-- End main-content -->
+</div><!-- End main-container -->
+
 <style>
-  /* Layout generale */
-  .social-section { max-width: min(1400px, 90vw); margin: clamp(1rem, 4vw, 3rem) auto; padding: 0 clamp(1rem, 3vw, 2rem); }
-  .social-section h2 { font-size: clamp(1.5rem, 2.5vw, 2rem); margin-bottom: 1rem; }
+  /* Main Container Layout */
+  .main-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #252a34;
+  }
+
+  @media (min-width: 1024px) {
+    .main-container {
+      flex-direction: row;
+    }
+  }
+
+  /* Sidebar Left - Logo and Description */
+  .sidebar-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(2rem, 4vw, 4rem);
+    background: #252a34;
+    text-align: center;
+  }
+
+  @media (min-width: 1024px) {
+    .sidebar-left {
+      position: sticky;
+      top: 0;
+      width: 35%;
+      max-width: 450px;
+      min-height: 100vh;
+      border-right: 1px solid rgba(100, 255, 218, 0.1);
+    }
+  }
+
+  /* Main Content - Social and Categories */
+  .main-content {
+    flex: 1;
+    background: linear-gradient(135deg, #1a1e25 0%, #252a34 100%);
+    overflow-y: auto;
+  }
+
+  /* Intro Content */
+  .intro-content {
+    max-width: 400px;
+    margin-top: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  .intro-title {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    color: #64ffda;
+    margin-bottom: clamp(0.8rem, 1.5vw, 1.2rem);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .intro-description {
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+    color: #ccc;
+    line-height: 1.6;
+    margin-bottom: clamp(1.2rem, 2.5vw, 1.8rem);
+  }
+
+  .intro-divider {
+    width: clamp(60px, 15vw, 80px);
+    height: 3px;
+    background: linear-gradient(90deg, #64ffda, transparent);
+    border-radius: 2px;
+    margin: 0 auto;
+  }
+
+  /* Logo Container */
+  .logo-container {
+    position: relative;
+    width: clamp(180px, 22vw, 250px);
+    height: clamp(180px, 22vw, 250px);
+  }
+
+  /* Social Section */
+  .social-section { 
+    padding: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .social-section h2 { 
+    font-size: clamp(1.5rem, 2.5vw, 2rem); 
+    margin-bottom: clamp(1rem, 2vw, 1.5rem);
+    color: #64ffda;
+  }
 
   /* Grid responsivo */
-  .social-grid { display: grid; gap: clamp(1rem, 2vw, 1.5rem); grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 15vw, 180px), 1fr)); }
+  .social-grid { 
+    display: grid; 
+    gap: clamp(1rem, 2vw, 1.5rem); 
+    grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 15vw, 180px), 1fr));
+    max-width: 1000px;
+  }
 
   .social-card {
     display: flex;
@@ -132,80 +224,7 @@ layout: home
     .social-name { font-size: 0.9rem; }
   }
 
-  /* Hero Section Styles */
-  .hero-section {
-    min-height: clamp(60vh, 80vh, 900px);
-    display: flex;
-    flex-direction: column;
-    background: #252a34;
-    overflow: hidden;
-  }
-
-  @media (min-width: 768px) {
-    .hero-section {
-      flex-direction: row;
-      align-items: center;
-    }
-  }
-
-  .hero-left {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: clamp(2rem, 4vw, 4rem);
-    background: #252a34;
-  }
-
-  @media (min-width: 768px) {
-    .hero-left {
-      flex: 0 0 40%;
-      min-height: clamp(60vh, 80vh, 900px);
-      position: sticky;
-      top: 0;
-    }
-  }
-
-  @media (min-width: 1200px) {
-    .hero-left {
-      flex: 0 0 35%;
-    }
-  }
-
-  .hero-right {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: clamp(2rem, 5vw, 4rem);
-    background: linear-gradient(135deg, #1a1e25 0%, #252a34 100%);
-  }
-
-  .intro-content {
-    max-width: 600px;
-  }
-
-  .intro-title {
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    color: #64ffda;
-    margin-bottom: clamp(1rem, 2vw, 1.5rem);
-    font-weight: 700;
-    line-height: 1.2;
-  }
-
-  .intro-description {
-    font-size: clamp(1rem, 2vw, 1.3rem);
-    color: #ccc;
-    line-height: 1.6;
-    margin-bottom: clamp(1.5rem, 3vw, 2rem);
-  }
-
-  .intro-divider {
-    width: clamp(60px, 15vw, 100px);
-    height: 4px;
-    background: linear-gradient(90deg, #64ffda, transparent);
-    border-radius: 2px;
-  }
+  /* Animated Logo Styles */
 
   .logo-container {
     position: relative;
@@ -267,7 +286,7 @@ layout: home
 
   /* Category styles */
   .category-section {
-    padding: clamp(1.5rem, 4vw, 3rem);
+    padding: clamp(1.5rem, 3vw, 2.5rem);
     background: #1a1e25;
     text-align: center;
   }
@@ -275,14 +294,15 @@ layout: home
   .category-section h2 {
     font-size: clamp(1.5rem, 2.5vw, 2.5rem);
     margin-bottom: clamp(1rem, 2vw, 2rem);
+    color: #64ffda;
   }
 
   .category-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(clamp(250px, 25vw, 350px), 1fr));
-    gap: clamp(1.5rem, 3vw, 2.5rem);
+    grid-template-columns: repeat(auto-fill, minmax(clamp(250px, 30vw, 320px), 1fr));
+    gap: clamp(1.5rem, 2.5vw, 2rem);
     margin-top: clamp(1.5rem, 3vw, 2rem);
-    max-width: min(1400px, 95vw);
+    max-width: 1000px;
     margin-left: auto;
     margin-right: auto;
   }
@@ -366,17 +386,17 @@ layout: home
 
   /* Recent Posts Section */
   .recent-posts-section {
-    padding: clamp(1.5rem, 4vw, 3rem);
+    padding: clamp(1.5rem, 3vw, 2.5rem);
     background: #252a34;
     text-align: center;
   }
   
   .posts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(clamp(280px, 30vw, 350px), 1fr));
-    gap: clamp(1.5rem, 3vw, 2.5rem);
+    grid-template-columns: repeat(auto-fill, minmax(clamp(280px, 35vw, 320px), 1fr));
+    gap: clamp(1.5rem, 2.5vw, 2rem);
     margin-top: clamp(1.5rem, 3vw, 2rem);
-    max-width: min(1400px, 95vw);
+    max-width: 1000px;
     margin-left: auto;
     margin-right: auto;
   }
@@ -410,35 +430,24 @@ layout: home
 
   /* Desktop specific adjustments */
   @media (min-width: 1200px) {
-    .hero-section {
-      min-height: clamp(65vh, 75vh, 850px);
-    }
-    
     body {
       max-width: 100%;
       overflow-x: hidden;
     }
     
     .category-card {
-      height: clamp(220px, 22vh, 300px);
-    }
-
-    .social-section,
-    .category-section,
-    .recent-posts-section {
-      padding-left: max(1rem, calc((100vw - 1400px) / 2));
-      padding-right: max(1rem, calc((100vw - 1400px) / 2));
-    }
-
-    .intro-content {
-      padding-left: clamp(1rem, 3vw, 3rem);
+      height: clamp(200px, 18vh, 260px);
     }
   }
 
   /* Ultra-wide screen optimization */
   @media (min-width: 1600px) {
+    .sidebar-left {
+      max-width: 500px;
+    }
+    
     .social-grid {
-      grid-template-columns: repeat(auto-fill, minmax(160px, 200px));
+      grid-template-columns: repeat(auto-fill, minmax(150px, 180px));
     }
     
     .category-grid,
