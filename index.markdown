@@ -28,10 +28,19 @@ layout: home
 </div>
 
 <div class="hero-section">
-  <div class="logo-container">
-    <div class="rays"></div>
-    <img src="/images/chris.jpg" alt="Security Specialist" class="animated-logo">
-    <div class="pulse-ring"></div>
+  <div class="hero-left">
+    <div class="logo-container">
+      <div class="rays"></div>
+      <img src="/images/chris.jpg" alt="Security Specialist" class="animated-logo">
+      <div class="pulse-ring"></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="intro-content">
+      <h1 class="intro-title">{{ site.title }}</h1>
+      <p class="intro-description">{{ site.description }}</p>
+      <div class="intro-divider"></div>
+    </div>
   </div>
 </div>
 
@@ -125,26 +134,83 @@ layout: home
 
   /* Hero Section Styles */
   .hero-section {
-    height: clamp(60vh, 80vh, 900px);
+    min-height: clamp(60vh, 80vh, 900px);
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
     background: #252a34;
     overflow: hidden;
-    padding: clamp(1rem, 3vw, 3rem);
+  }
+
+  @media (min-width: 768px) {
+    .hero-section {
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+
+  .hero-left {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(2rem, 4vw, 4rem);
+    background: #252a34;
+  }
+
+  @media (min-width: 768px) {
+    .hero-left {
+      flex: 0 0 40%;
+      min-height: clamp(60vh, 80vh, 900px);
+      position: sticky;
+      top: 0;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .hero-left {
+      flex: 0 0 35%;
+    }
+  }
+
+  .hero-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(2rem, 5vw, 4rem);
+    background: linear-gradient(135deg, #1a1e25 0%, #252a34 100%);
+  }
+
+  .intro-content {
+    max-width: 600px;
+  }
+
+  .intro-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: #64ffda;
+    margin-bottom: clamp(1rem, 2vw, 1.5rem);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .intro-description {
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    color: #ccc;
+    line-height: 1.6;
+    margin-bottom: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  .intro-divider {
+    width: clamp(60px, 15vw, 100px);
+    height: 4px;
+    background: linear-gradient(90deg, #64ffda, transparent);
+    border-radius: 2px;
   }
 
   .logo-container {
     position: relative;
-    width: clamp(180px, 20vw, 300px);
-    height: clamp(180px, 20vw, 300px);
-  }
-
-  @media (min-width: 768px) {
-    .logo-container {
-      width: clamp(220px, 22vw, 320px);
-      height: clamp(220px, 22vw, 320px);
-    }
+    width: clamp(200px, 25vw, 280px);
+    height: clamp(200px, 25vw, 280px);
   }
 
   .animated-logo {
@@ -345,7 +411,7 @@ layout: home
   /* Desktop specific adjustments */
   @media (min-width: 1200px) {
     .hero-section {
-      height: clamp(65vh, 75vh, 850px);
+      min-height: clamp(65vh, 75vh, 850px);
     }
     
     body {
@@ -362,6 +428,10 @@ layout: home
     .recent-posts-section {
       padding-left: max(1rem, calc((100vw - 1400px) / 2));
       padding-right: max(1rem, calc((100vw - 1400px) / 2));
+    }
+
+    .intro-content {
+      padding-left: clamp(1rem, 3vw, 3rem);
     }
   }
 
