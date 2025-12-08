@@ -82,11 +82,11 @@ layout: home
 
 <style>
   /* Layout generale */
-  .social-section { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
-  .social-section h2 { font-size: 1.5rem; margin-bottom: 1rem; }
+  .social-section { max-width: min(1400px, 90vw); margin: clamp(1rem, 4vw, 3rem) auto; padding: 0 clamp(1rem, 3vw, 2rem); }
+  .social-section h2 { font-size: clamp(1.5rem, 2.5vw, 2rem); margin-bottom: 1rem; }
 
   /* Grid responsivo */
-  .social-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .social-grid { display: grid; gap: clamp(1rem, 2vw, 1.5rem); grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 15vw, 180px), 1fr)); }
 
   .social-card {
     display: flex;
@@ -95,7 +95,7 @@ layout: home
     text-decoration: none;
     background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4));
     border-radius: 12px;
-    padding: 0.9rem;
+    padding: clamp(0.8rem, 1.5vw, 1.2rem);
     box-shadow: 0 6px 18px rgba(0,0,0,0.06);
     transition: transform 0.18s ease, box-shadow 0.18s ease;
     color: inherit;
@@ -105,17 +105,17 @@ layout: home
   .social-card:focus,
   .social-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
 
-  .logo-wrap { width: 64px; height: 64px; display: grid; place-items: center; margin-bottom: 0.6rem; }
+  .logo-wrap { width: clamp(56px, 8vw, 80px); height: clamp(56px, 8vw, 80px); display: grid; place-items: center; margin-bottom: clamp(0.5rem, 1vw, 0.8rem); }
   .logo-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
 
   /* Fallback badge */
   .fallback {
-    width: 64px; height: 64px; border-radius: 12px; display: grid; place-items: center; font-weight: 700; font-size: 1.2rem;
+    width: clamp(56px, 8vw, 80px); height: clamp(56px, 8vw, 80px); border-radius: 12px; display: grid; place-items: center; font-weight: 700; font-size: clamp(1rem, 1.8vw, 1.4rem);
     background: linear-gradient(135deg, #f3f4f6, #e5e7eb); color: #111827;
   }
 
   .social-meta { text-align: center; }
-  .social-name { display: block; font-size: 0.95rem; font-weight: 600; }
+  .social-name { display: block; font-size: clamp(0.85rem, 1.3vw, 1rem); font-weight: 600; }
 
   /* Small screens */
   @media (max-width: 480px) {
@@ -125,25 +125,25 @@ layout: home
 
   /* Hero Section Styles */
   .hero-section {
-    height: 100vh;
+    height: clamp(60vh, 80vh, 900px);
     display: flex;
     justify-content: center;
     align-items: center;
     background: #252a34;
     overflow: hidden;
-    padding: 2rem;
+    padding: clamp(1rem, 3vw, 3rem);
   }
 
   .logo-container {
     position: relative;
-    width: 200px;
-    height: 200px;
+    width: clamp(180px, 20vw, 300px);
+    height: clamp(180px, 20vw, 300px);
   }
 
   @media (min-width: 768px) {
     .logo-container {
-      width: 250px;
-      height: 250px;
+      width: clamp(220px, 22vw, 320px);
+      height: clamp(220px, 22vw, 320px);
     }
   }
 
@@ -201,24 +201,29 @@ layout: home
 
   /* Category styles */
   .category-section {
-    padding: 2rem;
+    padding: clamp(1.5rem, 4vw, 3rem);
     background: #1a1e25;
     text-align: center;
   }
 
+  .category-section h2 {
+    font-size: clamp(1.5rem, 2.5vw, 2.5rem);
+    margin-bottom: clamp(1rem, 2vw, 2rem);
+  }
+
   .category-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
-    max-width: 1200px;
+    grid-template-columns: repeat(auto-fill, minmax(clamp(250px, 25vw, 350px), 1fr));
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    margin-top: clamp(1.5rem, 3vw, 2rem);
+    max-width: min(1400px, 95vw);
     margin-left: auto;
     margin-right: auto;
   }
 
   .category-card {
     position: relative;
-    height: 200px;
+    height: clamp(180px, 20vh, 280px);
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -248,7 +253,7 @@ layout: home
   .category-content {
     position: relative;
     z-index: 1;
-    padding: 1.5rem;
+    padding: clamp(1rem, 2vw, 1.5rem);
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -268,21 +273,24 @@ layout: home
   .category-card h3 {
     color: #64ffda;
     margin-bottom: 0.5rem;
+    font-size: clamp(1.2rem, 2vw, 1.8rem);
   }
 
   .category-card p {
     color: white;
+    font-size: clamp(0.9rem, 1.5vw, 1.1rem);
   }
 
   .category-link {
     display: inline-block;
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
+    margin-top: clamp(0.5rem, 1vw, 1rem);
+    padding: clamp(0.4rem, 1vw, 0.6rem) clamp(0.8rem, 2vw, 1.2rem);
     background: #64ffda;
     color: #252a34;
     border-radius: 4px;
     text-decoration: none;
     font-weight: bold;
+    font-size: clamp(0.85rem, 1.2vw, 1rem);
     transition: background 0.3s ease;
   }
 
@@ -292,17 +300,17 @@ layout: home
 
   /* Recent Posts Section */
   .recent-posts-section {
-    padding: 2rem;
+    padding: clamp(1.5rem, 4vw, 3rem);
     background: #252a34;
     text-align: center;
   }
   
   .posts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
-    max-width: 1200px;
+    grid-template-columns: repeat(auto-fill, minmax(clamp(280px, 30vw, 350px), 1fr));
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    margin-top: clamp(1.5rem, 3vw, 2rem);
+    max-width: min(1400px, 95vw);
     margin-left: auto;
     margin-right: auto;
   }
@@ -310,31 +318,34 @@ layout: home
   .post-card {
     background: #1a1e25;
     border-radius: 8px;
-    padding: 1.5rem;
+    padding: clamp(1rem, 2vw, 1.5rem);
     text-align: left;
   }
   
   .post-card h3 a {
     color: #64ffda;
     text-decoration: none;
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
   }
   
   .post-card p {
     color: #ccc;
+    font-size: clamp(0.9rem, 1.5vw, 1rem);
   }
   
   /* Footer */
   .site-footer {
-    padding: 2rem;
+    padding: clamp(1.5rem, 3vw, 2rem);
     background: #1a1e25;
     text-align: center;
     color: #ccc;
+    font-size: clamp(0.9rem, 1.2vw, 1rem);
   }
 
   /* Desktop specific adjustments */
   @media (min-width: 1200px) {
     .hero-section {
-      height: 80vh;
+      height: clamp(65vh, 75vh, 850px);
     }
     
     body {
@@ -343,7 +354,26 @@ layout: home
     }
     
     .category-card {
-      height: 250px;
+      height: clamp(220px, 22vh, 300px);
+    }
+
+    .social-section,
+    .category-section,
+    .recent-posts-section {
+      padding-left: max(1rem, calc((100vw - 1400px) / 2));
+      padding-right: max(1rem, calc((100vw - 1400px) / 2));
+    }
+  }
+
+  /* Ultra-wide screen optimization */
+  @media (min-width: 1600px) {
+    .social-grid {
+      grid-template-columns: repeat(auto-fill, minmax(160px, 200px));
+    }
+    
+    .category-grid,
+    .posts-grid {
+      gap: 3rem;
     }
   }
 
@@ -370,10 +400,10 @@ layout: home
   .star-alert-content {
     background: linear-gradient(135deg, #64ffda, #4cd3a7);
     color: #252a34;
-    padding: 2rem 2.5rem;
+    padding: clamp(1.5rem, 3vw, 2.5rem) clamp(2rem, 4vw, 3rem);
     border-radius: 20px;
     box-shadow: 0 20px 60px rgba(100, 255, 218, 0.4);
-    max-width: 400px;
+    max-width: min(400px, 90vw);
     width: 90%;
     text-align: center;
     position: relative;
@@ -382,7 +412,7 @@ layout: home
   }
   
   .star-icon {
-    font-size: 3em;
+    font-size: clamp(2.5em, 5vw, 3.5em);
     display: block;
     margin-bottom: 1rem;
     animation: sparkle 2s infinite;
@@ -390,7 +420,7 @@ layout: home
   
   .star-text {
     font-weight: 600;
-    font-size: 1.1em;
+    font-size: clamp(1em, 2vw, 1.2em);
     margin-bottom: 1.5rem;
     line-height: 1.4;
   }
@@ -398,11 +428,11 @@ layout: home
   .star-button {
     background: #252a34;
     color: #64ffda;
-    padding: 12px 24px;
+    padding: clamp(10px, 2vw, 14px) clamp(20px, 3vw, 28px);
     border-radius: 12px;
     text-decoration: none;
     font-weight: bold;
-    font-size: 1em;
+    font-size: clamp(0.9em, 1.5vw, 1.1em);
     transition: all 0.3s ease;
     border: 3px solid transparent;
     display: inline-block;
