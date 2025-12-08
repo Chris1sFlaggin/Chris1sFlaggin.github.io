@@ -82,46 +82,59 @@ layout: home
 
 <style>
   /* Layout generale */
-  .social-section { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
-  .social-section h2 { font-size: clamp(1.25rem, 4vw, 1.5rem); margin-bottom: 1rem; }
+  .social-section { 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 3vw, 2rem); 
+    background: #252a34;
+  }
+  .social-section h2 { font-size: clamp(1.25rem, 4vw, 2rem); margin-bottom: 1.5rem; text-align: center; color: #64ffda; }
 
   /* Grid responsivo */
-  .social-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr)); }
+  .social-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr)); }
 
   .social-card {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-decoration: none;
-    background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4));
-    border-radius: 12px;
-    padding: clamp(0.7rem, 2vw, 0.9rem);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: clamp(0.9rem, 2vw, 1.2rem);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
     color: inherit;
-    border: 1px solid rgba(0,0,0,0.04);
+    border: 1px solid rgba(100, 255, 218, 0.1);
     min-height: 44px;
   }
 
   .social-card:focus,
-  .social-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
+  .social-card:hover { 
+    transform: translateY(-8px) scale(1.05); 
+    box-shadow: 0 20px 48px rgba(100, 255, 218, 0.2); 
+    background: linear-gradient(135deg, rgba(100, 255, 218, 0.15), rgba(100, 255, 218, 0.08));
+    border-color: rgba(100, 255, 218, 0.3);
+  }
 
   @media (hover: none) and (pointer: coarse) {
     .social-card:hover { transform: none; }
     .social-card:active { transform: scale(0.98); }
   }
 
-  .logo-wrap { width: 64px; height: 64px; display: grid; place-items: center; margin-bottom: 0.6rem; }
-  .logo-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+  .logo-wrap { width: 72px; height: 72px; display: grid; place-items: center; margin-bottom: 0.8rem; }
+  .logo-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; filter: drop-shadow(0 2px 8px rgba(100, 255, 218, 0.3)); transition: filter 0.3s ease; }
+
+  .social-card:hover .logo-wrap img { filter: drop-shadow(0 4px 12px rgba(100, 255, 218, 0.5)); }
 
   /* Fallback badge */
   .fallback {
-    width: 64px; height: 64px; border-radius: 12px; display: grid; place-items: center; font-weight: 700; font-size: 1.2rem;
-    background: linear-gradient(135deg, #f3f4f6, #e5e7eb); color: #111827;
+    width: 72px; height: 72px; border-radius: 16px; display: grid; place-items: center; font-weight: 700; font-size: 1.4rem;
+    background: linear-gradient(135deg, #64ffda, #4cd3a7); color: #252a34;
   }
 
   .social-meta { text-align: center; }
-  .social-name { display: block; font-size: clamp(0.85rem, 2vw, 0.95rem); font-weight: 600; }
+  .social-name { display: block; font-size: clamp(0.9rem, 2vw, 1.05rem); font-weight: 600; color: #64ffda; }
 
   /* Small screens */
   @media (max-width: 480px) {
@@ -132,26 +145,37 @@ layout: home
 
   /* Hero Section Styles */
   .hero-section {
-    min-height: 100vh;
-    min-height: 100dvh;
+    min-height: 85vh;
+    min-height: 85dvh;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #252a34;
+    background: linear-gradient(135deg, #1a1e25 0%, #252a34 50%, #1a1e25 100%);
     overflow: hidden;
     padding: clamp(1rem, 4vw, 2rem);
+    position: relative;
+  }
+
+  .hero-section::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 50%, rgba(100, 255, 218, 0.05) 0%, transparent 50%);
+    pointer-events: none;
   }
 
   .logo-container {
     position: relative;
-    width: clamp(180px, 40vw, 200px);
-    height: clamp(180px, 40vw, 200px);
+    width: clamp(200px, 40vw, 280px);
+    height: clamp(200px, 40vw, 280px);
+    z-index: 1;
   }
 
   @media (min-width: 768px) {
     .logo-container {
-      width: clamp(220px, 30vw, 250px);
-      height: clamp(220px, 30vw, 250px);
+      width: clamp(260px, 30vw, 320px);
+      height: clamp(260px, 30vw, 320px);
     }
   }
 
@@ -162,16 +186,18 @@ layout: home
     object-fit: cover;
     position: relative;
     z-index: 2;
-    border: 3px solid #64ffda;
+    border: 4px solid #64ffda;
     animation: glow 2s ease-in-out infinite;
+    box-shadow: 0 0 30px rgba(100, 255, 218, 0.4);
   }
 
   .rays {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: conic-gradient(from 0deg, transparent 0%, #64ffda 50%, transparent 100%);
-    animation: rotate 4s linear infinite;
+    background: conic-gradient(from 0deg, transparent 0%, rgba(100, 255, 218, 0.3) 50%, transparent 100%);
+    animation: rotate 6s linear infinite;
+    filter: blur(2px);
   }
 
   .pulse-ring {
@@ -181,8 +207,8 @@ layout: home
     width: 120%;
     height: 120%;
     border-radius: 50%;
-    border: 3px solid #64ffda;
-    animation: pulse 2s ease-out infinite;
+    border: 4px solid #64ffda;
+    animation: pulse 2.5s ease-out infinite;
   }
 
   @keyframes rotate {
@@ -202,47 +228,49 @@ layout: home
   }
   
   @keyframes glow {
-    0% { box-shadow: 0 0 5px rgba(100, 255, 218, 0.5); }
-    50% { box-shadow: 0 0 20px rgba(100, 255, 218, 0.8); }
-    100% { box-shadow: 0 0 5px rgba(100, 255, 218, 0.5); }
+    0% { box-shadow: 0 0 20px rgba(100, 255, 218, 0.4), 0 0 40px rgba(100, 255, 218, 0.2); }
+    50% { box-shadow: 0 0 30px rgba(100, 255, 218, 0.6), 0 0 60px rgba(100, 255, 218, 0.3); }
+    100% { box-shadow: 0 0 20px rgba(100, 255, 218, 0.4), 0 0 40px rgba(100, 255, 218, 0.2); }
   }
 
   /* Category styles */
   .category-section {
-    padding: clamp(1.5rem, 4vw, 2rem);
+    padding: clamp(2rem, 5vw, 4rem) clamp(1.5rem, 4vw, 2rem);
     background: #1a1e25;
     text-align: center;
   }
 
   .category-section h2 {
-    font-size: clamp(1.5rem, 5vw, 2rem);
-    margin-bottom: 1rem;
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+    margin-bottom: 1.5rem;
+    color: #64ffda;
+    font-weight: 700;
   }
 
   .category-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr));
-    gap: clamp(1rem, 3vw, 2rem);
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+    gap: clamp(1.5rem, 3vw, 2.5rem);
     margin-top: 2rem;
-    max-width: 1200px;
+    max-width: 1400px;
     margin-left: auto;
     margin-right: auto;
   }
 
   .category-card {
     position: relative;
-    height: clamp(180px, 30vw, 200px);
-    border-radius: 8px;
+    height: clamp(200px, 30vw, 280px);
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     background-size: cover;
     background-position: center;
   }
 
   @media (min-width: 768px) {
     .category-card {
-      height: 200px;
+      height: 280px;
     }
   }
 
@@ -260,14 +288,14 @@ layout: home
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(37, 42, 52, 0.7);
-    transition: background 0.3s ease;
+    background: rgba(37, 42, 52, 0.75);
+    transition: background 0.4s ease;
   }
 
   .category-content {
     position: relative;
     z-index: 1;
-    padding: clamp(1rem, 3vw, 1.5rem);
+    padding: clamp(1.5rem, 3vw, 2rem);
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -276,8 +304,8 @@ layout: home
   }
 
   .category-card:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 16px 40px rgba(100, 255, 218, 0.2);
   }
 
   @media (hover: none) and (pointer: coarse) {
@@ -290,40 +318,45 @@ layout: home
   }
 
   .category-card:hover .category-overlay {
-    background: rgba(37, 42, 52, 0.5);
+    background: rgba(37, 42, 52, 0.4);
   }
 
   .category-card h3 {
     color: #64ffda;
-    margin-bottom: 0.5rem;
-    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    margin-bottom: 0.8rem;
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+    font-weight: 700;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   }
 
   .category-card p {
     color: white;
-    font-size: clamp(0.9rem, 2vw, 1rem);
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
   }
 
   .category-link {
     display: inline-block;
-    margin-top: 1rem;
-    padding: clamp(0.4rem, 2vw, 0.5rem) clamp(0.8rem, 3vw, 1rem);
+    margin-top: 1.2rem;
+    padding: clamp(0.6rem, 2vw, 0.8rem) clamp(1.2rem, 3vw, 1.6rem);
     background: #64ffda;
     color: #252a34;
-    border-radius: 4px;
+    border-radius: 8px;
     text-decoration: none;
     font-weight: bold;
-    font-size: clamp(0.85rem, 2vw, 1rem);
-    transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s ease;
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     min-height: 44px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 4px 12px rgba(100, 255, 218, 0.3);
   }
 
   .category-link:hover {
     background: #4cd3a7;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(100, 255, 218, 0.5);
   }
 
   @media (hover: none) and (pointer: coarse) {
@@ -390,8 +423,8 @@ layout: home
   /* Desktop specific adjustments */
   @media (min-width: 1200px) {
     .hero-section {
-      min-height: 80vh;
-      min-height: 80dvh;
+      min-height: 75vh;
+      min-height: 75dvh;
     }
     
     body {
@@ -400,7 +433,21 @@ layout: home
     }
     
     .category-card {
-      height: 250px;
+      height: 300px;
+    }
+
+    .social-grid {
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 2rem;
+    }
+
+    .category-grid {
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    }
+
+    .logo-container {
+      width: 340px;
+      height: 340px;
     }
   }
 
@@ -408,10 +455,11 @@ layout: home
   @media (min-width: 768px) and (max-width: 1199px) {
     .social-grid {
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1.5rem;
     }
     
     .category-grid {
-      gap: 1.5rem;
+      gap: 2rem;
     }
   }
 
