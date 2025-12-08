@@ -53,7 +53,6 @@ layout: default
   .post-item {
     margin-bottom: clamp(2.5rem, 4vw, 3.5rem);
     padding: clamp(1.5rem, 3vw, 2rem);
-    padding-bottom: clamp(1.5rem, 3vw, 2rem);
     border-bottom: 2px solid rgba(100, 255, 218, 0.2);
     background: rgba(255, 255, 255, 0.02);
     border-radius: 12px;
