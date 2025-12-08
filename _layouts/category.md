@@ -45,11 +45,6 @@ layout: default
   .category-header p {
     font-size: clamp(0.9rem, 2.5vw, 1.1rem);
   }
-  .post-item {
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid #333;
-  }
   
   .post-item {
     margin-bottom: clamp(2rem, 4vw, 3rem);
@@ -106,7 +101,8 @@ layout: default
   }
   
   .read-more {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     margin-top: 1rem;
     color: #64ffda;
     text-decoration: none;
@@ -114,8 +110,6 @@ layout: default
     font-size: clamp(0.9rem, 2.5vw, 1rem);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     min-height: 44px;
-    display: inline-flex;
-    align-items: center;
   }
   
   .read-more:hover {

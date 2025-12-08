@@ -473,7 +473,6 @@ layout: home
     font-size: clamp(0.9em, 2.5vw, 1em);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 3px solid transparent;
-    display: inline-block;
     margin-bottom: 1rem;
     min-height: 44px;
     display: inline-flex;
