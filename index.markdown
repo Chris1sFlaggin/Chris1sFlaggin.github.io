@@ -226,12 +226,6 @@ layout: home
 
   /* Animated Logo Styles */
 
-  .logo-container {
-    position: relative;
-    width: clamp(200px, 25vw, 280px);
-    height: clamp(200px, 25vw, 280px);
-  }
-
   .animated-logo {
     width: 100%;
     height: 100%;
