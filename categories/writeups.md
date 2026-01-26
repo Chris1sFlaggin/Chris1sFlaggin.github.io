@@ -1,6 +1,6 @@
 ---
-layout: category
+layout: subcategory
 title: CTF Write Ups
-category: WriteUps
+category: writeups
 permalink: /categories/writeups/
 ---
