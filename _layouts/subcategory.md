@@ -2,186 +2,207 @@
 layout: default
 ---
 
-<div class="cyber-console">
-  <div class="console-header">
-    <span class="prompt">root@chris1sflaggin:~/categories/{{ page.category | downcase }}#</span> <span class="cursor">_</span>
-  </div>
-  
-  <div class="console-body">
-    <h1 class="glitch-title" data-text="{{ page.title }}">{{ page.title }}</h1>
-    <div class="scan-line"></div>
-    
-    <p class="system-msg">
-      > ACCESSING SECURE ARCHIVES...<br>
-      > DECRYPTING ENTRIES...
-    </p>
-
-    <div class="posts-grid-cyber">
-      {% assign cat_key = page.category %}
-      {% assign posts = site.categories[cat_key] %}
-      
-      {% unless posts %}
-        {% assign cat_key_down = page.category | downcase %}
-        {% assign posts = site.categories[cat_key_down] %}
-      {% endunless %}
-
-      {% if posts and posts.size > 0 %}
-        {% assign sorted_posts = posts | sort: 'date' | reverse %}
-        
-        {% for post in sorted_posts %}
-          <a href="{{ post.url | relative_url }}" class="cyber-card">
-            <div class="card-decoration top-left"></div>
-            <div class="card-decoration top-right"></div>
-            <div class="card-decoration bottom-left"></div>
-            <div class="card-decoration bottom-right"></div>
-            
-            <div class="card-content">
-              <span class="file-perm">drwxr-xr-x</span>
-              <span class="file-date">{{ post.date | date: "%Y-%m-%d" }}</span>
-              <h3 class="file-name">{{ post.title }}</h3>
-              <p class="file-excerpt">{{ post.excerpt | strip_html | truncatewords: 20 }}</p>
-              <div class="status-bar">
-                <span class="status-ok">[ EXECUTE ]</span>
-              </div>
-            </div>
-          </a>
-        {% endfor %}
-      {% else %}
-        <p class="error-msg">ERROR: No data found in sector '{{ page.category }}'.</p>
-      {% endif %}
+<div class="cyber-console-wrapper">
+  <div class="cyber-console">
+    <div class="console-header">
+      <div class="buttons">
+        <span class="btn red"></span>
+        <span class="btn yellow"></span>
+        <span class="btn green"></span>
+      </div>
+      <div class="title">
+        root@chris1sflaggin:~/categories/{{ page.category | downcase }}
+      </div>
     </div>
     
-    <div class="cmd-footer">
-      <a href="{{ site.baseurl }}/" class="back-cmd">< [cd ..] Return to Root</a>
+    <div class="console-body">
+      <h1 class="glitch-title">{{ page.title }}</h1>
+      <div class="scan-line"></div>
+      
+      <p class="system-msg">
+        > INITIALIZING SUB-ROUTINE...<br>
+        > FETCHING ENCRYPTED DATA... [ OK ]
+      </p>
+
+      <div class="posts-grid-cyber">
+        {% assign cat_key = page.category %}
+        {% assign posts = site.categories[cat_key] %}
+        
+        {% unless posts %}
+          {% assign cat_key_down = page.category | downcase %}
+          {% assign posts = site.categories[cat_key_down] %}
+        {% endunless %}
+
+        {% if posts and posts.size > 0 %}
+          {% assign sorted_posts = posts | sort: 'date' | reverse %}
+          
+          {% for post in sorted_posts %}
+            <a href="{{ post.url | relative_url }}" class="cyber-card">
+              <div class="card-content">
+                <div class="card-header">
+                  <span class="file-perm">RWX</span>
+                  <span class="file-date">{{ post.date | date: "%Y-%m-%d" }}</span>
+                </div>
+                <h3 class="file-name">{{ post.title }}</h3>
+                <p class="file-excerpt">{{ post.excerpt | strip_html | truncatewords: 15 }}</p>
+                <div class="status-bar">
+                  <span class="cmd-prompt">$ ./read_post</span>
+                  <span class="cursor">_</span>
+                </div>
+              </div>
+            </a>
+          {% endfor %}
+        {% else %}
+          <div class="error-box">
+            <p class="error-msg">ERROR 404: No data found in sector '{{ page.category }}'.</p>
+            <p>Check category name in Front Matter.</p>
+          </div>
+        {% endif %}
+      </div>
+      
+      <div class="cmd-footer">
+        <a href="{{ site.baseurl }}/" class="back-cmd">&lt; cd .. (Return to Root)</a>
+      </div>
     </div>
   </div>
 </div>
 
 <style>
-  /* Cyber Layout Styles */
+  /* --- CYBER LAYOUT --- */
+  .cyber-console-wrapper {
+    width: 100%;
+    padding: 20px 0;
+    box-sizing: border-box;
+  }
+
   .cyber-console {
-    max-width: 1000px;
-    margin: 2rem auto;
-    padding: 0 1rem;
+    width: 100%;
+    max-width: 100%; /* Ensures it doesn't overflow */
+    margin: 0 auto;
+    background-color: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
     font-family: 'Courier New', Courier, monospace;
-    color: #e0e0e0;
   }
 
+  /* Console Header (Mac/Linux style) */
   .console-header {
-    background: #111;
-    padding: 10px 20px;
-    border-top: 2px solid #64ffda;
-    border-radius: 5px 5px 0 0;
-    font-size: 0.9rem;
-    margin-bottom: 2rem;
+    background: #161b22;
+    padding: 10px 15px;
+    border-bottom: 1px solid #30363d;
+    display: flex;
+    align-items: center;
+    position: relative;
   }
 
-  .prompt { color: #64ffda; font-weight: bold; }
-  .cursor { animation: blink 1s infinite; color: #64ffda; }
-  
-  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  .buttons { display: flex; gap: 8px; }
+  .btn { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  .red { background-color: #ff5f56; }
+  .yellow { background-color: #ffbd2e; }
+  .green { background-color: #27c93f; }
+
+  .console-header .title {
+    position: absolute;
+    left: 0; right: 0;
+    text-align: center;
+    color: #8b949e;
+    font-size: 0.8rem;
+    font-weight: bold;
+    pointer-events: none;
+  }
+
+  .console-body {
+    padding: 2rem;
+    color: #c9d1d9;
+  }
 
   .glitch-title {
-    font-size: 2.5rem;
-    color: #fff;
-    text-transform: uppercase;
     margin: 0;
-    text-shadow: 2px 2px 0px #03a9f4;
-    letter-spacing: 2px;
+    color: #58a6ff;
+    font-size: 2rem;
+    text-shadow: 0 0 5px rgba(88, 166, 255, 0.5);
+    border-bottom: 2px solid #30363d;
+    padding-bottom: 10px;
   }
 
   .scan-line {
+    width: 100%;
     height: 2px;
-    background: linear-gradient(90deg, transparent, #64ffda, transparent);
-    margin: 1rem 0 2rem 0;
+    background: linear-gradient(90deg, transparent, #58a6ff, transparent);
+    margin-top: -2px;
     opacity: 0.7;
+    margin-bottom: 20px;
   }
 
   .system-msg {
-    color: #8892b0;
+    color: #8b949e;
     font-size: 0.9rem;
     margin-bottom: 2rem;
-    line-height: 1.6;
   }
 
-  /* Grid System */
+  /* Grid */
   .posts-grid-cyber {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Responsive grid */
+    gap: 20px;
   }
 
-  /* Cyber Card */
+  /* Card */
   .cyber-card {
-    display: block;
-    position: relative;
     background: #161b22;
     border: 1px solid #30363d;
+    border-radius: 6px;
     text-decoration: none;
-    transition: transform 0.2s, box-shadow 0.2s;
-    overflow: hidden;
+    transition: all 0.2s ease;
+    display: block;
   }
 
   .cyber-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0 15px rgba(100, 255, 218, 0.15);
-    border-color: #64ffda;
+    border-color: #58a6ff;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(88, 166, 255, 0.15);
   }
 
-  .cyber-card:hover .status-ok {
-    background: #64ffda;
-    color: #000;
-  }
+  .card-content { padding: 1.5rem; }
 
-  .card-content { padding: 20px; }
-
-  /* Angoli decorativi */
-  .card-decoration {
-    position: absolute;
-    width: 10px; height: 10px;
-    transition: all 0.3s;
-  }
-  .top-left { top: 0; left: 0; border-top: 2px solid #64ffda; border-left: 2px solid #64ffda; }
-  .top-right { top: 0; right: 0; border-top: 2px solid #64ffda; border-right: 2px solid #64ffda; }
-  .bottom-left { bottom: 0; left: 0; border-bottom: 2px solid #64ffda; border-left: 2px solid #64ffda; }
-  .bottom-right { bottom: 0; right: 0; border-bottom: 2px solid #64ffda; border-right: 2px solid #64ffda; }
-
-  .file-perm, .file-date {
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
     font-size: 0.75rem;
-    color: #64ffda;
-    opacity: 0.7;
-    display: block;
-    margin-bottom: 5px;
+    color: #8b949e;
   }
+  
+  .file-perm { color: #238636; }
 
   .file-name {
-    color: #fff;
-    margin: 10px 0;
+    color: #e0e0e0;
     font-size: 1.2rem;
+    margin: 0 0 10px 0;
   }
+  
+  .cyber-card:hover .file-name { color: #58a6ff; }
 
   .file-excerpt {
     color: #8b949e;
     font-size: 0.9rem;
     line-height: 1.5;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
   }
 
   .status-bar {
-    text-align: right;
-  }
-
-  .status-ok {
-    border: 1px solid #64ffda;
-    color: #64ffda;
-    padding: 2px 8px;
-    font-size: 0.8rem;
-    transition: all 0.2s;
+    font-size: 0.85rem;
+    color: #58a6ff;
   }
   
-  .error-msg { color: #ff5555; }
+  .cursor { animation: blink 1s infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
 
-  .cmd-footer { margin-top: 4rem; border-top: 1px solid #30363d; padding-top: 1rem; }
-  .back-cmd { color: #8892b0; text-decoration: none; }
-  .back-cmd:hover { color: #64ffda; }
+  .cmd-footer { margin-top: 3rem; border-top: 1px solid #30363d; padding-top: 1rem; }
+  .back-cmd { color: #8b949e; text-decoration: none; font-weight: bold; }
+  .back-cmd:hover { color: #58a6ff; }
+  
+  .error-box { padding: 20px; border: 1px solid #ff5f56; background: rgba(255, 95, 86, 0.1); border-radius: 6px; color: #ff5f56; }
 </style>
