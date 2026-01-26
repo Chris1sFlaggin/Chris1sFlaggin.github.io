@@ -1,6 +1,6 @@
 ---
 layout: category
 title: Heap Exploitation
-category: WriteUps
+category: Heap
 permalink: /categories/writeups/heap
 ---
