@@ -66,19 +66,30 @@
 
     // Funzione per caricare il JSON
     async function loadQuizzes() {
-        try {
-            const response = await fetch('quiz.json'); // Assicurati che il nome file sia corretto
-            if (!response.ok) throw new Error('Errore nel caricamento del file JSON');
-            allQuizzes = await response.json();
-            
-            initFilters();
-            displayQuizzes(allQuizzes);
-            document.getElementById('loading').style.display = 'none';
-        } catch (error) {
-            document.getElementById('loading').innerHTML = `<span style="color:red">Errore: ${error.message}</span>`;
-            console.error(error);
+    try {
+        // Aggiungiamo un parametro casuale per evitare che il browser usi una vecchia cache
+        const cacheBuster = `?v=${new Date().getTime()}`;
+        const response = await fetch('quiz.json' + cacheBuster); 
+        
+        if (!response.ok) {
+            throw new Error(`Errore HTTP! Stato: ${response.status}. Controlla che il file quiz.json sia nella stessa cartella dell'HTML.`);
         }
+        
+        allQuizzes = await response.json();
+        
+        initFilters();
+        displayQuizzes(allQuizzes);
+        document.getElementById('loading').style.display = 'none';
+    } catch (error) {
+        document.getElementById('loading').innerHTML = `
+            <div style="color:#e11d48; background:#fff1f2; padding:20px; border-radius:8px; border:1px solid #fda4af">
+                <strong>⚠️ Errore di caricamento:</strong><br>
+                ${error.message}<br><br>
+                <small>Assicurati che il nome del file sia esattamente <code>quiz.json</code> (tutto minuscolo) e che sia stato caricato correttamente.</small>
+            </div>`;
+        console.error("Dettaglio errore:", error);
     }
+}
 
     // Popola il menu a tendina dei capitoli in base ai dati presenti
     function initFilters() {
