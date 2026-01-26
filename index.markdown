@@ -90,7 +90,7 @@ header:
     </div>
 
     <div class="section-block">
-      <h2 class="section-title">MODULES</h2>
+      <h2 class="section-title">CONTENTS</h2>
       <div class="categories-grid">
         {% assign sorted_categories = site.categories | sort %}
         
