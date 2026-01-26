@@ -13,14 +13,6 @@ header:
   gtag('config', 'G-BL2501MC35');
 </script>
 
-<style>
-  .star-alert { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: none; align-items: center; justify-content: center; }
-  .star-alert-content { background: #1a1e25; border: 2px solid #64ffda; padding: 2rem; border-radius: 16px; text-align: center; color: #fff; }
-  .close-button { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
-  .star-button { display: inline-block; margin-top: 10px; padding: 10px 20px; background: #252a34; color: #64ffda; border-radius: 8px; text-decoration: none; border: 1px solid #64ffda; }
-  .hidden { display: none !important; }
-</style>
-
 <div id="star-alert" class="star-alert">
   <div class="star-alert-content">
     <span class="star-icon">⭐</span>
@@ -30,6 +22,14 @@ header:
     <button id="close-star-alert" class="close-button">&times;</button>
   </div>
 </div>
+
+<style>
+  .star-alert { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: none; align-items: center; justify-content: center; }
+  .star-alert-content { background: #1a1e25; border: 2px solid #64ffda; padding: 2rem; border-radius: 16px; text-align: center; color: #fff; }
+  .close-button { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+  .star-button { display: inline-block; margin-top: 10px; padding: 10px 20px; background: #252a34; color: #64ffda; border-radius: 8px; text-decoration: none; border: 1px solid #64ffda; }
+  .hidden { display: none !important; }
+</style>
 
 <script>
 (function() {
@@ -121,27 +121,77 @@ header:
 </div>
 
 <style>
-  /* STILI GENERALI DASHBOARD */
-  body { background-color: #1a1e25; margin: 0; overflow-x: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  .masthead, .page__footer, .skip-link { display: none !important; }
-  #main, .page__inner-wrap, .page__content { width: 100% !important; padding: 0 !important; margin: 0 !important; background: #1a1e25 !important; }
+  /* --- CRITICAL CSS RESET --- */
+  /* This fixes the "crooked" layout by forcing full width */
+  body {
+    background-color: #1a1e25;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  
+  /* Hide Theme Elements */
+  .masthead, .page__footer, .skip-link, .greedy-nav { 
+    display: none !important; 
+  }
+  
+  /* Reset Theme Containers */
+  #main, .page__inner-wrap, .page__content, .archive {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #1a1e25 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
 
-  .fullscreen-dashboard { display: flex; flex-direction: column; min-height: 100vh; width: 100%; }
+  /* --- DASHBOARD STYLES --- */
+  .fullscreen-dashboard {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%;
+  }
 
-  /* Profilo */
-  .profile-side { background: linear-gradient(180deg, #15181e 0%, #1a1e25 100%); padding: 2rem; display: flex; justify-content: center; width: 100%; box-sizing: border-box; }
+  /* Profile Side */
+  .profile-side {
+    background: linear-gradient(180deg, #15181e 0%, #1a1e25 100%);
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+  }
+
   .logo-container { width: 140px; height: 140px; margin: 0 auto 1.5rem; position: relative; }
   .animated-logo { width: 100%; height: 100%; border-radius: 50%; border: 3px solid #64ffda; position: relative; z-index: 2; box-shadow: 0 0 20px rgba(100, 255, 218, 0.2); }
   .pulse-ring { position: absolute; top: -10%; left: -10%; width: 120%; height: 120%; border: 2px solid #64ffda; border-radius: 50%; animation: pulse 3s infinite; opacity: 0; }
   @keyframes pulse { 0% { transform: scale(0.9); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
-  .desc-title { display: none; }
+
+  .desc-title { display: none; } /* Hidden on mobile */
   .desc-text { color: #b0b3b8; font-size: 0.95rem; line-height: 1.5; text-align: center; }
 
-  /* Contenuto */
-  .content-side { padding: 2rem 1.5rem; width: 100%; box-sizing: border-box; }
-  .section-title { color: #64ffda; font-size: 1.1rem; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid rgba(100, 255, 218, 0.2); padding-bottom: 0.5rem; margin-bottom: 1rem; }
+  /* Content Side */
+  .content-side {
+    padding: 2rem 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .section-title {
+    color: #64ffda;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(100, 255, 218, 0.2);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+  }
   
-  /* Griglie */
+  /* Grids */
   .social-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
   .card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; text-decoration: none; transition: transform 0.2s; }
   .social-card { display: flex; flex-direction: column; align-items: center; padding: 1.2rem; }
@@ -149,31 +199,48 @@ header:
   .card-label { color: #fff; font-size: 0.9rem; margin-top: 0.5rem; }
 
   .categories-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-  .category-card { position: relative; height: 180px; overflow: hidden; }
+  .category-card { position: relative; height: 180px; overflow: hidden; border-radius: 12px; }
   .card-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; transition: transform 0.5s; background-color: #222; }
   
-  /* Immagini Background Categorie */
+  /* Category Images */
   .category-card[data-category="writeups"] .card-bg { background-image: url('/images/writeups.jpg'); }
   .category-card[data-category="projects"] .card-bg { background-image: url('/images/projects.jpg'); }
   .category-card[data-category="university"] .card-bg { background-image: url('/images/pwncollege.svg'); background-size: contain; background-repeat: no-repeat; background-color: #111; }
 
   .card-content { position: relative; z-index: 2; width: 100%; height: 100%; background: rgba(26, 30, 37, 0.7); display: flex; flex-direction: column; justify-content: center; align-items: center; }
   .card-content h3 { color: #64ffda; font-size: 1.5rem; margin: 0; text-transform: uppercase; }
-  .card-content p { color: #ccc; font-size: 0.9rem; }
-  .btn-view { margin-top: 10px; background: transparent; color: #64ffda; padding: 5px 15px; border: 1px solid #64ffda; border-radius: 4px; text-decoration: none; font-size: 0.85rem; }
+  .card-content p { color: #ccc; font-size: 0.9rem; margin: 5px 0 15px; }
+  .btn-view { background: transparent; color: #64ffda; padding: 5px 15px; border: 1px solid #64ffda; border-radius: 4px; text-decoration: none; font-size: 0.85rem; transition: all 0.2s; }
   .btn-view:hover { background: #64ffda; color: #1a1e25; }
 
   .dashboard-footer { text-align: center; color: #555; margin-top: 2rem; font-size: 0.8rem; }
 
-  /* Desktop */
+  /* Desktop View */
   @media (min-width: 1024px) {
     .fullscreen-dashboard { flex-direction: row; height: 100vh; overflow: hidden; }
-    .profile-side { width: 35%; height: 100%; overflow-y: auto; border-right: 1px solid rgba(100,255,218,0.1); padding: 3rem 1rem; }
-    .content-side { width: 65%; height: 100%; overflow-y: auto; padding: 4rem 3rem; }
+    
+    .profile-side {
+      width: 35%;
+      height: 100%;
+      overflow-y: auto;
+      border-right: 1px solid rgba(100,255,218,0.1);
+      border-bottom: none;
+      padding: 3rem 1rem;
+    }
+    
+    .content-side {
+      width: 65%;
+      height: 100%;
+      overflow-y: auto;
+      padding: 4rem 3rem;
+    }
+    
     .logo-container { width: 260px; height: 260px; }
     .desc-title { display: block; color: #fff; font-size: 2rem; margin-bottom: 1rem; text-transform: uppercase; text-align: center; }
+    
     .categories-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
     .category-card { height: 220px; }
+    
     .category-card:hover .card-bg { transform: scale(1.05); }
     .card:hover { transform: translateY(-5px); border-color: #64ffda; }
   }
