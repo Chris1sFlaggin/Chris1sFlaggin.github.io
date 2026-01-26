@@ -2,165 +2,186 @@
 layout: default
 ---
 
-<div class="cyber-container">
-  <div class="cyber-header">
-    <h1 class="glitch-text" data-text="{{ page.title }}">{{ page.title }}</h1>
-    <div class="cyber-line"></div>
-    <p class="cyber-subtitle">Directory listing for: <span class="path">~/categories/{{ page.category }}</span></p>
+<div class="cyber-console">
+  <div class="console-header">
+    <span class="prompt">root@chris1sflaggin:~/categories/{{ page.category | downcase }}#</span> <span class="cursor">_</span>
   </div>
+  
+  <div class="console-body">
+    <h1 class="glitch-title" data-text="{{ page.title }}">{{ page.title }}</h1>
+    <div class="scan-line"></div>
+    
+    <p class="system-msg">
+      > ACCESSING SECURE ARCHIVES...<br>
+      > DECRYPTING ENTRIES...
+    </p>
 
-  <div class="posts-grid">
-    {% assign sorted_posts = site.categories[page.category] | sort: 'date' | reverse %}
-    {% for post in sorted_posts %}
-      <a href="{{ post.url | relative_url }}" class="cyber-card-item">
-        <div class="card-border"></div>
-        <div class="card-body">
-          <span class="date-badge">
-            <i class="fas fa-terminal"></i> {{ post.date | date: "%Y-%m-%d" }}
-          </span>
-          <h3>{{ post.title }}</h3>
-          <p>{{ post.excerpt | strip_html | truncatewords: 20 }}</p>
-          <div class="read-more">EXECUTE ></div>
-        </div>
-      </a>
-    {% endfor %}
-  </div>
+    <div class="posts-grid-cyber">
+      {% assign cat_key = page.category %}
+      {% assign posts = site.categories[cat_key] %}
+      
+      {% unless posts %}
+        {% assign cat_key_down = page.category | downcase %}
+        {% assign posts = site.categories[cat_key_down] %}
+      {% endunless %}
 
-  <div class="back-link">
-    <a href="{{ site.baseurl }}/">< [cd ..] Return to Root</a>
+      {% if posts and posts.size > 0 %}
+        {% assign sorted_posts = posts | sort: 'date' | reverse %}
+        
+        {% for post in sorted_posts %}
+          <a href="{{ post.url | relative_url }}" class="cyber-card">
+            <div class="card-decoration top-left"></div>
+            <div class="card-decoration top-right"></div>
+            <div class="card-decoration bottom-left"></div>
+            <div class="card-decoration bottom-right"></div>
+            
+            <div class="card-content">
+              <span class="file-perm">drwxr-xr-x</span>
+              <span class="file-date">{{ post.date | date: "%Y-%m-%d" }}</span>
+              <h3 class="file-name">{{ post.title }}</h3>
+              <p class="file-excerpt">{{ post.excerpt | strip_html | truncatewords: 20 }}</p>
+              <div class="status-bar">
+                <span class="status-ok">[ EXECUTE ]</span>
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      {% else %}
+        <p class="error-msg">ERROR: No data found in sector '{{ page.category }}'.</p>
+      {% endif %}
+    </div>
+    
+    <div class="cmd-footer">
+      <a href="{{ site.baseurl }}/" class="back-cmd">< [cd ..] Return to Root</a>
+    </div>
   </div>
 </div>
 
 <style>
   /* Cyber Layout Styles */
-  body {
-    background-color: #1a1e25;
-    color: #e0e0e0;
-    font-family: 'Courier New', Courier, monospace;
-  }
-
-  .cyber-container {
+  .cyber-console {
     max-width: 1000px;
-    margin: 4rem auto;
-    padding: 0 20px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: 'Courier New', Courier, monospace;
+    color: #e0e0e0;
   }
 
-  .cyber-header {
-    margin-bottom: 3rem;
-    text-align: left;
+  .console-header {
+    background: #111;
+    padding: 10px 20px;
+    border-top: 2px solid #64ffda;
+    border-radius: 5px 5px 0 0;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
   }
 
-  .glitch-text {
-    font-size: 3rem;
-    color: #64ffda;
+  .prompt { color: #64ffda; font-weight: bold; }
+  .cursor { animation: blink 1s infinite; color: #64ffda; }
+  
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  .glitch-title {
+    font-size: 2.5rem;
+    color: #fff;
     text-transform: uppercase;
     margin: 0;
+    text-shadow: 2px 2px 0px #03a9f4;
     letter-spacing: 2px;
-    text-shadow: 2px 2px 0px #0a0a0a;
   }
 
-  .cyber-line {
+  .scan-line {
     height: 2px;
-    background: linear-gradient(90deg, #64ffda 0%, transparent 100%);
-    margin: 1rem 0;
+    background: linear-gradient(90deg, transparent, #64ffda, transparent);
+    margin: 1rem 0 2rem 0;
+    opacity: 0.7;
   }
 
-  .cyber-subtitle {
+  .system-msg {
     color: #8892b0;
-    font-size: 1rem;
-  }
-
-  .path {
-    color: #ff79c6;
-    background: rgba(255, 121, 198, 0.1);
-    padding: 2px 6px;
-    border-radius: 4px;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
   }
 
   /* Grid System */
-  .posts-grid {
+  .posts-grid-cyber {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 25px;
+    gap: 30px;
   }
 
   /* Cyber Card */
-  .cyber-card-item {
-    position: relative;
+  .cyber-card {
     display: block;
+    position: relative;
+    background: #161b22;
+    border: 1px solid #30363d;
     text-decoration: none;
-    background: #111;
-    transition: transform 0.2s ease;
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
   }
 
-  .cyber-card-item:hover {
+  .cyber-card:hover {
     transform: translateY(-5px);
-  }
-
-  .card-border {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    border: 1px solid #333;
-    z-index: 1;
-    transition: border-color 0.3s;
-  }
-
-  .cyber-card-item:hover .card-border {
+    box-shadow: 0 0 15px rgba(100, 255, 218, 0.15);
     border-color: #64ffda;
-    box-shadow: 0 0 15px rgba(100, 255, 218, 0.1);
   }
 
-  .card-body {
-    position: relative;
-    z-index: 2;
-    padding: 20px;
+  .cyber-card:hover .status-ok {
+    background: #64ffda;
+    color: #000;
   }
 
-  .date-badge {
-    display: block;
+  .card-content { padding: 20px; }
+
+  /* Angoli decorativi */
+  .card-decoration {
+    position: absolute;
+    width: 10px; height: 10px;
+    transition: all 0.3s;
+  }
+  .top-left { top: 0; left: 0; border-top: 2px solid #64ffda; border-left: 2px solid #64ffda; }
+  .top-right { top: 0; right: 0; border-top: 2px solid #64ffda; border-right: 2px solid #64ffda; }
+  .bottom-left { bottom: 0; left: 0; border-bottom: 2px solid #64ffda; border-left: 2px solid #64ffda; }
+  .bottom-right { bottom: 0; right: 0; border-bottom: 2px solid #64ffda; border-right: 2px solid #64ffda; }
+
+  .file-perm, .file-date {
+    font-size: 0.75rem;
     color: #64ffda;
-    font-size: 0.8rem;
-    margin-bottom: 10px;
-    font-family: monospace;
+    opacity: 0.7;
+    display: block;
+    margin-bottom: 5px;
   }
 
-  .cyber-card-item h3 {
-    margin: 0 0 10px 0;
+  .file-name {
     color: #fff;
-    font-size: 1.4rem;
+    margin: 10px 0;
+    font-size: 1.2rem;
   }
 
-  .cyber-card-item p {
-    color: #8892b0;
+  .file-excerpt {
+    color: #8b949e;
     font-size: 0.9rem;
     line-height: 1.5;
+    margin-bottom: 20px;
   }
 
-  .read-more {
-    margin-top: 15px;
+  .status-bar {
+    text-align: right;
+  }
+
+  .status-ok {
+    border: 1px solid #64ffda;
     color: #64ffda;
-    font-weight: bold;
-    font-size: 0.9rem;
-    opacity: 0.8;
-  }
-
-  .cyber-card-item:hover .read-more {
-    opacity: 1;
-    text-decoration: underline;
-  }
-
-  .back-link {
-    margin-top: 3rem;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    transition: all 0.2s;
   }
   
-  .back-link a {
-    color: #8892b0;
-    text-decoration: none;
-    font-family: monospace;
-    font-size: 1.1rem;
-  }
-  
-  .back-link a:hover {
-    color: #64ffda;
-  }
+  .error-msg { color: #ff5555; }
+
+  .cmd-footer { margin-top: 4rem; border-top: 1px solid #30363d; padding-top: 1rem; }
+  .back-cmd { color: #8892b0; text-decoration: none; }
+  .back-cmd:hover { color: #64ffda; }
 </style>
