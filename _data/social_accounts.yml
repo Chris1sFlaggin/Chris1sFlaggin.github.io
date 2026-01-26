@@ -13,6 +13,6 @@
   logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/LinkedIn_icon.svg/2048px-LinkedIn_icon.svg.png"
   alt: "Profilo LinkedIn"  
 
-- name: Ethernaut Dashboard
+- name: "Ethernaut"
   url: /ethernaut-dashboard/
   icon: "https://nodauf.dev/images/openzeppelin-logo.svg" 
