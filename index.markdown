@@ -78,6 +78,18 @@ header:
             <div class="card-content">
               <h3>{{ category_name }}</h3>
               <p>{{ site.categories[category_name].size }} posts</p>
+              
+              <!-- Mostra sottocategorie se esistono -->
+              {% if category_name == 'writeups' %}
+                <div class="subcategories">
+                  {% assign stack_posts = site.categories['stack'] %}
+                  {% if stack_posts.size > 0 %}
+                    <span class="subcategory">Stack ({{ stack_posts.size }})</span>
+                  {% endif %}
+                  <!-- Aggiungi altre sottocategorie qui -->
+                </div>
+              {% endif %}
+              
               <a href="{{ site.baseurl }}/categories/{{ category_name | slugify }}/" class="btn-view">View Posts</a>
             </div>
           </div>
@@ -313,6 +325,20 @@ header:
   .star-alert-content { background: #1a1e25; border: 2px solid #64ffda; padding: 2rem; border-radius: 16px; text-align: center; color: #fff; }
   .close-button { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
   .hidden { display: none !important; }
+
+  .subcategories {
+    margin: 0.5rem 0;
+  }
+  
+  .subcategory {
+    background: rgba(100, 255, 218, 0.2);
+    color: #64ffda;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    display: inline-block;
+    margin: 0.2rem;
+  }
 </style>
 
 <script>
