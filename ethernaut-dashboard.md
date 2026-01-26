@@ -6,7 +6,7 @@ permalink: /ethernaut-dashboard/
 
 <div id="ethernaut-app" style="background: #1a1e25; color: #64ffda; padding: 20px; border-radius: 10px; border: 1px solid #64ffda; font-family: 'Courier New', Courier, monospace;">
   <div id="connection-status" style="margin-bottom: 20px; border-bottom: 1px solid #64ffda; padding-bottom: 10px;">
-    📡 <strong>Status:</strong> Mostrando i progressi ufficiali di Chris
+    Progressi attuali
   </div>
   
   <div id="level-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;"></div>
