@@ -1,0 +1,1562 @@
+[
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "Qual è la definizione formale di Sistema Operativo fornita dal testo?",
+    "risposta": "È un programma che agisce da intermediario tra l'utente e l'hardware, gestendo le risorse e fornendo un ambiente per l'esecuzione dei programmi in modo efficiente e sicuro."
+  },
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "Perché il Sistema Operativo è definito \"Allocatore di Risorse\"?",
+    "risposta": "Perché deve gestire e assegnare in modo equo e senza conflitti le risorse limitate del computer (CPU, memoria, spazio su disco, dispositivi I/O) tra i vari programmi e utenti."
+  },
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "Cos'è il \"Kernel\" e in cosa differisce dai programmi di sistema?",
+    "risposta": "Il kernel è l'unico programma sempre in esecuzione sul computer. I programmi di sistema sono software associati al SO ma non fanno parte del core, mentre i programmi applicativi sono quelli dell'utente."
+  },
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "Descrivi il meccanismo di Interrupt (Interruzione).",
+    "risposta": "È un segnale inviato dall'hardware o dal software alla CPU per segnalare un evento che richiede attenzione immediata. La CPU sospende il lavoro corrente e trasferisce l'esecuzione a una routine di servizio (Interrupt Service Routine)."
+  },
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "Cos'è il Vettore delle Interruzioni (Interrupt Vector)?",
+    "risposta": "È una tabella di indirizzi di memoria che punta alle varie routine di gestione delle interruzioni, permettendo alla CPU di saltare rapidamente alla funzione corretta in base al tipo di segnale ricevuto."
+  },
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "Spiega la differenza tra I/O sincrono e asincrono.",
+    "risposta": "Nell'I/O sincrono il controllo torna all'utente solo al termine dell'operazione. In quello asincrono, il controllo torna immediatamente e il programma può fare altro mentre l'I/O prosegue."
+  },
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "Cos'è l'accesso diretto alla memoria (DMA - Direct Memory Access)?",
+    "risposta": "È una tecnica che permette a un dispositivo di I/O ad alta velocità di trasferire interi blocchi di dati direttamente da/verso la memoria principale senza l'intervento costante della CPU per ogni byte."
+  },
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "Descrivi la gerarchia della memoria in base a velocità, costo e volatilità.",
+    "risposta": "La gerarchia va dai Registri (più veloci/cari/piccoli) alla Cache, RAM, Disco a stato solido (SSD), Disco Rigido (HDD) e Nastri (più lenti/economici/grandi)."
+  },
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "Cos'è il Caching e perché è fondamentale?",
+    "risposta": "È la copia di informazioni in una memoria più veloce (cache) per un accesso rapido. È fondamentale per mitigare il divario di velocità tra i componenti (es. tra CPU e RAM)."
+  },
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "Definisci il Multiprogramming (Multiprogrammazione).",
+    "risposta": "È la capacità di tenere più processi in memoria contemporaneamente affinché la CPU abbia sempre un lavoro da eseguire, aumentando così l'utilizzo della CPU (CPU utilization)."
+  },
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "Cos'è il Time-Sharing (Smultitasking) e come si differenzia dalla multiprogrammazione?",
+    "risposta": "È un'estensione logica della multiprogrammazione in cui la CPU commuta tra i processi così velocemente che gli utenti possono interagire con ogni programma durante l'esecuzione."
+  },
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "Spiega il funzionamento del Dual-Mode (User mode vs Kernel mode).",
+    "risposta": "L'hardware fornisce un bit di modalità (mode bit). In User Mode (1) l'accesso è limitato; in Kernel Mode (0) il SO ha il controllo totale. Serve a proteggere il sistema da utenti malintenzionati o errori."
+  },
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "Cos'è una \"Istruzione Privilegiata\"?",
+    "risposta": "Un'istruzione che può essere eseguita solo in Kernel Mode (es. disabilitare interruzioni, gestire la memoria, accedere all'I/O). Se eseguita in User Mode, causa un Trap."
+  },
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "Cos'è il Program Counter (PC)?",
+    "risposta": "Un registro che contiene l'indirizzo della prossima istruzione da eseguire per un determinato processo."
+  },
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "Qual è la differenza tra un sistema monoprocessore e uno multiprocessore (Symmetric Multiprocessing - SMP)?",
+    "risposta": "Nel monoprocessore c'è una sola CPU. Nell'SMP, più processori condividono la stessa memoria fisica e il sistema operativo, eseguendo compiti in parallelo."
+  },
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "Cos'è un sistema Clustered?",
+    "risposta": "Un insieme di sistemi separati (nodi) collegati tra loro che lavorano insieme, spesso condividendo lo storage, per fornire alta affidabilità e prestazioni."
+  },
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "A cosa serve il Timer di sistema?",
+    "risposta": "Serve a impedire che un programma utente monopolizzi la CPU. Alla scadenza del timer, viene generata un'interruzione che restituisce il controllo al SO."
+  },
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "Cosa si intende per \"Gestione della Memoria\" nel Capitolo 1?",
+    "risposta": "Il SO deve tracciare quali parti della memoria sono in uso, decidere quali processi caricare quando lo spazio è disponibile e allocare/deallocare spazio secondo necessità."
+  },
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "Cos'è la Protezione e la Sicurezza (Protection vs Security)?",
+    "risposta": "La protezione è il meccanismo per controllare l'accesso alle risorse interne; la sicurezza è la difesa del sistema contro attacchi esterni (virus, hacker)."
+  },
+  {
+    "capitolo": "1",
+    "titolo": "Introduzione e Strutture del Sistema",
+    "domanda": "Definisci il concetto di \"Sistema Operativo Real-Time\".",
+    "risposta": "Un sistema con vincoli temporali rigidi dove l'elaborazione deve essere completata entro scadenze precise (deadline), pena il fallimento del sistema."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "Cosa sono le System Call e come vengono utilizzate da un programma?",
+    "risposta": "Sono l'interfaccia di programmazione tra un processo e il sistema operativo. Generalmente non vengono chiamate direttamente, ma tramite API (Application Programming Interface) come POSIX (Linux) o Win32 (Windows)."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "Descrivi il meccanismo di passaggio dei parametri alle System Call.",
+    "risposta": "Esistono tre metodi: 1) Tramite registri della CPU (veloce ma limitato); 2) Tramite un blocco o tabella in memoria, il cui indirizzo è passato in un registro; 3) Tramite lo stack (pila), dove i parametri vengono inseriti (pushed) dal programma e prelevati dal SO."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "Qual è la differenza tra Programmi di Sistema (System Programs) e System Call?",
+    "risposta": "Le System Call sono funzioni di base del kernel. I Programmi di Sistema sono utility fornite con il SO (es. ls, cp, editor di testo) che utilizzano le system call per offrire un ambiente di sviluppo ed esecuzione all'utente."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "Elenca le 5 categorie principali di System Call.",
+    "risposta": "1) Controllo dei processi; 2) Manipolazione dei file; 3) Gestione dei dispositivi (I/O); 4) Mantenimento delle informazioni; 5) Comunicazioni."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "Cos'è l'interprete dei comandi (Shell) e dove risiede?",
+    "risposta": "È un programma di sistema che legge e interpreta i comandi impartiti dall'utente. Può essere integrato nel kernel (raro) o essere un programma separato che viene avviato al login."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "Descrivi la struttura a Monolite (Monolithic Kernel).",
+    "risposta": "Tutto il sistema operativo (scheduling, file system, gestione memoria) risiede in un unico grande spazio di indirizzamento nel kernel. È molto veloce per via dell'overhead ridotto, ma difficile da manutenere ed estendere."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "Cos'è la struttura a Strati (Layered Approach)?",
+    "risposta": "Il SO è diviso in livelli. Il livello 0 è l'hardware, l'ultimo è l'interfaccia utente. Ogni livello usa solo i servizi del livello inferiore. È facile da debuggare ma difficile da progettare efficientemente."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "Spiega la filosofia del Microkernel.",
+    "risposta": "Sposta il maggior numero possibile di servizi dal kernel allo \"spazio utente\" (user space). Il kernel gestisce solo la comunicazione minima, la memoria e lo scheduling. È molto sicuro e facile da estendere."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "Come comunicano i moduli in un sistema a Microkernel?",
+    "risposta": "Tramite il Message Passing (scambio di messaggi). Se un programma vuole leggere un file, invia un messaggio al servizio file system attraverso il microkernel."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "Cosa sono i Moduli Caricabili (Loadable Kernel Modules - LKM)?",
+    "risposta": "È l'approccio moderno (usato da Linux). Il kernel ha un core centrale e può caricare o scaricare moduli (es. driver, file system) a tempo di esecuzione senza dover riavviare il sistema."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "Cos'è un Sistema Ibrido?",
+    "risposta": "Un sistema che combina diverse architetture per bilanciare prestazioni e modularità (es. macOS usa un mix di microkernel Mach e componenti monolitici BSD)."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "A cosa serve il \"System Boot\" (Avvio del sistema)?",
+    "risposta": "È il processo di caricamento del kernel in memoria. Inizia con un piccolo codice chiamato bootstrap program (nella ROM o EEPROM) che individua il kernel sul disco, lo carica e lo avvia."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "Qual è il ruolo dei Servizi del Sistema Operativo?",
+    "risposta": "Fornire funzioni comuni agli utenti: esecuzione programmi, operazioni di I/O, manipolazione del file system, comunicazioni, rilevamento errori, allocazione risorse e protezione."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "Cos'è l'interfaccia GUI rispetto alla CLI?",
+    "risposta": "La CLI (Command Line Interface) usa testo e tastiera; la GUI (Graphical User Interface) usa icone, finestre e dispositivi di puntamento. Entrambe servono a invocare i servizi del SO."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "Come viene gestito l'errore di una System Call?",
+    "risposta": "Solitamente la chiamata restituisce un codice d'errore (es. -1) e scrive il dettaglio in una variabile globale (es. errno in C)."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "Perché le API sono preferite alle System Call dirette?",
+    "risposta": "Per la portabilità. Un programma scritto usando le API può essere compilato su diversi sistemi che supportano quell'interfaccia, senza conoscere i dettagli specifici del kernel sottostante."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "Cos'è la \"System Call Interface\"?",
+    "risposta": "È lo strato che intercetta le chiamate alle API e invoca le corrispondenti funzioni nel kernel, gestendo una tabella di numeri identificativi per ogni system call."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "Qual è il vantaggio principale del Microkernel rispetto al Monolito?",
+    "risposta": "La robustezza: se un servizio (es. il driver della stampante) crasha in spazio utente, il kernel continua a funzionare. Nel monolito, un errore in un driver può bloccare l'intero sistema."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "Cos'è il \"Core Dump\"?",
+    "risposta": "Un file generato dal SO quando un processo fallisce, contenente lo stato della memoria del processo in quel momento per scopi di debugging."
+  },
+  {
+    "capitolo": "2",
+    "titolo": "Strutture del Sistema",
+    "domanda": "Qual è l'obiettivo principale dei sistemi Virtual Machine?",
+    "risposta": "Emulare l'hardware di una macchina fisica per permettere l'esecuzione di più sistemi operativi contemporaneamente in modo isolato sullo stesso hardware."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Qual è la differenza formale tra Programma e Processo?",
+    "risposta": "Il programma è un'entità passiva (un file eseguibile su disco); il processo è un'entità attiva, un programma in esecuzione che include il Program Counter, i registri della CPU e lo stack."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Descrivi le sezioni di un processo in memoria (Stack, Heap, Data, Text).",
+    "risposta": "1) Text: il codice eseguibile; 2) Data: variabili globali e statiche; 3) Heap: memoria allocata dinamicamente durante il run-time; 4) Stack: dati temporanei (parametri di funzioni, indirizzi di ritorno, variabili locali)."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Quali sono i 5 stati principali di un processo?",
+    "risposta": "1) New (creazione); 2) Running (istruzioni in esecuzione); 3) Waiting (in attesa di un evento/IO); 4) Ready (pronto per essere assegnato alla CPU); 5) Terminated (fine esecuzione)."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Cos'è il Process Control Block (PCB)?",
+    "risposta": "È la struttura dati nel kernel che contiene tutte le informazioni di un processo: stato, PC, registri, limiti di memoria, elenco dei file aperti e statistiche di scheduling."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Cos'è il Context Switch (Cambio di contesto) e perché è considerato un costo (overhead)?",
+    "risposta": "È il salvataggio dello stato del processo attuale e il caricamento di quello del nuovo processo. È un costo perché la CPU non compie lavoro utile per l'utente durante questa operazione."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Spiega la differenza tra lo Scheduler a breve termine (CPU Scheduler) e a lungo termine (Job Scheduler).",
+    "risposta": "Quello a breve termine sceglie quale processo eseguire tra quelli pronti (frequente); quello a lungo termine controlla il grado di multiprogrammazione decidendo quali processi portare dal disco alla memoria (meno frequente)."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Cos'è un processo \"I/O-bound\" rispetto a uno \"CPU-bound\"?",
+    "risposta": "Un processo I/O-bound passa più tempo a fare I/O che calcoli (brevi raffiche di CPU); un processo CPU-bound usa la maggior parte del tempo per calcoli (lunghe raffiche di CPU)."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Descrivi il meccanismo di creazione dei processi: fork() e exec().",
+    "risposta": "fork() crea un processo figlio che è una copia esatta del padre; exec() sostituisce lo spazio di memoria del processo con un nuovo programma."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Cosa succede se un padre termina prima del figlio?",
+    "risposta": "Il figlio diventa un processo Orfano (Orphan) e viene solitamente \"adottato\" dal processo radice (init o systemd)."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Cos'è un processo \"Zombie\"?",
+    "risposta": "Un processo che è terminato ma la cui voce nel PCB rimane nella tabella dei processi finché il padre non esegue la chiamata wait()."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Qual è lo scopo della Comunicazione tra Processi (IPC)?",
+    "risposta": "Permettere ai processi di scambiare dati e sincronizzarsi. Utile per la condivisione di informazioni, la velocità di calcolo (parallelismo) e la modularità."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Confronta i due modelli di IPC: Memoria Condivisa (Shared Memory) e Scambio di Messaggi (Message Passing).",
+    "risposta": "La memoria condivisa è più veloce (velocità della RAM) ma richiede sincronizzazione manuale; lo scambio di messaggi è più facile da implementare (specialmente in sistemi distribuiti) ma ha l'overhead delle system call."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Nello scambio di messaggi, qual è la differenza tra comunicazione Diretta e Indiretta?",
+    "risposta": "Nella Diretta, il mittente deve nominare esplicitamente il destinatario; nella Indiretta, i messaggi vengono inviati a \"caselle postali\" (mailboxes) o porte."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Cosa si intende per comunicazione Sincrona (Blocking) e Asincrona (Non-blocking)?",
+    "risposta": "Sincrona: il mittente/ricevente si blocca finché il messaggio non è inviato/ricevuto. Asincrona: il mittente invia e prosegue; il ricevente ottiene un messaggio o un valore nullo senza fermarsi."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Cos'è il buffering nei sistemi di messaggistica (Capacità zero, limitata, illimitata)?",
+    "risposta": "Zero: il mittente deve aspettare il ricevente (appuntamento); Limitata: coda di lunghezza n; Illimitata: il mittente non si blocca mai."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Descrivi il concetto di Socket.",
+    "risposta": "È un punto di terminazione (endpoint) per la comunicazione tra due processi attraverso una rete, identificato da una coppia Indirizzo IP e Numero di Porta."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Cosa sono le RPC (Remote Procedure Calls)?",
+    "risposta": "Permettono a un programma di eseguire una procedura su un altro computer come se fosse una chiamata locale, utilizzando \"stubs\" per gestire i dettagli della rete."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Cos'è una Pipe ordinaria (anonima) e qual è il suo limite principale?",
+    "risposta": "Permette la comunicazione unidirezionale tra due processi correlati (padre-figlio). Il limite è che non può essere usata tra processi non correlati."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Cosa sono le Named Pipes (FIFO)?",
+    "risposta": "Pipe che appaiono come file nel file system; permettono la comunicazione bidirezionale tra processi qualsiasi, anche senza legami di parentela."
+  },
+  {
+    "capitolo": "3",
+    "titolo": "Processi",
+    "domanda": "Perché lo scheduling dei processi è necessario?",
+    "risposta": "Per massimizzare l'utilizzo della CPU (tenerla sempre occupata) e per garantire tempi di risposta rapidi agli utenti in un sistema multitasking."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Cos'è un Thread e in cosa differisce da un processo?",
+    "risposta": "Un thread (o processo leggero) è l'unità base di utilizzo della CPU. Mentre un processo ha un proprio spazio di indirizzamento isolato, i thread dello stesso processo condividono il codice, i dati e le risorse del sistema operativo, ma hanno ciascuno il proprio Program Counter, i registri e lo stack."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Quali sono i quattro vantaggi principali della programmazione multithread?",
+    "risposta": "1) Reattività (l'applicazione continua a rispondere anche se una parte è bloccata); 2) Condivisione delle risorse (più facile e veloce della IPC); 3) Economia (creare thread costa meno che creare processi); 4) Scalabilità (sfrutta meglio le architetture multiprocessore)."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Cosa condividono tra loro i thread appartenenti allo stesso processo?",
+    "risposta": "Condividono la sezione del codice (text), la sezione dei dati (variabili globali) e le risorse del sistema operativo (come i file aperti e i segnali)."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Qual è la differenza tra Parallelismo e Concorrenza?",
+    "risposta": "La concorrenza permette a più task di fare progressi (anche su una sola CPU tramite time-sharing). Il parallelismo permette l'esecuzione simultanea di più task (richiede più processori o core)."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Descrivi il Parallelismo dei Dati (Data Parallelism).",
+    "risposta": "Distribuisce sottoinsiemi dello stesso dato su più core, eseguendo la stessa operazione su ogni core (es. sommare una matrice gigante)."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Descrivi il Parallelismo delle Mansioni (Task Parallelism).",
+    "risposta": "Distribuisce thread diversi (mansioni diverse) su più core, dove ogni thread opera sugli stessi dati o su dati differenti."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Cosa sono i Thread Utente (User Threads)?",
+    "risposta": "Sono thread gestiti da librerie a livello utente senza il supporto diretto del kernel. Il kernel vede solo il processo e non i singoli thread."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Cosa sono i Thread Kernel (Kernel Threads)?",
+    "risposta": "Sono thread supportati e gestiti direttamente dal sistema operativo. Il kernel esegue lo scheduling dei singoli thread invece che dei processi."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Descrivi il modello Many-to-One.",
+    "risposta": "Molti thread utente sono mappati su un unico thread kernel. Se un thread utente esegue una system call bloccante, l'intero processo si blocca. Non sfrutta il multicore."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Descrivi il modello One-to-One.",
+    "risposta": "Ogni thread utente ha un corrispondente thread kernel. Offre massima concorrenza, ma la creazione di troppi thread può appesantire il sistema (overhead del kernel). È il modello usato da Linux e Windows."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Descrivi il modello Many-to-Many.",
+    "risposta": "Molti thread utente vengono multiplexati su un numero uguale o minore di thread kernel. Combina i vantaggi degli altri due modelli senza i loro limiti estremi."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Cos'è una Libreria di Thread (Thread Library)?",
+    "risposta": "Forisce al programmatore un'API per la creazione e gestione dei thread. Esempi principali sono Pthreads (POSIX), Windows threads e Java threads."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Spiega la differenza tra la creazione di thread asincrona e sincrona.",
+    "risposta": "Asincrona: il padre crea il figlio e continua l'esecuzione. Sincrona (fork-join): il padre aspetta che tutti i figli terminino prima di riprendere."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Cosa succede se un thread chiama la system call fork()?",
+    "risposta": "Dipende dall'implementazione: alcune versioni duplicano tutti i thread del processo, altre duplicano solo il thread che ha chiamato la fork()."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Qual è lo scopo della system call exec() in un ambiente multithread?",
+    "risposta": "Se un thread chiama exec(), il nuovo programma sostituirà l'intero processo, inclusi tutti gli altri thread esistenti."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Cos'è la Cancellazione del Thread (Thread Cancellation) e quali sono i due tipi?",
+    "risposta": "È il termine di un thread prima che sia completato. 1) Asincrona: termina il thread bersaglio immediatamente. 2) Differita (deferred): il thread bersaglio controlla periodicamente se deve terminare (punto di cancellazione)."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Cosa sono i Segnali (Signals) nei sistemi UNIX?",
+    "risposta": "Sono notifiche inviate a un processo per comunicare che si è verificato un evento specifico. Possono essere sincroni (errori di memoria) o asincroni (pressione di Ctrl+C)."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Cos'è un Thread Pool e perché si usa?",
+    "risposta": "È un insieme di thread creati all'avvio che aspettano lavoro in una coda. Evita il costo continuo di creazione/distruzione dei thread e limita il numero massimo di thread attivi."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Cosa sono i Thread-Specific Data (Dati specifici del thread)?",
+    "risposta": "Dati che appartengono esclusivamente a un determinato thread (non condivisi), utili quando il programmatore non ha controllo sulla creazione del thread (es. in un pool)."
+  },
+  {
+    "capitolo": "4",
+    "titolo": "Thread",
+    "domanda": "Cos'è lo Scheduler Activations?",
+    "risposta": "Un meccanismo di comunicazione tra il kernel e la libreria dei thread (tramite upcalls) per mantenere il numero corretto di thread kernel assegnati a un'applicazione."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Qual è l'obiettivo principale del multiprogramming in relazione alla CPU?",
+    "risposta": "Massimizzare l'utilizzo della CPU (CPU utilization). L'idea è di avere sempre un processo in esecuzione per evitare che la CPU rimanga inattiva durante le operazioni di I/O degli altri processi."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Cos'è il ciclo \"CPU-I/O Burst Cycle\"?",
+    "risposta": "L'esecuzione di un processo consiste in un'alternanza di raffiche di calcolo (CPU burst) e raffiche di attesa per l'input/output (I/O burst). Lo scheduling avviene quando termina un CPU burst."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Spiega la differenza tra Scheduling Preemptive (con diritto di prelazione) e Non-preemptive.",
+    "risposta": "Nel Non-preemptive, un processo tiene la CPU finché non la rilascia volontariamente o termina. Nel Preemptive, il sistema operativo può interrompere un processo in esecuzione per assegnare la CPU a un altro (es. quando arriva un processo a priorità più alta)."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Qual è il ruolo del Dispatcher?",
+    "risposta": "È il modulo che assegna materialmente il controllo della CPU al processo selezionato dallo scheduler. Si occupa del context switch, del passaggio alla modalità utente e del salto all'indirizzo corretto del programma."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Definisci la \"Dispatch Latency\".",
+    "risposta": "È il tempo impiegato dal dispatcher per fermare un processo e avviarne un altro. Deve essere il più piccolo possibile."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Quali sono i 5 criteri principali per valutare un algoritmo di scheduling?",
+    "risposta": "1) CPU Utilization (massimizzare); 2) Throughput (n. processi completati nell'unità di tempo); 3) Turnaround Time (tempo totale dalla sottomissione alla fine); 4) Waiting Time (tempo passato nella ready queue); 5) Response Time (tempo dalla richiesta alla prima risposta)."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Descrivi l'algoritmo FCFS (First-Come, First-Served) e il suo principale difetto.",
+    "risposta": "I processi sono serviti nell'ordine di arrivo. Il difetto principale è l'effetto convoglio (Convoy Effect): processi brevi devono aspettare dietro un processo molto lungo, aumentando il tempo medio di attesa."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Come funziona l'algoritmo SJF (Shortest Job First)?",
+    "risposta": "Assegna la CPU al processo che ha il prossimo CPU burst più breve. È l'algoritmo ottimale per minimizzare il tempo medio di attesa."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Qual è la difficoltà principale nell'implementare SJF?",
+    "risposta": "Non è possibile conoscere in anticipo la durata del prossimo CPU burst. Si può solo stimare usando una media esponenziale dei burst precedenti."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Cos'è lo Shortest-Remaining-Time-First (SRTF)?",
+    "risposta": "È la versione preemptive di SJF. Se arriva un nuovo processo con un burst residuo minore di quello corrente, la CPU viene riassegnata al nuovo arrivato."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Descrivi lo Scheduling a Priorità e il problema della Starvation.",
+    "risposta": "Ogni processo ha un numero (priorità). La CPU va al processo con priorità più alta. La Starvation avviene quando processi a bassa priorità non vengono mai eseguiti perché arrivano sempre processi a priorità più alta."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Cos'è la tecnica dell'\"Aging\" (Invecchiamento)?",
+    "risposta": "È la soluzione alla starvation: consiste nell'aumentare gradualmente la priorità dei processi che attendono nella ready queue da molto tempo."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Come funziona l'algoritmo Round Robin (RR)?",
+    "risposta": "È progettato per i sistemi time-sharing. Ogni processo riceve una piccola unità di tempo di CPU (time quantum). Allo scadere, il processo viene messo in coda e la CPU passa al successivo."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Come influisce la dimensione del Time Quantum sulle prestazioni del Round Robin?",
+    "risposta": "Se il quantum è troppo grande, RR diventa un FCFS. Se è troppo piccolo, l'overhead del context switch diventa eccessivo, rallentando il sistema."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Descrivi le Multilevel Queue (Code a più livelli).",
+    "risposta": "La ready queue è divisa in code separate (es. processi interattivi in primo piano e processi batch in background). Ogni coda può avere il suo algoritmo di scheduling specifico."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Cosa differenzia le Multilevel Feedback Queues dalle code semplici?",
+    "risposta": "Permettono ai processi di spostarsi tra le code. Se un processo usa troppa CPU viene spostato in una coda a priorità più bassa; se un processo aspetta troppo viene promosso in una a priorità più alta (aging)."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Cos'è l'Affinità del Processore (Processor Affinity)?",
+    "risposta": "Nei sistemi multiprocessore, è la tendenza a mantenere un processo sulla stessa CPU per sfruttare i dati già presenti nella memoria cache di quel processore."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Spiega la differenza tra Load Balancing \"Push\" e \"Pull\".",
+    "risposta": "Push migration: un task specifico controlla il carico e \"spinge\" processi dalle CPU cariche a quelle scariche. Pull migration: una CPU inattiva \"tira\" un processo da una coda di una CPU occupata."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Cos'è il Real-Time Scheduling \"Hard\" rispetto al \"Soft\"?",
+    "risposta": "Nel Hard, i task devono assolutamente essere completati entro la loro deadline. Nel Soft, si garantisce solo la priorità ai task critici, ma senza garanzie assolute di scadenza."
+  },
+  {
+    "capitolo": "5",
+    "titolo": "Scheduling della CPU",
+    "domanda": "Definisci la Latenza di Interruzione (Interrupt Latency) nei sistemi Real-Time.",
+    "risposta": "È l'intervallo di tempo dal momento in cui arriva un'interruzione a quando inizia l'esecuzione della routine di servizio corrispondente. Deve essere minima per garantire la reattività del sistema."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "Cos'è una Race Condition (Corsa critica)?",
+    "risposta": "È una situazione in cui più processi accedono e manipolano dati condivisi in modo concorrente, e l'esito finale dell'esecuzione dipende dall'ordine particolare in cui avvengono gli accessi."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "Definisci il problema della Sezione Critica.",
+    "risposta": "È un segmento di codice in cui un processo modifica dati condivisi (variabili, tabelle, file). Il problema consiste nel progettare un protocollo che garantisca che nessun altro processo sia nella sua sezione critica mentre uno lo è già."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "Quali sono i tre requisiti fondamentali per una soluzione al problema della sezione critica?",
+    "risposta": "1) Mutua Esclusione (solo un processo alla volta); 2) Progresso (se nessuno è nella sezione critica, la decisione su chi entra non può essere rimandata all'infinito); 3) Attesa Limitata (un processo non deve aspettare per sempre l'ingresso)."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "Spiega l'approccio dei \"Kernel Preemptive\" vs \"Non-preemptive\" per la sincronizzazione.",
+    "risposta": "Un kernel non-preemptive evita race condition perché un processo non viene interrotto mentre è in modalità kernel. Un kernel preemptive è più difficile da progettare ma più reattivo, poiché permette interruzioni anche durante le operazioni di sistema."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "Cos'è la soluzione di Peterson?",
+    "risposta": "È una soluzione classica basata su software per due processi. Utilizza due variabili condivise: un array flag (intenzione di entrare) e una variabile turn (a chi tocca). È limitata a due processi e richiede un'architettura di memoria specifica."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "Cosa si intende per supporto hardware alla sincronizzazione?",
+    "risposta": "L'uso di istruzioni atomiche speciali fornite dalla CPU, come TestAndSet o CompareAndSwap, che permettono di leggere e modificare una variabile in un unico passo indivisibile."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "Cos'è l'Atomicità?",
+    "risposta": "Una proprietà di un'operazione o di un insieme di istruzioni che garantisce che vengano eseguite come un'unica unità senza interruzioni. Se fallisce, non deve lasciare effetti parziali."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "Definisci il Mutex Lock.",
+    "risposta": "È lo strumento di sincronizzazione più semplice. Un processo deve acquisire il lock (acquire()) prima di entrare nella sezione critica e rilasciarlo (release()) all'uscita. È basato su una variabile booleana."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "Cos'è lo Spinlock e quando è utile usarlo?",
+    "risposta": "È un mutex lock in cui il processo \"gira\" in un ciclo continuo aspettando che il lock si liberi (busy waiting). È utile in sistemi multiprocessore se il tempo di attesa previsto è inferiore a quello di due context switch."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "Cos'è un Semaforo e qual è la sua struttura?",
+    "risposta": "È una variabile intera a cui si accede solo tramite due operazioni atomiche: wait() (o P) e signal() (o V). Se il valore è <= 0, il processo chiamante si blocca."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "Differenza tra Semaforo Binario e Semaforo Counting.",
+    "risposta": "Il binario (0 o 1) agisce come un mutex. Il counting può assumere qualsiasi valore intero e viene usato per gestire l'accesso a una risorsa con più istanze disponibili."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "Come si risolve il problema del \"Busy Waiting\" nei semafori?",
+    "risposta": "Implementando una coda di attesa associata al semaforo. Invece di ciclare, il processo viene sospeso (stato waiting) e messo in una coda; viene poi risvegliato da un altro processo tramite l'operazione signal()."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "Cos'è l'Inversione di Priorità (Priority Inversion)?",
+    "risposta": "Si verifica quando un processo ad alta priorità deve aspettare una risorsa detenuta da uno a bassa priorità, che a sua volta è interrotto da uno a priorità media."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "Descrivi il protocollo di Ereditarietà della Priorità (Priority Inheritance).",
+    "risposta": "È la soluzione all'inversione di priorità: il processo a bassa priorità che detiene il lock \"eredita\" temporaneamente la priorità alta del processo che lo sta aspettando, finché non rilascia la risorsa."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "Descrivi il problema del Produttore-Consumatore.",
+    "risposta": "Un produttore inserisce dati in un buffer e un consumatore li preleva. La sincronizzazione deve impedire che il produttore inserisca in un buffer pieno o che il consumatore prelevi da un buffer vuoto."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "Descrivi il problema dei Lettori-Scrittori.",
+    "risposta": "Più lettori possono leggere contemporaneamente, ma se uno scrittore sta modificando il dato, nessun altro (lettore o scrittore) può accedere. Esistono varianti che danno priorità ai lettori o agli scrittori."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "Descrivi il problema dei Cinque Filosofi.",
+    "risposta": "Un problema classico che illustra i pericoli del deadlock e della starvation nell'allocazione di risorse multiple (bacchette) tra processi concorrenti."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "Cos'è un Monitor?",
+    "risposta": "È un costrutto di sincronizzazione di alto livello (tipico di Java o C#) che incapsula dati e procedure, garantendo automaticamente che solo un thread alla volta possa eseguire una procedura al suo interno."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "A cosa servono le Variabili di Condizione (Condition Variables)?",
+    "risposta": "Sono usate all'interno dei monitor per permettere a un thread di aspettare una condizione specifica (tramite wait()) e di essere risvegliato da un altro (tramite signal())."
+  },
+  {
+    "capitolo": "6",
+    "titolo": "Sincronizzazione dei Processi",
+    "domanda": "Qual è la differenza tra la semantica \"Signal and Wait\" e \"Signal and Continue\" nei monitor?",
+    "risposta": "In \"Signal and Wait\", chi segnala aspetta che chi è stato risvegliato esca dal monitor. In \"Signal and Continue\", chi segnala continua la sua esecuzione e chi è stato risvegliato deve aspettare che il monitor torni libero."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Qual è la definizione formale di Deadlock?",
+    "risposta": "Una situazione in cui ogni processo in un insieme di processi è in attesa di un evento (tipicamente il rilascio di una risorsa) che può essere causato solo da un altro processo appartenente allo stesso insieme."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Quali sono le 4 condizioni necessarie affinché si verifichi un deadlock?",
+    "risposta": "1) Mutua Esclusione (risorse non condivisibili); 2) Possesso e Attesa (un processo tiene una risorsa e ne aspetta un'altra); 3) Assenza di Preemption (le risorse non possono essere sottratte forzatamente); 4) Attesa Circolare (esiste una catena di processi P_0 -> P_1 -> ... -> P_n -> P_0)."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Cos'è un Grafo di Allocazione delle Risorse (RAG)?",
+    "risposta": "È un grafo diretto dove i nodi sono processi (cerchi) e tipi di risorse (quadrati). Un arco P -> R indica una richiesta; un arco R -> P indica un'allocazione."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Se un grafo di allocazione contiene un ciclo, c'è sempre un deadlock?",
+    "risposta": "Se ogni risorsa ha una sola istanza, un ciclo implica sempre un deadlock. Se ci sono più istanze, il ciclo è una condizione necessaria ma non sufficiente (potrebbe non esserci stallo)."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Quali sono i tre modi principali per gestire il Deadlock?",
+    "risposta": "1) Prevenzione o Evitamento (assicurarsi che il sistema non entri mai in deadlock); 2) Rilevamento e Ripristino (lasciare che accada, trovarlo e risolverlo); 3) Ignorare il problema (Algoritmo dello Struzzo, usato da molti SO moderni)."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Come si implementa la \"Prevenzione\" (Prevention) del deadlock?",
+    "risposta": "Invalidando almeno una delle 4 condizioni necessarie (es. eliminando l'attesa circolare imponendo un ordine gerarchico alle risorse)."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Cos'è la tecnica dell'Attesa Circolare eliminata tramite Ordinamento Gerarchico?",
+    "risposta": "Si assegna un numero intero a ogni tipo di risorsa. Un processo può richiedere risorse solo in ordine crescente. Questo impedisce matematicamente la formazione di cicli."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Qual è la differenza tra Prevenzione (Prevention) ed Evitamento (Avoidance)?",
+    "risposta": "La prevenzione pone limiti rigidi su come richiedere risorse. L'evitamento analizza dinamicamente ogni richiesta e la concede solo se il sistema rimane in uno \"Stato Sicuro\"."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Definisci lo \"Stato Sicuro\" (Safe State).",
+    "risposta": "Uno stato è sicuro se esiste una sequenza di esecuzione (Safe Sequence) tale che ogni processo possa completare il suo lavoro usando le risorse correnti più quelle rilasciate dai processi precedenti."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Cos'è l'Algoritmo del Banchiere?",
+    "risposta": "È un algoritmo di evitamento del deadlock per sistemi con risorse a istanze multiple. Prima di allocare, simula l'assegnazione e verifica se il sistema rimane in uno stato sicuro."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Quali strutture dati servono per l'Algoritmo del Banchiere?",
+    "risposta": "1) Available (risorse libere); 2) Max (richiesta massima di ogni processo); 3) Allocation (risorse già assegnate); 4) Need (Max - Allocation, risorse ancora necessarie)."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Cosa succede se una richiesta di risorse porta il sistema in uno \"Stato Insicuro\"?",
+    "risposta": "La richiesta non viene concessa e il processo viene messo in attesa, anche se le risorse sono fisicamente disponibili in quel momento."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Descrivi l'Algoritmo di Rilevamento per istanze singole (Wait-for Graph).",
+    "risposta": "Si crea un grafo solo con i processi. Un arco Pi -> Pj esiste se Pi aspetta una risorsa tenuta da Pj. Se c'è un ciclo, c'è un deadlock."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Ogni quanto dovrebbe essere eseguito l'algoritmo di rilevamento?",
+    "risposta": "Dipende dalla frequenza prevista dei deadlock e da quanti processi saranno influenzati. Eseguirlo a ogni richiesta è costoso (overhead CPU)."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Quali sono le due opzioni per il Ripristino (Recovery) da un deadlock?",
+    "risposta": "1) Terminazione dei processi (uccidere uno o tutti i processi coinvolti); 2) Prelazione delle risorse (sottrarre risorse a un processo e darne a un altro)."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Quali sono i criteri per scegliere quale processo terminare in caso di stallo?",
+    "risposta": "Priorità del processo, tempo di esecuzione già effettuato, risorse utilizzate, risorse necessarie per finire e se il processo è interattivo o batch."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Cos'è il \"Rollback\" nel recupero da deadlock?",
+    "risposta": "Riportare un processo a uno stato precedente sicuro (checkpoint) e ricominciare l'esecuzione da lì, dopo avergli sottratto la risorsa contesa."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Spiega il problema della Starvation nel recupero da deadlock.",
+    "risposta": "Se si sceglie sempre lo stesso processo come \"vittima\", quel processo non finirà mai. Occorre includere il numero di \"vittimizzazioni\" nel criterio di scelta."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Perché i sistemi operativi moderni spesso usano l'Algoritmo dello Struzzo?",
+    "risposta": "Perché il costo degli algoritmi di prevenzione/evitamento è troppo alto rispetto alla rarità del deadlock nei sistemi desktop. Si preferisce far crashare il sistema una volta all'anno piuttosto che rallentarlo ogni secondo."
+  },
+  {
+    "capitolo": "7",
+    "titolo": "Deadlock",
+    "domanda": "Differenza tra Deadlock e Livelock.",
+    "risposta": "Nel Deadlock i processi sono bloccati (waiting). Nel Livelock i processi continuano a cambiare stato (attivi) ma nessuno dei due fa progressi."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Perché è necessaria la protezione della memoria in un sistema multiprogrammato?",
+    "risposta": "Per evitare che un processo utente acceda alla memoria del kernel o di altri processi, garantendo la stabilità e la sicurezza del sistema."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Come vengono utilizzati i registri \"Base\" e \"Limite\"?",
+    "risposta": "Il registro Base contiene l'indirizzo fisico più basso legale; il registro Limite specifica la dimensione. Ogni indirizzo generato dalla CPU deve essere >= Base e < Base + Limite."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Cos'è la MMU (Memory Management Unit)?",
+    "risposta": "È un dispositivo hardware che trasforma in tempo reale gli indirizzi logici (virtuali) in indirizzi fisici."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Spiega il concetto di \"Spazio di Indirizzamento Logico\".",
+    "risposta": "È l'insieme di tutti gli indirizzi generati da un programma durante l'esecuzione. Non corrispondono necessariamente a posizioni reali nella RAM."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Cosa si intende per \"Caricamento Dinamico\" (Dynamic Loading)?",
+    "risposta": "Una routine non viene caricata in memoria finché non viene chiamata. Questo permette di risparmiare RAM, caricando solo il codice effettivamente utilizzato."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Cos'è lo \"Swapping\" (Scambio)?",
+    "risposta": "Una tecnica che permette di spostare temporaneamente un processo dalla memoria principale a un'area di memoria secondaria (backing store) per liberare RAM, e poi riportarlo indietro."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Qual è il limite principale dello Swapping classico?",
+    "risposta": "L'elevato tempo di trasferimento tra disco e RAM, che può rendere il sistema molto lento se avviene troppo frequentemente (thrashing)."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Descrivi l'allocazione a Partizioni Fissee.",
+    "risposta": "La memoria è divisa in sezioni di dimensione fissa. Ogni partizione può ospitare un solo processo. È semplice ma causa frammentazione interna."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Descrivi l'allocazione a Partizioni Variabili.",
+    "risposta": "Il sistema operativo mantiene una tabella delle parti occupate e libere. Ai processi viene assegnato un blocco grande quanto serve. Causa frammentazione esterna."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Cos'è un \"Hole\" (Buco) nella gestione della memoria?",
+    "risposta": "Un blocco di memoria libera. Nel tempo, la memoria diventa un insieme di processi e buchi di varie dimensioni."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Spiega la frammentazione esterna nell'allocazione contigua.",
+    "risposta": "Avviene quando la memoria libera totale è sufficiente per un processo, ma è divisa in molti piccoli fori non contigui."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Cos'è la frammentazione interna?",
+    "risposta": "Memoria sprecata quando a un processo viene assegnata una porzione di memoria leggermente più grande di quella richiesta (es. in partizioni fisse o pagine)."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Come aiuta la Paginazione a risolvere la frammentazione esterna?",
+    "risposta": "Permette allo spazio di indirizzamento fisico di un processo di essere non contiguo, mappando pagine logiche in frame fisici ovunque siano disponibili."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Qual è la struttura della Page Table (Tabella delle Pagine)?",
+    "risposta": "È un array di voci (PTE - Page Table Entries) dove l'indice è il numero di pagina e il valore contenuto è il numero di frame fisico."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Cos'è l'Offset (d) nell'indirizzamento paginato?",
+    "risposta": "Rappresenta lo spostamento all'interno della pagina. Combinato con l'indirizzo base del frame, determina l'indirizzo fisico esatto."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Perché il TLB è necessario nella paginazione?",
+    "risposta": "Per ridurre l'overhead degli accessi alla memoria. Senza TLB, ogni lettura/scrittura richiederebbe due accessi alla RAM (uno per la tabella, uno per il dato)."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Cosa succede durante un \"Context Switch\" in un sistema paginato rispetto al TLB?",
+    "risposta": "Il TLB deve essere svuotato (flushed) affinché il nuovo processo non usi le traduzioni del vecchio, oppure ogni entry del TLB deve avere un identificatore di processo (ASID)."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Descrivi la Paginazione Gerarchica.",
+    "risposta": "Una tecnica in cui la tabella delle pagine stessa è divisa in pagine. Serve a gestire spazi di indirizzamento molto grandi senza occupare memoria contigua eccessiva."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Cosa sono le Pagine Condivise (Shared Pages)?",
+    "risposta": "Sono pagine di codice \"read-only\" che possono essere mappate negli spazi logici di più processi contemporaneamente (es. le librerie di sistema)."
+  },
+  {
+    "capitolo": "8",
+    "titolo": "Memoria Principale",
+    "domanda": "Cos'è la Segmentazione?",
+    "risposta": "Uno schema di gestione della memoria che asseconda la visione dell'utente: la memoria è divisa in segmenti logici (es. codice, stack, dati) invece che in pagine fisse."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "Cos'è la Memoria Virtuale e qual è il suo vantaggio principale?",
+    "risposta": "È una tecnica che permette l'esecuzione di processi non completamente carichi in RAM. Il vantaggio è che lo spazio logico può essere più grande della RAM fisica."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "Spiega il concetto di \"Paginazione su Richiesta\" (Demand Paging).",
+    "risposta": "È un sistema in cui le pagine vengono caricate in RAM solo quando effettivamente richieste durante l'esecuzione, riducendo l'I/O inutile."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "Cosa succede durante un Page Fault (Errore di pagina)?",
+    "risposta": "La CPU accede a una pagina invalida. Il SO deve: 1) Trovare la pagina su disco; 2) Trovare un frame libero; 3) Caricarla; 4) Aggiornare la tabella; 5) Riavviare l'istruzione."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "Cos'è il \"Pure Demand Paging\"?",
+    "risposta": "Un caso estremo in cui un processo parte con zero pagine in RAM. Ogni istruzione iniziale causa un page fault finché le pagine minime non sono cariche."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "Perché è necessario il supporto hardware per la paginazione su richiesta?",
+    "risposta": "Serve una tabella con bit valido/invalido e un meccanismo per riavviare un'istruzione esattamente dal punto in cui è stata interrotta."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "Definisci l'Effective Access Time (EAT) per la memoria virtuale.",
+    "risposta": "È il tempo medio di accesso: EAT = (1 - p) * accesso_RAM + p * tempo_gestione_page_fault. Anche un p piccolissimo rallenta molto il sistema per via del disco."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "Cos'è la Sostituzione della Pagina (Page Replacement)?",
+    "risposta": "Quando manca un frame libero durante un page fault, il SO sceglie una pagina vittima in RAM, la scrive su disco (se modificata) e la sostituisce."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "A cosa serve il \"Dirty Bit\" (o Modify Bit)?",
+    "risposta": "Indica se una pagina in RAM è stata modificata. Se è 0, la pagina vittima può essere sovrascritta senza scrivere sul disco, risparmiando tempo."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "Descrivi l'algoritmo di sostituzione FIFO e il suo difetto (Anomalia di Belady).",
+    "risposta": "Sostituisce la pagina più vecchia. L'anomalia di Belady è il fenomeno per cui, aumentando i frame, i page fault possono aumentare invece di diminuire."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "Qual è l'Algoritmo Ottimale (OPT) di sostituzione?",
+    "risposta": "Sostituisce la pagina che non sarà usata per il periodo più lungo in futuro. Impossibile da implementare, serve come benchmark."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "Spiega l'algoritmo LRU (Least Recently Used).",
+    "risposta": "Sostituisce la pagina non utilizzata da più tempo. Si basa sulla località temporale: chi è stato usato di recente lo sarà probabilmente di nuovo."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "Quali sono i limiti dell'implementazione di LRU?",
+    "risposta": "Richiede un supporto hardware costoso (contatori o stack). Spesso si usano algoritmi di approssimazione come il Second-Chance."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "Come funziona l'algoritmo della Seconda Occasione (Second-Chance/Clock)?",
+    "risposta": "Usa un bit di riferimento. Se la pagina selezionata ha il bit a 1, le viene data una seconda occasione (bit azzerato); se è 0, viene sostituita."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "Cos'è l'Allocazione Fisso vs Allocazione Prioritaria dei frame?",
+    "risposta": "L'allocazione fissa assegna un numero fisso di frame a ogni processo. Quella prioritaria permette ai processi importanti di \"rubare\" frame agli altri."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "Definisci il fenomeno del Thrashing.",
+    "risposta": "Una situazione in cui un processo passa più tempo a paginare che a eseguire calcoli. Accade quando non ha abbastanza frame per il suo \"Working Set\"."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "Cos'è il Modello del Working Set?",
+    "risposta": "L'insieme delle pagine usate attivamente in un intervallo Delta. Il SO deve garantire che la somma dei Working Set sia <= RAM totale per evitare il thrashing."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "Cos'è il File Mapping (Memory-Mapped Files)?",
+    "risposta": "Permette di mappare un file su disco direttamente nello spazio virtuale, trattando l'I/O del file come normali accessi alla memoria."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "Come viene gestita la memoria Kernel rispetto a quella utente?",
+    "risposta": "Il kernel richiede spesso memoria contigua. Usa algoritmi come il Buddy System o la Slab Allocation per minimizzare la frammentazione."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "Spiega il Buddy System.",
+    "risposta": "Alloca memoria in potenze di 2. Divide blocchi grandi in \"buddy\" più piccoli e li ricombina quando vengono liberati se entrambi sono liberi."
+  },
+  {
+    "capitolo": "9",
+    "titolo": "Memoria Virtuale",
+    "domanda": "Cos'è la Slab Allocation?",
+    "risposta": "Usa cache di oggetti pre-allocati (es. PCB) per velocizzare l'allocazione di strutture dati del kernel usate frequentemente."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Quali sono le tre componenti principali della latenza di un disco magnetico (HDD)?",
+    "risposta": "1) Seek time (posizionamento testina); 2) Rotational latency (rotazione settore); 3) Transfer time (spostamento dati)."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Perché è necessario lo scheduling del disco (Disk Scheduling)?",
+    "risposta": "Per minimizzare il movimento della testina (seek time) e massimizzare il throughput, dato che l'accesso al disco è molto lento."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Descrivi l'algoritmo FCFS (First-Come, First-Served) per il disco.",
+    "risposta": "Le richieste sono servite nell'ordine di arrivo. Equo ma inefficiente, causa grandi spostamenti tra cilindri distanti."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Come funziona l'algoritmo SSTF (Shortest Seek Time First)?",
+    "risposta": "Seleziona la richiesta più vicina alla posizione attuale della testina. Riduce il movimento ma può causare starvation per le richieste lontane."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Spiega l'algoritmo SCAN (o algoritmo dell'ascensore).",
+    "risposta": "La testina serve le richieste muovendosi da un'estremità all'altra del disco, invertendo direzione solo alla fine."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Qual è la differenza tra SCAN e C-SCAN (Circular SCAN)?",
+    "risposta": "In C-SCAN la testina torna all'inizio immediatamente dopo la fine senza servire richieste nel ritorno, offrendo un tempo d'attesa più uniforme."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Descrivi gli algoritmi LOOK e C-LOOK.",
+    "risposta": "Versioni ottimizzate di SCAN/C-SCAN: la testina inverte la marcia non appena servita l'ultima richiesta, senza arrivare al bordo fisico."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Come deve scegliere il SO l'algoritmo di scheduling del disco?",
+    "risposta": "Dipende dal carico: SSTF/LOOK sono standard; SCAN/C-SCAN sono migliori per carichi pesanti."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Cos'è la Formattazione a Basso Livello (Low-level formatting)?",
+    "risposta": "Creazione dei settori fisici con header e ECC, fatta solitamente in fabbrica."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Cos'è la Formattazione Logica e la creazione del File System?",
+    "risposta": "Il SO crea le strutture del file system (FAT, Inode table) e divide il disco in partizioni."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Cos'è il Master Boot Record (MBR)?",
+    "risposta": "Il primo settore del disco contenente il codice di avvio del SO e la tabella delle partizioni."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Come vengono gestiti i \"Bad Blocks\" (settori danneggiati)?",
+    "risposta": "Il controller mappa i settori logici danneggiati su settori fisici sani di riserva (sector sparing)."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Cos'è lo Swap Space (Spazio di scambio) e dove risiede?",
+    "risposta": "Area del disco per estendere la RAM. Può essere un file o una partizione dedicata più efficiente."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Definisci la struttura RAID (Redundant Array of Independent Disks).",
+    "risposta": "Tecnica che usa più dischi in parallelo per aumentare affidabilità (ridondanza) e prestazioni."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Differenza tra RAID 0 (Striping) e RAID 1 (Mirroring).",
+    "risposta": "RAID 0 divide i dati per velocità (no tolleranza guasti); RAID 1 duplica i dati per sicurezza."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Cos'è il RAID 5 (Parità distribuita)?",
+    "risposta": "Dati e parità distribuiti su tutti i dischi. Tolleranza alla perdita di un disco con minor spreco di spazio rispetto al mirroring."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Cos'è il RAID 6 e perché è più sicuro del RAID 5?",
+    "risposta": "Usa doppia parità distribuita, resistendo al guasto simultaneo di due dischi."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Qual è la differenza principale tra HDD e SSD (Solid State Drive) nello scheduling?",
+    "risposta": "Gli SSD non hanno parti meccaniche (seek time nullo). Gli algoritmi SCAN sono inutili; ci si concentra sul wear leveling."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Cos'è il NAS (Network-Attached Storage)?",
+    "risposta": "Dispositivo di storage collegato alla rete che fornisce accesso ai dati a livello di file."
+  },
+  {
+    "capitolo": "10",
+    "titolo": "Struttura della Memoria di Massa",
+    "domanda": "Cos'è la SAN (Storage Area Network)?",
+    "risposta": "Rete dedicata ad alta velocità che fornisce ai server accesso allo storage a livello di blocchi."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Cos'è un File dal punto di vista del Sistema Operativo?",
+    "risposta": "Un'unità logica di memorizzazione, astrazione dell'hardware che raccoglie informazioni correlate."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Quali sono gli attributi tipici di un file?",
+    "risposta": "Nome, ID, tipo, posizione, dimensione, protezione e timestamp."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Descrivi le operazioni base su un file.",
+    "risposta": "Creazione, scrittura, lettura, seek, cancellazione e troncamento."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Perché è necessaria l'operazione di \"Open\" (Apertura)?",
+    "risposta": "Per copiare gli attributi del file in RAM (tabella file aperti) ed evitare ricerche ripetute, restituendo un file descriptor."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Qual è la differenza tra la Tabella dei File Aperti del Sistema e quella del Processo?",
+    "risposta": "Quella del processo ha dati locali (puntatore corrente); quella del sistema ha dati condivisi (contatore accessi)."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Spiega la differenza tra Accesso Sequenziale e Accesso Diretto.",
+    "risposta": "Sequenziale: dati in ordine; Diretto: salto a qualsiasi blocco (tipico dei dischi)."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Cos'è una Directory?",
+    "risposta": "Contenitore che mappa nomi di file nei corrispondenti FCB (File Control Block)."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Descrivi la struttura di directory a due livelli.",
+    "risposta": "Ogni utente ha la sua directory (UFD) sotto una principale (MFD). No sottocartelle."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Cos'è la struttura di directory ad Albero (Tree-Structured Directory)?",
+    "risposta": "Struttura moderna con gerarchia infinita di cartelle e file."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Qual è la differenza tra un Cammino Assoluto (Absolute Path) e uno Relativo?",
+    "risposta": "Assoluto parte dalla radice (/); Relativo dalla cartella corrente."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Cos'è un Grafo Aciclico per le directory?",
+    "risposta": "Struttura che permette link condivisi ma vieta cicli infiniti."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Spiega la differenza tra Hard Link e Symbolic Link (Soft Link).",
+    "risposta": "Hard Link: stesso inode fisico; Symbolic Link: file con il percorso di un altro."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Cos'è il \"Mounting\" di un File System?",
+    "risposta": "Collegamento di un file system esterno a un punto (Mount Point) dell'albero principale."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Quali sono i metodi principali di condivisione dei file tra utenti?",
+    "risposta": "Permessi rwx e ID utente/gruppo (UID/GID)."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Cos'è un File Control Block (FCB)?",
+    "risposta": "Struttura (inode in UNIX) con metadati del file (permessi, blocchi dati) tranne il nome."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Come vengono gestiti i permessi di accesso in UNIX (rwx)?",
+    "risposta": "Tre bit (read, write, execute) per Proprietario, Gruppo e Altri."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Cos'è la Consistenza del File System?",
+    "risposta": "Stato in cui le strutture su disco corrispondono alla realtà. Ripristinata via fsck o Journaling."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Spiega il concetto di Journaling.",
+    "risposta": "Scrittura delle modifiche in un log prima di eseguirle per garantire atomicità post-crash."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Cos'è il VFS (Virtual File System)?",
+    "risposta": "Strato del kernel che uniforma l'accesso a diversi file system (NTFS, ext4, ecc.)."
+  },
+  {
+    "capitolo": "11",
+    "titolo": "Interfaccia del File System",
+    "domanda": "Cos'è il Remote File System (NFS)?",
+    "risposta": "Protocollo per accedere a file remoti via rete come se fossero locali."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Cos'è il \"Bus\" e qual è la differenza tra bus di sistema e bus di espansione?",
+    "risposta": "Fili e protocollo per segnali. Sistema collega CPU-RAM; Espansione (PCIe) collega periferiche."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Cosa sono i Registri del Controller (Porte di I/O)?",
+    "risposta": "Registri (Data-in, Data-out, Status, Control) usati dal controller per comunicare con la CPU."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Spiega la differenza tra I/O tramite porte e Memory-Mapped I/O.",
+    "risposta": "Porte: istruzioni speciali (in/out); Memory-Mapped: registri mappati in indirizzi RAM."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Cos'è il Polling (Busy Waiting) e quando è inefficiente?",
+    "risposta": "Lettura continua dello stato finché pronto. Inefficiente se il dispositivo è lento (spreco CPU)."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Descrivi il meccanismo degli Interrupt (Interruzioni) nell'I/O.",
+    "risposta": "Segnale hardware dal dispositivo a fine compito. La CPU esegue l'Handler e poi riprende."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Cos'è il Controller delle Interruzioni (APIC)?",
+    "risposta": "Hardware che gestisce le priorità delle interruzioni dirette alla CPU."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Spiega il Direct Memory Access (DMA).",
+    "risposta": "Controller che trasferisce dati tra memoria e dispositivo senza CPU per ogni byte."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Qual è la differenza tra un'interfaccia a blocchi e una a caratteri?",
+    "risposta": "Blocchi: unità fisse, accesso diretto (dischi); Caratteri: flusso di byte sequenziali (tastiera)."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Cos'è il Blocking I/O (I/O bloccante)?",
+    "risposta": "Processo sospeso (Waiting) finché l'operazione I/O non è conclusa."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Cos'è il Non-blocking I/O?",
+    "risposta": "La chiamata restituisce subito il controllo indicando se il dato è pronto o meno."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Spiega l'Asynchronous I/O (I/O asincrono).",
+    "risposta": "Il processo continua subito e riceve notifica (segnale/callback) solo a operazione finita."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Cos'è il Buffering e perché si usa?",
+    "risposta": "Memoria temporanea per gestire differenze di velocità e dimensioni tra dispositivi."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Cos'è il Caching nel sistema di I/O?",
+    "risposta": "Copia dei dati in memoria veloce per accelerare accessi futuri (es. settori disco in RAM)."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Cos'è lo Spooling (Simultaneous Peripheral Operations On-Line)?",
+    "risposta": "Buffer per dispositivi non interlacciabili (stampante): accumula lavori e li invia uno alla volta."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Qual è il ruolo del Device Driver?",
+    "risposta": "Traduttore tra chiamate kernel generiche e comandi specifici per l'hardware."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Cos'è il sottosistema di I/O del Kernel?",
+    "risposta": "Parte del kernel che gestisce scheduling I/O, buffering, caching e protezione per tutti i driver."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Spiega la gestione degli errori nell'I/O.",
+    "risposta": "Restituzione codici errore o tentativi di ripetizione per problemi transitori."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Cos'è la \"I/O Protection\"?",
+    "risposta": "Istruzioni I/O privilegiate: l'utente deve usare system call per accedere all'hardware."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Cos'è il concetto di \"Double Buffering\"?",
+    "risposta": "Uso di due buffer per parallelizzare riempimento da dispositivo ed elaborazione CPU."
+  },
+  {
+    "capitolo": "13",
+    "titolo": "Sistemi di I/O",
+    "domanda": "Descrivi la \"I/O Request Packet\" (IRP) in sistemi come Windows.",
+    "risposta": "Struttura dati che porta parametri e stato della richiesta attraverso i vari strati del kernel."
+  },
+  {
+    "capitolo": "14",
+    "titolo": "Protezione",
+    "domanda": "Qual è la differenza tra Protezione e Sicurezza?",
+    "risposta": "Protezione: controllo interno accessi; Sicurezza: difesa da minacce esterne/interne (virus, hacker)."
+  },
+  {
+    "capitolo": "14",
+    "titolo": "Protezione",
+    "domanda": "Cos'è il \"Principio del Privilegio Minimo\" (Least Privilege)?",
+    "risposta": "Operare con il set minimo di privilegi necessari per limitare danni da errori o attacchi."
+  },
+  {
+    "capitolo": "14",
+    "titolo": "Protezione",
+    "domanda": "Cos'è un Dominio di Protezione (Protection Domain)?",
+    "risposta": "Collezione di coppie (oggetto, diritti) che definisce cosa un processo può fare."
+  },
+  {
+    "capitolo": "14",
+    "titolo": "Protezione",
+    "domanda": "Spiega il concetto di Matrice di Accesso (Access Matrix).",
+    "risposta": "Modello astratto con Righe=Domini, Colonne=Oggetti, Celle=Diritti."
+  },
+  {
+    "capitolo": "14",
+    "titolo": "Protezione",
+    "domanda": "Cos'è una Access Control List (ACL)?",
+    "risposta": "Implementazione della matrice per colonne: ogni oggetto ha la lista dei permessi dei domini."
+  },
+  {
+    "capitolo": "14",
+    "titolo": "Protezione",
+    "domanda": "Cos'è una Capability List (C-List)?",
+    "risposta": "Implementazione della matrice per righe: ogni processo ha i suoi \"biglietti\" di accesso."
+  },
+  {
+    "capitolo": "14",
+    "titolo": "Protezione",
+    "domanda": "Cos'è il \"Role-Based Access Control\" (RBAC)?",
+    "risposta": "Privilegi assegnati a ruoli (es. Amministratore) a cui vengono poi associati gli utenti."
+  },
+  {
+    "capitolo": "14",
+    "titolo": "Protezione",
+    "domanda": "Spiega la differenza tra Revoca Immediata e Revoca Differita dei diritti.",
+    "risposta": "Immediata cancella subito (facile con ACL); Differita richiede tempo o eventi specifici."
+  },
+  {
+    "capitolo": "14",
+    "titolo": "Protezione",
+    "domanda": "Cos'è il meccanismo dei \"Password-based Capabilities\"?",
+    "risposta": "Approccio ibrido dove l'accesso richiede il possesso di una chiave crittografica."
+  },
+  {
+    "capitolo": "14",
+    "titolo": "Protezione",
+    "domanda": "Descrivi la protezione basata su anelli (Protection Rings).",
+    "risposta": "Divisione privilegi hardware in cerchi: Anello 0 (Kernel) massimo, Anello 3 (User) minimo."
+  },
+  {
+    "capitolo": "Killer",
+    "titolo": "Domande Killer",
+    "domanda": "Collega la Paginazione alla Protezione: come fa l'hardware a impedire che un processo acceda alla memoria di un altro?",
+    "risposta": "Ogni processo ha la sua Page Table privata. La CPU usa solo quella del processo corrente; è impossibile puntare a frame altrui se non configurati come Shared Pages."
+  },
+  {
+    "capitolo": "Killer",
+    "titolo": "Domande Killer",
+    "domanda": "Come interagisce lo Scheduling della CPU con il Context Switch?",
+    "risposta": "Lo scheduler sceglie il processo, il Dispatcher esegue il cambio salvando/caricando PCB. Troppi cambi degradano le prestazioni (overhead)."
+  },
+  {
+    "capitolo": "Killer",
+    "titolo": "Domande Killer",
+    "domanda": "Perché il DMA può essere un problema per la coerenza della Cache?",
+    "risposta": "Il DMA scrive direttamente in RAM saltando la CPU; la cache potrebbe contenere dati vecchi (stale). Serve invalidazione o cache snooping."
+  },
+  {
+    "capitolo": "Killer",
+    "titolo": "Domande Killer",
+    "domanda": "Qual è il legame tra Interrupt e System Call?",
+    "risposta": "La System Call è spesso una Trap (interruzione software) che attiva il passaggio a Kernel Mode e salta alla routine corretta."
+  },
+  {
+    "capitolo": "Killer",
+    "titolo": "Domande Killer",
+    "domanda": "Come può un Deadlock influenzare la gestione della memoria?",
+    "risposta": "Se i processi in stallo tengono RAM aspettando I/O, il sistema può andare in Thrashing o bloccarsi per mancanza di memoria libera."
+  },
+  {
+    "capitolo": "Killer",
+    "titolo": "Domande Killer",
+    "domanda": "In che modo la Paginazione Gerarchica aiuta a gestire il \"File Mapping\"?",
+    "risposta": "Permette di mappare file enormi creando solo le tabelle necessarie quando si accede a parti specifiche (Demand Paging)."
+  },
+  {
+    "capitolo": "Killer",
+    "titolo": "Domande Killer",
+    "domanda": "Descrivi il percorso di un dato dal Disco alla RAM durante un Page Fault.",
+    "risposta": "1. Trap. 2. Sospensione. 3. Scheduling disco. 4. Trasferimento DMA. 5. Interrupt fine I/O. 6. Aggiornamento Page Table. 7. Processo in Ready."
+  },
+  {
+    "capitolo": "Killer",
+    "titolo": "Domande Killer",
+    "domanda": "Perché i Semafori necessitano di istruzioni atomiche (es. TestAndSet) per essere implementati?",
+    "risposta": "Perché wait/signal modificano variabili condivise. Senza atomicità, due processi potrebbero causare Race Condition sulla sincronizzazione stessa."
+  },
+  {
+    "capitolo": "Killer",
+    "titolo": "Domande Killer",
+    "domanda": "Come influisce l'Hit Ratio del TLB sulla velocità di un sistema a 2 o più livelli di paginazione?",
+    "risposta": "Con Hit basso, ogni accesso richiede 3 letture RAM (rallentamento 300%). Con Hit alto, si viaggia a velocità hardware (cache)."
+  },
+  {
+    "capitolo": "Killer",
+    "titolo": "Domande Killer",
+    "domanda": "Perché il Journaling nel File System è considerato una protezione contro i crash?",
+    "risposta": "Garantisce atomicità: scrivendo prima l'intenzione nel log, il SO può ripristinare la consistenza delle strutture anche se interrotto a metà."
+  }
+]
