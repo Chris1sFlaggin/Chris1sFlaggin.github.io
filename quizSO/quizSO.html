@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistemi Operativi - Quiz Hub</title>
+    <style>
+        :root { --primary: #2563eb; --bg: #f1f5f9; --card: #ffffff; --text: #0f172a; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; }
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        .header { text-align: center; margin-bottom: 30px; }
+        
+        .filters { 
+            display: flex; gap: 10px; margin-bottom: 20px; 
+            background: var(--card); padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; flex-grow: 1; }
+
+        .quiz-item { 
+            background: var(--card); margin-bottom: 15px; padding: 20px; 
+            border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+        }
+        .badge { 
+            display: inline-block; padding: 2px 8px; background: #e0e7ff; 
+            color: #4338ca; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 10px;
+        }
+        .question { font-size: 18px; font-weight: 600; margin-bottom: 15px; display: block; }
+        
+        .ans-toggle { 
+            background: var(--primary); color: white; border: none; padding: 8px 15px; 
+            border-radius: 5px; cursor: pointer; transition: 0.2s;
+        }
+        .ans-toggle:hover { background: #1d4ed8; }
+        
+        .answer { 
+            display: none; margin-top: 15px; padding: 15px; 
+            background: #f8fafc; border-left: 4px solid var(--primary); border-radius: 4px; 
+        }
+        .show { display: block; }
+        
+        #loading { text-align: center; font-weight: bold; padding: 50px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>🖥️ Quiz di Sistemi Operativi</h1>
+        <p>Caricamento dati dal file JSON esterno</p>
+    </div>
+
+    <div class="filters">
+        <input type="text" id="searchInput" placeholder="Cerca parole chiave (es. DMA, Semaphore)...">
+        <select id="capFilter">
+            <option value="all">Tutti i capitoli</option>
+        </select>
+    </div>
+
+    <div id="loading">Caricamento quiz in corso...</div>
+    <div id="quizContainer"></div>
+</div>
+
+<script>
+    let allQuizzes = [];
+
+    // Funzione per caricare il JSON
+    async function loadQuizzes() {
+        try {
+            const response = await fetch('quiz.json'); // Assicurati che il nome file sia corretto
+            if (!response.ok) throw new Error('Errore nel caricamento del file JSON');
+            allQuizzes = await response.json();
+            
+            initFilters();
+            displayQuizzes(allQuizzes);
+            document.getElementById('loading').style.display = 'none';
+        } catch (error) {
+            document.getElementById('loading').innerHTML = `<span style="color:red">Errore: ${error.message}</span>`;
+            console.error(error);
+        }
+    }
+
+    // Popola il menu a tendina dei capitoli in base ai dati presenti
+    function initFilters() {
+        const caps = [...new Set(allQuizzes.map(q => q.capitolo))];
+        const select = document.getElementById('capFilter');
+        caps.sort((a, b) => (isNaN(a) ? 1 : isNaN(b) ? -1 : a - b)).forEach(cap => {
+            const opt = document.createElement('option');
+            opt.value = cap;
+            opt.textContent = isNaN(cap) ? cap : `Capitolo ${cap}`;
+            select.appendChild(opt);
+        });
+    }
+
+    function displayQuizzes(data) {
+        const container = document.getElementById('quizContainer');
+        container.innerHTML = '';
+
+        data.forEach((q, index) => {
+            const div = document.createElement('div');
+            div.className = 'quiz-item';
+            div.innerHTML = `
+                <div class="badge">CAP ${q.capitolo}</div>
+                <div class="question">${q.domanda}</div>
+                <button class="ans-toggle" onclick="toggleAns(${index})">Mostra/Nascondi Risposta</button>
+                <div id="ans-${index}" class="answer">${q.risposta}</div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function toggleAns(id) {
+        const el = document.getElementById(`ans-${id}`);
+        el.classList.toggle('show');
+    }
+
+    // Filtri dinamici
+    function applyFilters() {
+        const text = document.getElementById('searchInput').value.toLowerCase();
+        const cap = document.getElementById('capFilter').value;
+
+        const filtered = allQuizzes.filter(q => {
+            const matchText = q.domanda.toLowerCase().includes(text) || q.risposta.toLowerCase().includes(text);
+            const matchCap = cap === 'all' || q.capitolo === cap;
+            return matchText && matchCap;
+        });
+        displayQuizzes(filtered);
+    }
+
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+    document.getElementById('capFilter').addEventListener('change', applyFilters);
+
+    // Avvio
+    loadQuizzes();
+</script>
+
+</body>
+</html>
