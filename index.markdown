@@ -39,7 +39,7 @@ header:
       </div>
 
       <div class="description-box">
-        <h1 class="desc-title">DESCRIZIONE</h1>
+        <h1 class="desc-title">chris1sflaggin</h1>
         <p class="desc-text">
           {{ site.description | default: "I'm a IT student with a deep passion for cybersecurity. I'm still learning so pls be patient with me🙏. Here I'll post my CTF write ups and my own projects.📖 Hope you enjoy your stay!👋" }}
         </p>
