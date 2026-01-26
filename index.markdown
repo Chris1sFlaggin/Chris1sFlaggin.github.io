@@ -51,7 +51,7 @@ header:
   <div class="content-side">
     
     <div class="section-block">
-      <h2 class="section-title">I MIEI PROFILI</h2>
+      <h2 class="section-title">SOCIALS</h2>
       <div class="social-grid">
         {% for account in site.data.social_accounts %}
           <a class="card social-card" href="{{ account.url }}" target="_blank" rel="noopener noreferrer">
@@ -69,36 +69,32 @@ header:
     </div>
 
     <div class="section-block">
-      <h2 class="section-title">CATEGORIES</h2>
+      <h2 class="section-title">MODULES</h2>
       <div class="categories-grid">
-        {% for category in site.categories %}
+        {% assign sorted_categories = site.categories | sort %}
+        
+        {% for category in sorted_categories %}
           {% assign category_name = category | first %}
-          <div class="card category-card" data-category="{{ category_name | slugify }}">
-            <div class="card-bg"></div>
-            <div class="card-content">
-              <h3>{{ category_name }}</h3>
-              <p>{{ site.categories[category_name].size }} posts</p>
-              
-              <!-- Mostra sottocategorie se esistono -->
-              {% if category_name == 'writeups' %}
-                <div class="subcategories">
-                  {% assign stack_posts = site.categories['stack'] %}
-                  {% if stack_posts.size > 0 %}
-                    <span class="subcategory">Stack ({{ stack_posts.size }})</span>
-                  {% endif %}
-                  <!-- Aggiungi altre sottocategorie qui -->
-                </div>
-              {% endif %}
-              
-              <a href="{{ site.baseurl }}/categories/{{ category_name | slugify }}/" class="btn-view">View Posts</a>
+          
+          {% unless category_name == 'stack' or category_name == 'heap' or category_name == 'smart-contracts' %}
+          
+            <div class="card category-card" data-category="{{ category_name | slugify }}">
+              <div class="card-bg"></div>
+              <div class="card-content">
+                <h3>{{ category_name | capitalize }}</h3>
+                <p>{{ category | last | size }} posts</p>
+                
+                <a href="{{ site.baseurl }}/categories/{{ category_name | slugify }}/" class="btn-view">Access Data</a>
+              </div>
             </div>
-          </div>
+
+          {% endunless %}
         {% endfor %}
       </div>
     </div>
     
     <div class="dashboard-footer">
-      <small>© 2025 Chris1sFlaggin</small>
+      <small>© 2025 Chris1sFlaggin | System Online</small>
     </div>
 
   </div>
@@ -116,10 +112,10 @@ header:
   body {
     background-color: #1a1e25;
     margin: 0;
-    overflow-x: hidden; /* Evita scroll orizzontale */
+    overflow-x: hidden;
   }
 
-  /* --- 2. LAYOUT DASHBOARD (MOBILE DEFAULT) --- */
+  /* --- 2. LAYOUT DASHBOARD --- */
   .fullscreen-dashboard {
     display: flex;
     flex-direction: column;
@@ -129,12 +125,11 @@ header:
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 
-  /* --- 3. PROFILO (MOBILE) --- */
+  /* --- 3. PROFILO --- */
   .profile-side {
     width: 100%;
-    /* Sfondo leggermente diverso per staccare visivamente */
     background: linear-gradient(180deg, #15181e 0%, #1a1e25 100%);
-    padding: 2rem 1rem 1rem; /* Padding ridotto */
+    padding: 2rem 1rem 1rem;
     display: flex;
     justify-content: center;
     border-bottom: 1px solid rgba(100, 255, 218, 0.1);
@@ -148,7 +143,7 @@ header:
   }
 
   .logo-container {
-    width: 140px; /* Più piccolo su mobile */
+    width: 140px;
     height: 140px;
     margin: 0 auto 1.5rem;
     position: relative;
@@ -173,10 +168,7 @@ header:
   }
   @keyframes pulse { 0% { transform: scale(0.9); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
 
-  /* Titolo DESCRIZIONE nascosto su mobile */
-  .desc-title {
-    display: none; 
-  }
+  .desc-title { display: none; }
 
   .desc-text {
     color: #b0b3b8;
@@ -186,10 +178,10 @@ header:
     padding: 0 10px;
   }
 
-  /* --- 4. CONTENUTI (MOBILE) --- */
+  /* --- 4. CONTENUTI --- */
   .content-side {
     width: 100%;
-    padding: 2rem 1.5rem; /* Spazio laterale */
+    padding: 2rem 1.5rem;
     box-sizing: border-box;
   }
 
@@ -207,10 +199,8 @@ header:
     display: inline-block;
   }
 
-  /* SOCIAL GRID (Ottimizzata Mobile) */
   .social-grid {
     display: grid;
-    /* Due colonne su mobile (minimo 110px) invece di una */
     grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); 
     gap: 1rem;
   }
@@ -220,9 +210,9 @@ header:
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 12px;
     text-decoration: none;
-    transition: transform 0.2s;
+    transition: transform 0.2s, border-color 0.2s;
   }
-  .card:active { transform: scale(0.98); } /* Feedback al tocco */
+  .card:active { transform: scale(0.98); }
 
   .social-card {
     display: flex;
@@ -235,10 +225,9 @@ header:
   .icon-box img { width: 100%; height: 100%; object-fit: contain; }
   .card-label { color: #fff; font-size: 0.9rem; font-weight: 600; }
 
-  /* CATEGORIES GRID */
   .categories-grid {
     display: grid;
-    grid-template-columns: 1fr; /* Una colonna su mobile per dare spazio all'immagine */
+    grid-template-columns: 1fr;
     gap: 1.5rem;
   }
 
@@ -249,30 +238,40 @@ header:
   .card-bg {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     background-size: cover; background-position: center;
+    transition: transform 0.5s;
   }
+  
+  /* IMMAGINI CATEGORIE */
   .category-card[data-category="writeups"] .card-bg { background-image: url('/images/writeups.jpg'); }
   .category-card[data-category="projects"] .card-bg { background-image: url('/images/projects.jpg'); }
   .category-card[data-category="university"] .card-bg { background-image: url('/images/pwncollege.svg'); background-size: contain; background-repeat: no-repeat; background-color: #111; }
+  
+  /* Fallback color if image missing */
+  .category-card .card-bg { background-color: #222; }
 
   .card-content {
     position: relative; z-index: 2; width: 100%; height: 100%;
     background: rgba(26, 30, 37, 0.7);
     display: flex; flex-direction: column;
     justify-content: center; align-items: center;
+    transition: background 0.3s;
   }
 
-  .card-content h3 { color: #64ffda; font-size: 1.5rem; margin: 0; font-weight: 700; }
+  .card-content h3 { color: #64ffda; font-size: 1.5rem; margin: 0; font-weight: 700; text-transform: uppercase; }
   .card-content p { color: #ccc; margin: 0.3rem 0 0.8rem; font-size: 0.9rem; }
 
   .btn-view {
-    background: #64ffda; color: #1a1e25;
-    padding: 0.4rem 1.2rem; border-radius: 20px;
+    background: transparent; color: #64ffda;
+    padding: 0.4rem 1.2rem; border: 1px solid #64ffda; border-radius: 4px;
     font-weight: bold; text-decoration: none; font-size: 0.85rem;
+    transition: background 0.2s, color 0.2s;
   }
+  
+  .btn-view:hover { background: #64ffda; color: #1a1e25; }
 
   .dashboard-footer { text-align: center; color: #555; font-size: 0.8rem; margin-top: 2rem; }
 
-  /* --- 5. DESKTOP OVERRIDES (Schermi Grandi) --- */
+  /* --- 5. DESKTOP OVERRIDES --- */
   @media (min-width: 1024px) {
     .fullscreen-dashboard {
       flex-direction: row;
@@ -297,10 +296,8 @@ header:
       padding: 4rem 3rem;
     }
 
-    /* Ripristina grandezza elementi Desktop */
     .logo-container { width: 260px; height: 260px; margin-bottom: 2rem; }
     
-    /* Mostra titolo descrizione solo su Desktop */
     .desc-title { 
       display: block; 
       color: #fff; font-size: 2rem; margin-bottom: 1rem;
@@ -313,11 +310,11 @@ header:
     .icon-box { width: 40px; height: 40px; }
     
     .categories-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-    .category-card { height: 200px; }
+    .category-card { height: 220px; }
     
     .card:hover { transform: translateY(-5px); border-color: #64ffda; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
     .category-card:hover .card-bg { transform: scale(1.05); }
-    .category-card:hover .card-content { background: rgba(26, 30, 37, 0.6); }
+    .category-card:hover .card-content { background: rgba(26, 30, 37, 0.5); }
   }
 
   /* Star Alert */
@@ -325,20 +322,6 @@ header:
   .star-alert-content { background: #1a1e25; border: 2px solid #64ffda; padding: 2rem; border-radius: 16px; text-align: center; color: #fff; }
   .close-button { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
   .hidden { display: none !important; }
-
-  .subcategories {
-    margin: 0.5rem 0;
-  }
-  
-  .subcategory {
-    background: rgba(100, 255, 218, 0.2);
-    color: #64ffda;
-    padding: 0.2rem 0.5rem;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    display: inline-block;
-    margin: 0.2rem;
-  }
 </style>
 
 <script>
