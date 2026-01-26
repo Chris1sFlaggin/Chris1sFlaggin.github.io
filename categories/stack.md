@@ -1,6 +1,6 @@
 ---
 layout: category
 title: Stack Exploitation
-category: WriteUps
+category: Stack
 permalink: /categories/writeups/stack
 ---

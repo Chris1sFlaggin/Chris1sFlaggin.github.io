@@ -1,6 +1,6 @@
 ---
 layout: category
 title: Smart Contracts Auditing
-category: WriteUps
+category: Smart-Contracts
 permalink: /categories/writeups/smart-contracts
 ---
