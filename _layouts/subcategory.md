@@ -61,7 +61,7 @@ layout: default
       </div>
       
       <div class="cmd-footer">
-        <a href="{{ site.baseurl }}/" class="back-cmd">&lt; cd .. (Return to Root)</a>
+        <a href="{{ site.baseurl }}/categories/writeups" class="back-cmd">&lt; cd .. (Return to Root)</a>
       </div>
     </div>
   </div>
