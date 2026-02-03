@@ -97,7 +97,7 @@ header:
         {% for category in sorted_categories %}
           {% assign category_name = category | first %}
           
-          {% unless category_name == 'stack' or category_name == 'heap' or category_name == 'smart-contracts' %}
+          {% unless category_name == 'stack' or category_name == 'heap' %}
           
             <div class="card category-card" data-category="{{ category_name | slugify }}">
               <div class="card-bg"></div>
