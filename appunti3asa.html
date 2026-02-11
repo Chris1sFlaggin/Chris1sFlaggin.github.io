@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Calcolatrice RPN</title>
+    <!-- Tailwind CSS per lo stile -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Icone Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Animazioni personalizzate */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        
+        /* Scrollbar personalizzata per il blocco codice */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { bg-slate-900; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex items-center justify-center p-4">
+
+    <!-- Container Principale -->
+    <div id="app" class="w-full max-w-2xl relative">
+        <!-- Il contenuto verrà iniettato qui via JavaScript -->
+    </div>
+
+    <!-- Modale Codice (Nascosta di default) -->
+    <div id="codeModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm hidden">
+        <div class="bg-slate-800 w-full max-w-3xl rounded-xl shadow-2xl border border-slate-700 flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center p-4 border-b border-slate-700">
+                <h3 class="font-mono text-lg text-emerald-400 flex items-center gap-2">
+                    <i data-lucide="code"></i> calcolatriceRPN.py
+                </h3>
+                <button onclick="toggleCodeModal(false)" class="hover:bg-slate-700 p-2 rounded-full transition text-slate-400 hover:text-white">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="p-4 overflow-auto font-mono text-sm text-slate-300 bg-slate-950">
+                <pre id="pythonCodeContent" class="whitespace-pre-wrap"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATI ---
+        const pythonCode = `def calcolatriceRPN (stack):
+    operazione = stack.pop()
+    b = stack.pop()
+    a = stack.pop()
+    if (operazione == '+'):
+        result = a+b
+    elif (operazione == '*'):
+        result = a*b
+    elif (operazione == '-'):
+        result = a-b
+    elif (operazione == '/' and b != 0):
+        result = a/b
+    else:
+        print('Operazione non riconosciuta')
+        exit(1)
+    stack.append(result)
+    return stack
+
+def printStack (stack):
+    for elem in stack:
+        print(elem, '\\n')
+
+stack = []
+
+a = int(input("Inserisci il primo termine."))
+stack.append(a)
+
+b = int(input("Inserisci il secondo termine."))
+stack.append(b)
+
+operazione = str(input("Inserisci l'operazione desiderata"))
+
+stack.append(operazione)
+
+print('--------INIZIO--------\\n')
+printStack(stack)
+
+stack = calcolatriceRPN(stack)
+
+print('--------FINE--------\\n')
+printStack(stack)`;
+
+        const questions = [
+            {
+                q: "Nel codice presentato, la lista `stack` viene utilizzata per simulare una struttura dati specifica. Quale?",
+                options: [
+                    { text: "Una Coda (Queue)", correct: false },
+                    { text: "Una Pila (Stack)", correct: true },
+                    { text: "Un Dizionario", correct: false },
+                    { text: "Un Set", correct: false }
+                ],
+                rationale: "Esatto. Si utilizza il principio LIFO (Last In, First Out) tramite i metodi `append()` e `pop()`."
+            },
+            {
+                q: "Cosa succede esattamente quando viene eseguita l'istruzione `operazione = stack.pop()` alla riga 2?",
+                options: [
+                    { text: "Legge il primo elemento della lista senza rimuoverlo.", correct: false },
+                    { text: "Rimuove l'ultimo elemento della lista e lo assegna alla variabile `operazione`.", correct: true },
+                    { text: "Aggiunge un elemento alla fine della lista.", correct: false },
+                    { text: "Svuota l'intera lista.", correct: false }
+                ],
+                rationale: "Corretto. `pop()` senza argomenti rimuove e restituisce l'ultimo elemento della lista."
+            },
+            {
+                q: "Se l'utente inserisce `10` come primo termine, `2` come secondo termine e `/` come operazione, quale sarà il contenuto di `stack` alla fine del programma?",
+                options: [
+                    { text: "[5.0]", correct: true },
+                    { text: "[0.2]", correct: false },
+                    { text: "[10, 2]", correct: false },
+                    { text: "[8]", correct: false }
+                ],
+                rationale: "Corretto. Lo stack diventa `[10, 2, '/']`. `pop` estrae `/`, poi `2` (b), poi `10` (a). `10 / 2` fa `5.0`."
+            },
+            {
+                q: "Perché alla riga 11 è presente la condizione `and b != 0`?",
+                options: [
+                    { text: "Per assicurarsi che il risultato sia un numero intero.", correct: false },
+                    { text: "Per verificare che l'operatore sia valido.", correct: false },
+                    { text: "Per prevenire un errore di runtime dovuto alla divisione per zero.", correct: true },
+                    { text: "Perché la RPN non accetta lo zero come numero.", correct: false }
+                ],
+                rationale: "Esatto. In Python (e in matematica), la divisione per zero solleva un'eccezione (ZeroDivisionError)."
+            },
+            {
+                q: "Nelle righe 24 e 27 viene usata la funzione `int()`. A cosa serve?",
+                options: [
+                    { text: "A stampare il valore a video.", correct: false },
+                    { text: "A convertire l'input, che di default è una stringa, in un numero intero.", correct: true },
+                    { text: "A creare una lista di numeri interi.", correct: false },
+                    { text: "A arrotondare un numero decimale.", correct: false }
+                ],
+                rationale: "Corretto. `input()` restituisce sempre una stringa, quindi è necessario il casting per fare operazioni matematiche."
+            },
+            {
+                q: "Se un utente inserisce l'operatore `%` (modulo), cosa farà il programma?",
+                options: [
+                    { text: "Calcolerà il resto della divisione.", correct: false },
+                    { text: "Il programma si bloccherà senza messaggi.", correct: false },
+                    { text: "Stamperà 'Operazione non riconosciuta' e terminerà.", correct: true },
+                    { text: "Aggiungerà comunque il risultato allo stack.", correct: false }
+                ],
+                rationale: "Corretto. Il blocco `else` finale cattura qualsiasi operatore non elencato (+, *, -, /)."
+            },
+            {
+                q: "Qual è il ruolo della variabile `result` nella funzione `calcolatriceRPN`?",
+                options: [
+                    { text: "È una variabile globale accessibile ovunque.", correct: false },
+                    { text: "Memorizza temporaneamente il risultato del calcolo prima di inserirlo nello stack.", correct: true },
+                    { text: "Serve a contare quante operazioni sono state eseguite.", correct: false },
+                    { text: "È il nome della funzione che calcola il risultato.", correct: false }
+                ],
+                rationale: "Corretto. Viene assegnata nei blocchi `if/elif` e poi passata a `stack.append(result)`."
+            },
+            {
+                q: "Se inseriamo: primo termine `3`, secondo termine `4`, operazione `-` (meno). Qual è il risultato?",
+                options: [
+                    { text: "-1", correct: true },
+                    { text: "1", correct: false },
+                    { text: "7", correct: false },
+                    { text: "Errore", correct: false }
+                ],
+                rationale: "Corretto. Operazione `a - b` dove a=3 e b=4 (l'ordine di estrazione è inverso all'inserimento)."
+            },
+            {
+                q: "Cosa verrebbe stampato dalla funzione `printStack` se lo stack fosse `[10, 5]`?",
+                options: [
+                    { text: "10 5 (su una riga sola)", correct: false },
+                    { text: "10 seguito da una riga vuota, poi 5 seguito da una riga vuota.", correct: true },
+                    { text: "[10, 5]", correct: false },
+                    { text: "5 10", correct: false }
+                ],
+                rationale: "Corretto. Il ciclo `for` stampa ogni elemento seguito dal carattere newline esplicito `\\n`."
+            },
+            {
+                q: "Qual è un potenziale problema logico nell'ordine delle istruzioni `input` nel codice principale?",
+                options: [
+                    { text: "Non ci sono problemi.", correct: false },
+                    { text: "L'utente è obbligato a inserire l'operazione come stringa.", correct: false },
+                    { text: "La struttura è rigida: funziona solo per esattamente due numeri e un operatore.", correct: true },
+                    { text: "Le variabili `a` e `b` vengono sovrascritte.", correct: false }
+                ],
+                rationale: "Corretto. Una calcolatrice RPN reale dovrebbe permettere di inserire N numeri e poi operatori a piacimento."
+            },
+            {
+                q: "Che cosa accadrebbe se l'utente inserisse la parola 'ciao' invece di un numero quando il programma chiede il 'primo termine'?",
+                options: [
+                    { text: "Il programma assegnerebbe a `a` il valore 0.", correct: false },
+                    { text: "Il programma si interromperebbe con un `ValueError`.", correct: true },
+                    { text: "La stringa 'ciao' verrebbe aggiunta allo stack.", correct: false },
+                    { text: "Il programma chiederebbe di nuovo l'input.", correct: false }
+                ],
+                rationale: "Corretto. Python non può convertire una stringa alfabetica in intero con `int()`."
+            },
+            {
+                q: "Nell'istruzione `exit(1)` alla riga 14, cosa indica generalmente il numero `1`?",
+                options: [
+                    { text: "Che il programma è terminato con successo.", correct: false },
+                    { text: "Attesa di 1 secondo.", correct: false },
+                    { text: "Che il programma è terminato a causa di un errore.", correct: true },
+                    { text: "Numero di elementi rimasti.", correct: false }
+                ],
+                rationale: "Corretto. Un codice di uscita diverso da 0 segnala al sistema operativo che qualcosa è andato storto."
+            },
+            {
+                q: "Cosa succederebbe se la funzione `calcolatriceRPN` venisse chiamata con una lista `stack` contenente solo due elementi (es. `[5, '+']`)?",
+                options: [
+                    { text: "Restituirebbe `None`.", correct: false },
+                    { text: "Solleverebbe un `IndexError`.", correct: true },
+                    { text: "Considererebbe il valore mancante come 0.", correct: false },
+                    { text: "Funzionerebbe normalmente.", correct: false }
+                ],
+                rationale: "Corretto. Il terzo `pop()` (per la variabile `a`) fallirebbe perché la lista è vuota."
+            },
+            {
+                q: "Alla riga 30, `operazione = str(input(...))`. L'uso di `str()` è necessario?",
+                options: [
+                    { text: "Sì, altrimenti input restituisce un numero.", correct: false },
+                    { text: "No, è ridondante perché `input()` restituisce già una stringa.", correct: true },
+                    { text: "Sì, per evitare errori con simboli speciali.", correct: false },
+                    { text: "Dipende dalla versione di Python.", correct: false }
+                ],
+                rationale: "Corretto. In Python 3, `input()` restituisce sempre il tipo `str`."
+            },
+            {
+                q: "Se si usa l'operazione di divisione `/` con `a=10` e `b=2`, il risultato nello stack sarà di tipo:",
+                options: [
+                    { text: "Integer (`int`)", correct: false },
+                    { text: "Float (`float`)", correct: true },
+                    { text: "String (`str`)", correct: false },
+                    { text: "Dipende dai numeri in ingresso.", correct: false }
+                ],
+                rationale: "Corretto. In Python 3, l'operatore `/` esegue sempre una divisione 'vera' restituendo un float (es. 5.0)."
+            },
+            {
+                q: "Nel main, dopo aver chiamato `calcolatriceRPN(stack)`, la variabile `stack` viene aggiornata. Perché?",
+                options: [
+                    { text: "Perché le liste sono passate per valore.", correct: false },
+                    { text: "Solo perché c'è l'istruzione `stack = calcolatriceRPN(stack)`.", correct: true },
+                    { text: "Perché `stack` è `global`.", correct: false },
+                    { text: "Magia di Python.", correct: false }
+                ],
+                rationale: "Anche se le liste sono mutabili, l'assegnazione esplicita rende chiaro l'aggiornamento."
+            },
+            {
+                q: "Se volessi permettere all'utente di inserire anche numeri con la virgola (es. 5.5), quale modifica dovresti fare?",
+                options: [
+                    { text: "Sostituire `int()` con `float()` nelle righe 24 e 27.", correct: true },
+                    { text: "Rimuovere il casting.", correct: false },
+                    { text: "Cambiare l'operazione in `+`.", correct: false },
+                    { text: "Non è possibile in Python.", correct: false }
+                ],
+                rationale: "Corretto. `float()` permette di convertire stringhe come '5.5' in numeri reali."
+            },
+            {
+                q: "Quale operatore gode della proprietà commutativa, rendendo meno critico l'ordine dei `pop()`?",
+                options: [
+                    { text: "Sottrazione (`-`)", correct: false },
+                    { text: "Divisione (`/`)", correct: false },
+                    { text: "Addizione (`+`)", correct: true },
+                    { text: "Nessuno.", correct: false }
+                ],
+                rationale: "Corretto. `a + b` è uguale a `b + a`."
+            },
+            {
+                q: "Cosa verrebbe stampato se il programma venisse eseguito con `a=5`, `b=0`, e operazione `/`?",
+                options: [
+                    { text: "ZeroDivisionError", correct: false },
+                    { text: "Infinity", correct: false },
+                    { text: "Operazione non riconosciuta", correct: true },
+                    { text: "NaN", correct: false }
+                ],
+                rationale: "Corretto. Poiché `b != 0` è falso, l'`elif` fallisce e si va nell'`else` finale."
+            },
+            {
+                q: "Per rendere questo codice una vera RPN che accetta espressioni lunghe (es. `3 4 + 2 *`), cosa manca?",
+                options: [
+                    { text: "Un dizionario.", correct: false },
+                    { text: "Una classe.", correct: false },
+                    { text: "Un ciclo (Loop).", correct: true },
+                    { text: "Un database.", correct: false }
+                ],
+                rationale: "Corretto. Servirebbe un ciclo che continua a leggere input finché l'utente non esce."
+            }
+        ];
+
+        // --- STATO ---
+        let state = {
+            view: 'start', // 'start', 'playing', 'end'
+            currentIdx: 0,
+            score: 0,
+            isAnswered: false,
+            selectedOption: null
+        };
+
+        // --- LOGICA ---
+
+        function init() {
+            document.getElementById('pythonCodeContent').textContent = pythonCode;
+            render();
+        }
+
+        function startGame() {
+            state = { view: 'playing', currentIdx: 0, score: 0, isAnswered: false, selectedOption: null };
+            render();
+        }
+
+        function selectAnswer(optIndex, isCorrect) {
+            if (state.isAnswered) return;
+            state.isAnswered = true;
+            state.selectedOption = optIndex;
+            if (isCorrect) state.score++;
+            render();
+        }
+
+        function nextQuestion() {
+            if (state.currentIdx < questions.length - 1) {
+                state.currentIdx++;
+                state.isAnswered = false;
+                state.selectedOption = null;
+                render();
+            } else {
+                state.view = 'end';
+                render();
+            }
+        }
+
+        function toggleCodeModal(show) {
+            const modal = document.getElementById('codeModal');
+            if (show) modal.classList.remove('hidden');
+            else modal.classList.add('hidden');
+        }
+
+        function getPerformanceMessage() {
+            const percentage = (state.score / questions.length) * 100;
+            if (percentage === 100) return "Perfetto! Sei un compilatore umano!";
+            if (percentage >= 80) return "Ottimo lavoro! Conosci bene lo stack.";
+            if (percentage >= 60) return "Buono, ma ripassa un po' la logica RPN.";
+            return "Bisogna studiare! Rivedi il codice e riprova.";
+        }
+
+        // --- RENDER ---
+        function render() {
+            const app = document.getElementById('app');
+            let html = '';
+
+            // Header Comune
+            const header = `
+                <div class="text-center mb-8">
+                    <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-500 bg-clip-text text-transparent mb-2">
+                        Quiz Calcolatrice RPN
+                    </h1>
+                    <p class="text-slate-400">Ripasso Python & Strutture Dati</p>
+                </div>
+            `;
+
+            if (state.view === 'start') {
+                html = `
+                    ${header}
+                    <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-8 text-center animate-fade-in">
+                        <div class="mb-6 flex justify-center">
+                            <div class="w-24 h-24 bg-slate-700 rounded-full flex items-center justify-center animate-pulse">
+                                <i data-lucide="code" class="w-12 h-12 text-emerald-400"></i>
+                            </div>
+                        </div>
+                        <h2 class="text-2xl font-bold mb-4">Pronto a testare il codice?</h2>
+                        <p class="text-slate-300 mb-8 leading-relaxed">
+                            Questo quiz contiene ${questions.length} domande basate sul codice Python della calcolatrice RPN.
+                            Preparati su Stack, Funzioni e Logica.
+                        </p>
+                        <button onclick="startGame()" class="group relative inline-flex items-center justify-center px-8 py-3 font-bold text-white transition-all duration-200 bg-emerald-600 font-lg rounded-full hover:bg-emerald-500 focus:outline-none ring-offset-2 focus:ring-2 w-full md:w-auto gap-2">
+                            <i data-lucide="play" class="w-5 h-5 fill-current"></i> Inizia il Quiz
+                        </button>
+                    </div>
+                `;
+            } else if (state.view === 'playing') {
+                const q = questions[state.currentIdx];
+                const progress = ((state.currentIdx + 1) / questions.length) * 100;
+
+                let optionsHtml = '';
+                q.options.forEach((opt, idx) => {
+                    let btnClass = "w-full text-left p-4 rounded-xl border-2 transition-all duration-200 relative mb-3 flex justify-between items-center ";
+                    let icon = '';
+
+                    if (!state.isAnswered) {
+                        btnClass += "border-slate-600 bg-slate-750 hover:border-slate-400 hover:bg-slate-700 cursor-pointer";
+                    } else {
+                        if (opt.correct) {
+                            btnClass += "border-emerald-500 bg-emerald-500/10 text-emerald-100";
+                            icon = '<i data-lucide="check" class="text-emerald-400 w-5 h-5"></i>';
+                        } else if (idx === state.selectedOption && !opt.correct) {
+                            btnClass += "border-rose-500 bg-rose-500/10 text-rose-100";
+                            icon = '<i data-lucide="x" class="text-rose-400 w-5 h-5"></i>';
+                        } else {
+                            btnClass += "border-slate-700 bg-slate-800/50 opacity-50 cursor-not-allowed";
+                        }
+                    }
+
+                    optionsHtml += `
+                        <button 
+                            onclick="selectAnswer(${idx}, ${opt.correct})" 
+                            ${state.isAnswered ? 'disabled' : ''}
+                            class="${btnClass}">
+                            <span>${opt.text}</span>
+                            ${state.isAnswered ? icon : ''}
+                        </button>
+                    `;
+                });
+
+                let feedbackHtml = '';
+                if (state.isAnswered) {
+                    const isCorrect = q.options[state.selectedOption].correct;
+                    const feedbackClass = isCorrect ? "bg-emerald-900/30 border-emerald-500" : "bg-rose-900/30 border-rose-500";
+                    const feedbackTitleClass = isCorrect ? "text-emerald-400" : "text-rose-400";
+                    const feedbackIcon = isCorrect ? "check" : "alert-circle";
+                    const feedbackText = isCorrect ? "Corretto!" : "Sbagliato";
+
+                    feedbackHtml = `
+                        <div class="mt-8 animate-fade-in">
+                            <div class="p-4 rounded-lg border-l-4 mb-4 ${feedbackClass}">
+                                <h4 class="font-bold mb-1 flex items-center gap-2 ${feedbackTitleClass}">
+                                    <i data-lucide="${feedbackIcon}" class="w-4 h-4"></i> ${feedbackText}
+                                </h4>
+                                <p class="text-slate-300 text-sm leading-relaxed">${q.rationale}</p>
+                            </div>
+                            <div class="flex justify-end">
+                                <button onclick="nextQuestion()" class="bg-slate-100 text-slate-900 hover:bg-white px-6 py-2.5 rounded-lg font-bold flex items-center gap-2 transition-colors shadow-lg shadow-white/10">
+                                    ${state.currentIdx < questions.length - 1 ? "Prossima Domanda" : "Vedi Risultati"} 
+                                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                html = `
+                    ${header}
+                    <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 overflow-hidden relative">
+                        <!-- Progress Bar -->
+                        <div class="h-2 bg-slate-900 w-full">
+                            <div class="h-full bg-emerald-500 transition-all duration-500" style="width: ${progress}%"></div>
+                        </div>
+
+                        <div class="p-6 md:p-8">
+                            <div class="flex justify-between items-start mb-6">
+                                <span class="bg-slate-700 text-slate-300 px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase">
+                                    Domanda ${state.currentIdx + 1}/${questions.length}
+                                </span>
+                                <button onclick="toggleCodeModal(true)" class="flex items-center gap-2 text-xs md:text-sm text-cyan-400 hover:text-cyan-300 transition-colors border border-cyan-400/30 hover:bg-cyan-400/10 px-3 py-1.5 rounded-lg">
+                                    <i data-lucide="code" class="w-4 h-4"></i> Mostra Codice
+                                </button>
+                            </div>
+
+                            <h2 class="text-xl md:text-2xl font-semibold mb-8 text-white leading-tight">
+                                ${q.q}
+                            </h2>
+
+                            <div class="space-y-3">
+                                ${optionsHtml}
+                            </div>
+
+                            ${feedbackHtml}
+                        </div>
+                    </div>
+                `;
+            } else if (state.view === 'end') {
+                html = `
+                    ${header}
+                    <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-8 text-center animate-fade-in">
+                        <div class="mb-6 flex justify-center">
+                           <div class="relative">
+                             <i data-lucide="trophy" class="w-16 h-16 text-yellow-400"></i>
+                             <div class="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                               ${Math.round((state.score / questions.length) * 100)}%
+                             </div>
+                           </div>
+                        </div>
+                        
+                        <h2 class="text-3xl font-bold mb-2">Quiz Completato!</h2>
+                        <p class="text-4xl font-mono font-bold text-emerald-400 mb-4">${state.score} / ${questions.length}</p>
+                        
+                        <p class="text-lg text-slate-300 mb-8 border-t border-b border-slate-700 py-4 italic">
+                          "${getPerformanceMessage()}"
+                        </p>
+
+                        <div class="flex justify-center">
+                          <button onclick="startGame()" class="bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors">
+                            <i data-lucide="rotate-ccw" class="w-5 h-5"></i> Ricomincia
+                          </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            app.innerHTML = html;
+            lucide.createIcons(); // Re-inizializza le icone dopo il render
+        }
+
+        // Avvio
+        init();
+
+    </script>
+</body>
+</html>
