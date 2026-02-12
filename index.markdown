@@ -114,7 +114,7 @@ header:
     </div>
     
     <div class="section-block">
-      <h2 class="section-title">PRODUCTS & PACKAGES</h2>
+      <h2 class="section-title">PRODUCTS</h2>
       <div class="products-grid">
         
         <a href="https://chris1sflaggin.it/LCSAJdump" class="card product-card">
@@ -122,9 +122,8 @@ header:
             <img src="/images/LCSAJfull.png" alt="Descrizione Immagine" style="width: 50px; height: 50px; object-fit: contain;">
           </div>
           <div class="product-info">
-            <h3>Starter Kit</h3>
-            <p>Il pacchetto base per iniziare.</p>
-            <span class="price">€19.99</span>
+            <h3>LCSAJdump</h3>
+            <p>Recursive gadget finder for RISC-V architectures.</p>
           </div>
         </a>
 
@@ -260,15 +259,6 @@ header:
     font-size: 0.9rem;
     margin-bottom: 1rem;
     line-height: 1.4;
-  }
-
-  .price {
-    display: inline-block;
-    color: #64ffda;
-    font-weight: bold;
-    font-family: monospace;
-    font-size: 1.1rem;
-    margin-top: auto; /* Spinge il prezzo in basso */
   }
   
   /* Category Images */
