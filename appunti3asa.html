@@ -3,508 +3,1382 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Calcolatrice RPN</title>
-    <!-- Tailwind CSS per lo stile -->
+    <title>Python Lab: Guida Interattiva</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Icone Lucide -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Chosen Palette: Warm Neutrals & Academic Blue -->
+    <!-- Application Structure Plan: 
+         The app is designed as a "Developer's Dashboard" divided into 4 core functional modules matching the report's topics:
+         1. I/O Console: Simulates the Input/Print/Cast workflow.
+         2. Logic Flow: Visualizes If/Elif/Else branching using interactive sliders.
+         3. Data Structures (The Backpack): A visual list manipulator to understand append/remove/pop dynamically.
+         4. Loop Visualizer: Animations to demonstrate While and For cycles.
+         
+         Navigation is tab-based for easy switching. Each section includes a specific interactive visualization and a "Code Context" panel showing the underlying Python syntax.
+    -->
+    
+    <!-- Visualization & Content Choices:
+         - I/O Section: Uses a DOM-based "Terminal" simulation to show text vs number casting. Goal: Clarify int() concept.
+         - Logic Section: Uses a dynamic flowchart (CSS highlighting) + Bar Chart (Chart.js) to compare user input against thresholds. Goal: Visualize decision boundaries.
+         - List Section: Uses a "Backpack" visual container (Flexbox) + Doughnut Chart (Chart.js) to show item composition. Goal: Make abstract list operations concrete.
+         - Loop Section: Uses a step-by-step JS animation to generate DOM elements, mimicking the 'range()' function. Goal: Show iteration progress.
+         - NO SVG used (FontAwesome icons only). NO Mermaid used.
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
     <style>
-        /* Animazioni personalizzate */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        body {
+            background-color: #fcfbf9; /* Warm neutral background */
+            color: #1f2937;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
         
-        /* Scrollbar personalizzata per il blocco codice */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { bg-slate-900; }
-        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        /* Custom scrollbar for terminal */
+        .terminal-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .terminal-scroll::-webkit-scrollbar-track {
+            background: #2d3748; 
+        }
+        .terminal-scroll::-webkit-scrollbar-thumb {
+            background: #4a5568; 
+            border-radius: 4px;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        .nav-item.active {
+            border-bottom: 3px solid #3b82f6;
+            color: #1d4ed8;
+            font-weight: 700;
+        }
+        
+        .code-block {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+        }
+
+        .highlight-keyword { color: #569cd6; }
+        .highlight-string { color: #ce9178; }
+        .highlight-function { color: #dcdcaa; }
+        .highlight-number { color: #b5cea8; }
+        
+        /* Animation classes */
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex items-center justify-center p-4">
+<body class="flex flex-col min-h-screen">
 
-    <!-- Container Principale -->
-    <div id="app" class="w-full max-w-2xl relative">
-        <!-- Il contenuto verrà iniettato qui via JavaScript -->
-    </div>
-
-    <!-- Modale Codice (Nascosta di default) -->
-    <div id="codeModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm hidden">
-        <div class="bg-slate-800 w-full max-w-3xl rounded-xl shadow-2xl border border-slate-700 flex flex-col max-h-[90vh]">
-            <div class="flex justify-between items-center p-4 border-b border-slate-700">
-                <h3 class="font-mono text-lg text-emerald-400 flex items-center gap-2">
-                    <i data-lucide="code"></i> calcolatriceRPN.py
-                </h3>
-                <button onclick="toggleCodeModal(false)" class="hover:bg-slate-700 p-2 rounded-full transition text-slate-400 hover:text-white">
-                    <i data-lucide="x"></i>
-                </button>
-            </div>
-            <div class="p-4 overflow-auto font-mono text-sm text-slate-300 bg-slate-950">
-                <pre id="pythonCodeContent" class="whitespace-pre-wrap"></pre>
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-600 text-white p-2 rounded-lg">
+                        <i class="fa-brands fa-python text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">Python Lab</h1>
+                        <p class="text-xs text-gray-500">Appunti Interattivi</p>
+                    </div>
+                </div>
+                <!-- Navigation -->
+                <nav class="hidden md:flex space-x-8" id="desktop-nav">
+                    <button onclick="switchTab('io')" class="nav-item active px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-700">Input & Cast</button>
+                    <button onclick="switchTab('logic')" class="nav-item px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-700">Logica (If)</button>
+                    <button onclick="switchTab('lists')" class="nav-item px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-700">Liste</button>
+                    <button onclick="switchTab('loops')" class="nav-item px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-700">Cicli</button>
+                </nav>
             </div>
         </div>
-    </div>
+        <!-- Mobile Nav -->
+        <div class="flex md:hidden justify-around border-t border-gray-200 bg-gray-50 p-2">
+            <button onclick="switchTab('io')" class="text-gray-600 hover:text-blue-600"><i class="fa-solid fa-keyboard"></i></button>
+            <button onclick="switchTab('logic')" class="text-gray-600 hover:text-blue-600"><i class="fa-solid fa-code-branch"></i></button>
+            <button onclick="switchTab('lists')" class="text-gray-600 hover:text-blue-600"><i class="fa-solid fa-list-ul"></i></button>
+            <button onclick="switchTab('loops')" class="text-gray-600 hover:text-blue-600"><i class="fa-solid fa-rotate"></i></button>
+        </div>
+    </header>
 
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <!-- SECTION 1: INPUT & CASTING -->
+        <section id="io-section" class="space-y-6 fade-in">
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+                <h2 class="text-2xl font-bold mb-2">1. Interazione e Tipi di Dati</h2>
+                <p class="text-gray-600">
+                    Le basi della comunicazione: <strong>input()</strong> riceve dati (sempre come testo!) e <strong>print()</strong> li mostra. 
+                    Usa il simulatore qui sotto per capire perché il <em>casting</em> (es. <code>int()</code>) è fondamentale per la matematica.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Interactive Terminal -->
+                <div class="bg-gray-900 rounded-lg p-4 shadow-xl text-gray-100 font-mono text-sm relative overflow-hidden flex flex-col h-96">
+                    <div class="flex justify-between items-center mb-2 border-b border-gray-700 pb-2">
+                        <span class="text-xs text-gray-400">Terminale Python</span>
+                        <div class="flex gap-2">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        </div>
+                    </div>
+                    <div id="terminal-output" class="terminal-scroll flex-grow overflow-y-auto space-y-2 p-2">
+                        <div class="text-green-400">>>> Inizializzazione sistema...</div>
+                        <div>Pronto.</div>
+                    </div>
+                    <div class="mt-2 border-t border-gray-700 pt-2 flex gap-2 items-center">
+                        <span class="text-green-400">>>></span>
+                        <input type="text" id="terminal-input" placeholder="Scrivi qui (es: 2023)..." class="bg-transparent border-none outline-none text-white w-full focus:ring-0">
+                        <button onclick="processInput()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs">Invio</button>
+                    </div>
+                </div>
+
+                <!-- Explanation Panel -->
+                <div class="space-y-4">
+                    <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
+                        <h3 class="font-bold text-lg mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-calculator text-blue-500"></i>
+                            Calcolatrice di Età
+                        </h3>
+                        <p class="text-sm text-gray-600 mb-4">Prova a inserire il tuo anno di nascita nel terminale. Guarda cosa succede se usiamo <code>input()</code> puro rispetto a <code>int(input())</code>.</p>
+                        
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                                <span class="font-semibold text-xs uppercase text-gray-500">Valore Grezzo (Str)</span>
+                                <span id="val-raw" class="font-mono text-blue-600">None</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                                <span class="font-semibold text-xs uppercase text-gray-500">Valore Intero (Int)</span>
+                                <span id="val-int" class="font-mono text-green-600">None</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                                <span class="font-semibold text-xs uppercase text-gray-500">Risultato Operazione</span>
+                                <span id="val-calc" class="font-mono text-purple-600">In attesa...</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 code-block p-4 rounded text-sm">
+                            <p><span class="highlight-keyword">anno_testo</span> = <span class="highlight-function">input</span>("...")</p>
+                            <p class="text-gray-500"># Senza int(), questo fallirebbe:</p>
+                            <p><span class="highlight-keyword">anno_num</span> = <span class="highlight-function">int</span>(anno_testo)</p>
+                            <p><span class="highlight-function">print</span>(2025 - anno_num)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: LOGIC BRANCHING -->
+        <section id="logic-section" class="hidden space-y-6 fade-in">
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500">
+                <h2 class="text-2xl font-bold mb-2">2. Prendere Decisioni (If/Elif/Else)</h2>
+                <p class="text-gray-600">
+                    Il computer valuta le condizioni in ordine. Usa lo slider per cambiare il voto e vedi quale "ramo" del codice viene eseguito.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Controls & Chart -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Simula il voto del test (0-30)</label>
+                        <input type="range" id="grade-slider" min="0" max="30" value="10" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        <div class="mt-2 text-center text-3xl font-bold text-purple-600" id="grade-display">10</div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow">
+                         <h4 class="text-sm font-bold text-gray-500 mb-2 text-center">Analisi Soglia</h4>
+                         <div class="chart-container">
+                             <canvas id="logicChart"></canvas>
+                         </div>
+                    </div>
+                </div>
+
+                <!-- Visual Code Flow -->
+                <div class="lg:col-span-7 space-y-4">
+                    <div id="branch-1" class="border-2 border-transparent p-4 rounded-lg bg-gray-50 transition-all duration-300 opacity-50">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center font-bold">1</div>
+                            <code class="text-sm font-bold">if voto >= 18:</code>
+                        </div>
+                        <p class="ml-11 text-sm text-gray-600">"Test superato! Complimenti."</p>
+                        <div id="sub-branch-1" class="ml-11 mt-2 p-2 bg-green-50 border border-green-200 rounded text-xs hidden">
+                            <strong>if voto == 30:</strong> "Hai preso il massimo!"
+                        </div>
+                    </div>
+
+                    <div id="branch-2" class="border-2 border-transparent p-4 rounded-lg bg-gray-50 transition-all duration-300 opacity-50">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center font-bold">2</div>
+                            <code class="text-sm font-bold">elif voto >= 15:</code>
+                        </div>
+                        <p class="ml-11 text-sm text-gray-600">"Non hai passato il test, ma ci sei andato vicino (Orale)."</p>
+                    </div>
+
+                    <div id="branch-3" class="border-2 border-transparent p-4 rounded-lg bg-gray-50 transition-all duration-300 opacity-50">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold">3</div>
+                            <code class="text-sm font-bold">else:</code>
+                        </div>
+                        <p class="ml-11 text-sm text-gray-600">"Test non superato. Devi ritentare."</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: LISTS -->
+        <section id="lists-section" class="hidden space-y-6 fade-in">
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+                <h2 class="text-2xl font-bold mb-2">3. Le Liste (Lo Zaino)</h2>
+                <p class="text-gray-600">
+                    Una lista mantiene l'ordine degli elementi. Aggiungi oggetti allo zaino con <code>append</code>, rimuovili con <code>remove</code> o estrai l'ultimo con <code>pop</code>.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Controls -->
+                <div class="lg:col-span-4 space-y-6">
+                    <div class="bg-white p-6 rounded-lg shadow space-y-4">
+                        <h3 class="font-bold text-gray-700">Gestione Inventario</h3>
+                        
+                        <div>
+                            <label class="text-xs font-semibold text-gray-500 uppercase">Oggetto</label>
+                            <div class="flex gap-2 mt-1">
+                                <select id="item-select" class="block w-full rounded border-gray-300 bg-gray-50 p-2 text-sm border">
+                                    <option value="Torcia">🔦 Torcia</option>
+                                    <option value="Mappa">🗺️ Mappa</option>
+                                    <option value="Bussola">🧭 Bussola</option>
+                                    <option value="Borraccia">💧 Borraccia</option>
+                                    <option value="Chiave">🔑 Chiave</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="listAppend()" class="col-span-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded text-sm flex justify-center items-center gap-2">
+                                <i class="fa-solid fa-plus"></i> zaino.append()
+                            </button>
+                            <button onclick="listPop()" class="bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded text-sm flex justify-center items-center gap-2">
+                                <i class="fa-solid fa-upload"></i> .pop()
+                            </button>
+                            <button onclick="listRemove()" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded text-sm flex justify-center items-center gap-2">
+                                <i class="fa-solid fa-trash"></i> .remove()
+                            </button>
+                        </div>
+                        
+                        <div class="pt-4 border-t">
+                            <p class="text-xs text-gray-400 mb-2">Composizione Zaino:</p>
+                            <div class="chart-container" style="height: 200px;">
+                                <canvas id="backpackChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Representation -->
+                <div class="lg:col-span-8 bg-gray-100 rounded-xl p-6 border-2 border-dashed border-gray-300 min-h-[400px] flex flex-col">
+                    <div class="flex justify-between items-end mb-4">
+                        <h3 class="font-bold text-gray-600">Contenuto Zaino: <span id="list-repr" class="font-mono text-sm text-blue-600">[]</span></h3>
+                        <span class="text-xs bg-gray-200 px-2 py-1 rounded">Indice 0 inizia a sinistra</span>
+                    </div>
+                    
+                    <!-- The Backpack Container -->
+                    <div id="backpack-container" class="flex flex-wrap gap-4 items-start content-start flex-grow">
+                        <!-- Items will be injected here JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: LOOPS -->
+        <section id="loops-section" class="hidden space-y-6 fade-in">
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
+                <h2 class="text-2xl font-bold mb-2">4. I Cicli (For & While)</h2>
+                <p class="text-gray-600">
+                    Automatizza le ripetizioni. <strong>While</strong> continua finché la condizione è vera. <strong>For</strong> scorre una collezione o un range di numeri.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- While Loop Demo -->
+                <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-spin text-yellow-600"></i>
+                        Ciclo While (Password)
+                    </h3>
+                    <div class="code-block p-3 rounded text-xs mb-4">
+                        password = ""<br>
+                        <span class="highlight-keyword">while</span> password != "segreto123":<br>
+                        &nbsp;&nbsp;password = <span class="highlight-function">input</span>(...)
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <input type="text" id="while-input" placeholder="Indovina la password..." class="w-full border p-2 rounded">
+                        <button onclick="checkWhileLoop()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded">Controlla</button>
+                        <div id="while-msg" class="text-center text-sm font-bold min-h-[20px] text-gray-400">Inserisci 'segreto123'</div>
+                    </div>
+                </div>
+
+                <!-- For Loop Demo -->
+                <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-list-ol text-green-600"></i>
+                        Ciclo For (Range)
+                    </h3>
+                    <div class="code-block p-3 rounded text-xs mb-4">
+                        <span class="highlight-keyword">for</span> i <span class="highlight-keyword">in</span> <span class="highlight-function">range</span>(<span id="range-val-code" class="highlight-number">5</span>):<br>
+                        &nbsp;&nbsp;<span class="highlight-function">print</span>(5 - i)
+                    </div>
+
+                    <div class="flex items-center gap-4 mb-4">
+                        <input type="range" id="loop-range" min="1" max="10" value="5" class="flex-grow h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        <span id="loop-count" class="font-bold text-xl w-8">5</span>
+                    </div>
+                    
+                    <button onclick="runForLoop()" class="w-full bg-green-600 hover:bg-green-700 text-white p-2 rounded mb-4">Esegui Ciclo</button>
+
+                    <div id="for-output" class="flex gap-2 flex-wrap justify-center min-h-[60px]">
+                        <!-- Dynamic boxes -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-gray-500 text-sm">
+                Generato da Python Interactive Guide &copy; 2024. Basato sugli appunti forniti.
+            </p>
+        </div>
+    </footer>
+
+    <!-- LOGIC SCRIPT -->
     <script>
-        // --- DATI ---
-        const pythonCode = `def calcolatriceRPN (stack):
-    operazione = stack.pop()
-    b = stack.pop()
-    a = stack.pop()
-    if (operazione == '+'):
-        result = a+b
-    elif (operazione == '*'):
-        result = a*b
-    elif (operazione == '-'):
-        result = a-b
-    elif (operazione == '/' and b != 0):
-        result = a/b
-    else:
-        print('Operazione non riconosciuta')
-        exit(1)
-    stack.append(result)
-    return stack
+        // --- GLOBAL STATE & NAVIGATION ---
+        let currentTab = 'io';
+        
+        function switchTab(tabId) {
+            // Update UI
+            document.querySelectorAll('section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId + '-section').classList.remove('hidden');
+            
+            // Nav styles
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active', 'border-bottom', 'text-blue-600'));
+            // Find nav item (simple loop matching onclick attribute roughly or id logic)
+            // Ideally we'd use IDs on buttons, but simpler:
+            const buttons = document.querySelectorAll('button[onclick^="switchTab"]');
+            buttons.forEach(btn => {
+                if(btn.getAttribute('onclick').includes(tabId)) {
+                    // Check if it's desktop nav to add 'active' class
+                    if(btn.classList.contains('nav-item')) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.add('text-blue-600'); // Mobile highlight
+                    }
+                } else {
+                    if(!btn.classList.contains('nav-item')) btn.classList.remove('text-blue-600');
+                }
+            });
 
-def printStack (stack):
-    for elem in stack:
-        print(elem, '\\n')
+            // Trigger chart resize
+            if (tabId === 'logic' && logicChart) logicChart.resize();
+            if (tabId === 'lists' && backpackChart) backpackChart.resize();
+        }
 
-stack = []
+        // --- SECTION 1: I/O & CASTING ---
+        function processInput() {
+            const inputField = document.getElementById('terminal-input');
+            const outputDiv = document.getElementById('terminal-output');
+            const valRaw = document.getElementById('val-raw');
+            const valInt = document.getElementById('val-int');
+            const valCalc = document.getElementById('val-calc');
+            
+            const text = inputField.value;
+            if (!text) return;
 
-a = int(input("Inserisci il primo termine."))
-stack.append(a)
+            // Simulate Print
+            const line = document.createElement('div');
+            line.innerHTML = `<span class="text-blue-400">In:</span> ${text}`;
+            outputDiv.appendChild(line);
 
-b = int(input("Inserisci il secondo termine."))
-stack.append(b)
-
-operazione = str(input("Inserisci l'operazione desiderata"))
-
-stack.append(operazione)
-
-print('--------INIZIO--------\\n')
-printStack(stack)
-
-stack = calcolatriceRPN(stack)
-
-print('--------FINE--------\\n')
-printStack(stack)`;
-
-        const questions = [
-            {
-                q: "Nel codice presentato, la lista `stack` viene utilizzata per simulare una struttura dati specifica. Quale?",
-                options: [
-                    { text: "Una Coda (Queue)", correct: false },
-                    { text: "Una Pila (Stack)", correct: true },
-                    { text: "Un Dizionario", correct: false },
-                    { text: "Un Set", correct: false }
-                ],
-                rationale: "Esatto. Si utilizza il principio LIFO (Last In, First Out) tramite i metodi `append()` e `pop()`."
-            },
-            {
-                q: "Cosa succede esattamente quando viene eseguita l'istruzione `operazione = stack.pop()` alla riga 2?",
-                options: [
-                    { text: "Legge il primo elemento della lista senza rimuoverlo.", correct: false },
-                    { text: "Rimuove l'ultimo elemento della lista e lo assegna alla variabile `operazione`.", correct: true },
-                    { text: "Aggiunge un elemento alla fine della lista.", correct: false },
-                    { text: "Svuota l'intera lista.", correct: false }
-                ],
-                rationale: "Corretto. `pop()` senza argomenti rimuove e restituisce l'ultimo elemento della lista."
-            },
-            {
-                q: "Se l'utente inserisce `10` come primo termine, `2` come secondo termine e `/` come operazione, quale sarà il contenuto di `stack` alla fine del programma?",
-                options: [
-                    { text: "[5.0]", correct: true },
-                    { text: "[0.2]", correct: false },
-                    { text: "[10, 2]", correct: false },
-                    { text: "[8]", correct: false }
-                ],
-                rationale: "Corretto. Lo stack diventa `[10, 2, '/']`. `pop` estrae `/`, poi `2` (b), poi `10` (a). `10 / 2` fa `5.0`."
-            },
-            {
-                q: "Perché alla riga 11 è presente la condizione `and b != 0`?",
-                options: [
-                    { text: "Per assicurarsi che il risultato sia un numero intero.", correct: false },
-                    { text: "Per verificare che l'operatore sia valido.", correct: false },
-                    { text: "Per prevenire un errore di runtime dovuto alla divisione per zero.", correct: true },
-                    { text: "Perché la RPN non accetta lo zero come numero.", correct: false }
-                ],
-                rationale: "Esatto. In Python (e in matematica), la divisione per zero solleva un'eccezione (ZeroDivisionError)."
-            },
-            {
-                q: "Nelle righe 24 e 27 viene usata la funzione `int()`. A cosa serve?",
-                options: [
-                    { text: "A stampare il valore a video.", correct: false },
-                    { text: "A convertire l'input, che di default è una stringa, in un numero intero.", correct: true },
-                    { text: "A creare una lista di numeri interi.", correct: false },
-                    { text: "A arrotondare un numero decimale.", correct: false }
-                ],
-                rationale: "Corretto. `input()` restituisce sempre una stringa, quindi è necessario il casting per fare operazioni matematiche."
-            },
-            {
-                q: "Se un utente inserisce l'operatore `%` (modulo), cosa farà il programma?",
-                options: [
-                    { text: "Calcolerà il resto della divisione.", correct: false },
-                    { text: "Il programma si bloccherà senza messaggi.", correct: false },
-                    { text: "Stamperà 'Operazione non riconosciuta' e terminerà.", correct: true },
-                    { text: "Aggiungerà comunque il risultato allo stack.", correct: false }
-                ],
-                rationale: "Corretto. Il blocco `else` finale cattura qualsiasi operatore non elencato (+, *, -, /)."
-            },
-            {
-                q: "Qual è il ruolo della variabile `result` nella funzione `calcolatriceRPN`?",
-                options: [
-                    { text: "È una variabile globale accessibile ovunque.", correct: false },
-                    { text: "Memorizza temporaneamente il risultato del calcolo prima di inserirlo nello stack.", correct: true },
-                    { text: "Serve a contare quante operazioni sono state eseguite.", correct: false },
-                    { text: "È il nome della funzione che calcola il risultato.", correct: false }
-                ],
-                rationale: "Corretto. Viene assegnata nei blocchi `if/elif` e poi passata a `stack.append(result)`."
-            },
-            {
-                q: "Se inseriamo: primo termine `3`, secondo termine `4`, operazione `-` (meno). Qual è il risultato?",
-                options: [
-                    { text: "-1", correct: true },
-                    { text: "1", correct: false },
-                    { text: "7", correct: false },
-                    { text: "Errore", correct: false }
-                ],
-                rationale: "Corretto. Operazione `a - b` dove a=3 e b=4 (l'ordine di estrazione è inverso all'inserimento)."
-            },
-            {
-                q: "Cosa verrebbe stampato dalla funzione `printStack` se lo stack fosse `[10, 5]`?",
-                options: [
-                    { text: "10 5 (su una riga sola)", correct: false },
-                    { text: "10 seguito da una riga vuota, poi 5 seguito da una riga vuota.", correct: true },
-                    { text: "[10, 5]", correct: false },
-                    { text: "5 10", correct: false }
-                ],
-                rationale: "Corretto. Il ciclo `for` stampa ogni elemento seguito dal carattere newline esplicito `\\n`."
-            },
-            {
-                q: "Qual è un potenziale problema logico nell'ordine delle istruzioni `input` nel codice principale?",
-                options: [
-                    { text: "Non ci sono problemi.", correct: false },
-                    { text: "L'utente è obbligato a inserire l'operazione come stringa.", correct: false },
-                    { text: "La struttura è rigida: funziona solo per esattamente due numeri e un operatore.", correct: true },
-                    { text: "Le variabili `a` e `b` vengono sovrascritte.", correct: false }
-                ],
-                rationale: "Corretto. Una calcolatrice RPN reale dovrebbe permettere di inserire N numeri e poi operatori a piacimento."
-            },
-            {
-                q: "Che cosa accadrebbe se l'utente inserisse la parola 'ciao' invece di un numero quando il programma chiede il 'primo termine'?",
-                options: [
-                    { text: "Il programma assegnerebbe a `a` il valore 0.", correct: false },
-                    { text: "Il programma si interromperebbe con un `ValueError`.", correct: true },
-                    { text: "La stringa 'ciao' verrebbe aggiunta allo stack.", correct: false },
-                    { text: "Il programma chiederebbe di nuovo l'input.", correct: false }
-                ],
-                rationale: "Corretto. Python non può convertire una stringa alfabetica in intero con `int()`."
-            },
-            {
-                q: "Nell'istruzione `exit(1)` alla riga 14, cosa indica generalmente il numero `1`?",
-                options: [
-                    { text: "Che il programma è terminato con successo.", correct: false },
-                    { text: "Attesa di 1 secondo.", correct: false },
-                    { text: "Che il programma è terminato a causa di un errore.", correct: true },
-                    { text: "Numero di elementi rimasti.", correct: false }
-                ],
-                rationale: "Corretto. Un codice di uscita diverso da 0 segnala al sistema operativo che qualcosa è andato storto."
-            },
-            {
-                q: "Cosa succederebbe se la funzione `calcolatriceRPN` venisse chiamata con una lista `stack` contenente solo due elementi (es. `[5, '+']`)?",
-                options: [
-                    { text: "Restituirebbe `None`.", correct: false },
-                    { text: "Solleverebbe un `IndexError`.", correct: true },
-                    { text: "Considererebbe il valore mancante come 0.", correct: false },
-                    { text: "Funzionerebbe normalmente.", correct: false }
-                ],
-                rationale: "Corretto. Il terzo `pop()` (per la variabile `a`) fallirebbe perché la lista è vuota."
-            },
-            {
-                q: "Alla riga 30, `operazione = str(input(...))`. L'uso di `str()` è necessario?",
-                options: [
-                    { text: "Sì, altrimenti input restituisce un numero.", correct: false },
-                    { text: "No, è ridondante perché `input()` restituisce già una stringa.", correct: true },
-                    { text: "Sì, per evitare errori con simboli speciali.", correct: false },
-                    { text: "Dipende dalla versione di Python.", correct: false }
-                ],
-                rationale: "Corretto. In Python 3, `input()` restituisce sempre il tipo `str`."
-            },
-            {
-                q: "Se si usa l'operazione di divisione `/` con `a=10` e `b=2`, il risultato nello stack sarà di tipo:",
-                options: [
-                    { text: "Integer (`int`)", correct: false },
-                    { text: "Float (`float`)", correct: true },
-                    { text: "String (`str`)", correct: false },
-                    { text: "Dipende dai numeri in ingresso.", correct: false }
-                ],
-                rationale: "Corretto. In Python 3, l'operatore `/` esegue sempre una divisione 'vera' restituendo un float (es. 5.0)."
-            },
-            {
-                q: "Nel main, dopo aver chiamato `calcolatriceRPN(stack)`, la variabile `stack` viene aggiornata. Perché?",
-                options: [
-                    { text: "Perché le liste sono passate per valore.", correct: false },
-                    { text: "Solo perché c'è l'istruzione `stack = calcolatriceRPN(stack)`.", correct: true },
-                    { text: "Perché `stack` è `global`.", correct: false },
-                    { text: "Magia di Python.", correct: false }
-                ],
-                rationale: "Anche se le liste sono mutabili, l'assegnazione esplicita rende chiaro l'aggiornamento."
-            },
-            {
-                q: "Se volessi permettere all'utente di inserire anche numeri con la virgola (es. 5.5), quale modifica dovresti fare?",
-                options: [
-                    { text: "Sostituire `int()` con `float()` nelle righe 24 e 27.", correct: true },
-                    { text: "Rimuovere il casting.", correct: false },
-                    { text: "Cambiare l'operazione in `+`.", correct: false },
-                    { text: "Non è possibile in Python.", correct: false }
-                ],
-                rationale: "Corretto. `float()` permette di convertire stringhe come '5.5' in numeri reali."
-            },
-            {
-                q: "Quale operatore gode della proprietà commutativa, rendendo meno critico l'ordine dei `pop()`?",
-                options: [
-                    { text: "Sottrazione (`-`)", correct: false },
-                    { text: "Divisione (`/`)", correct: false },
-                    { text: "Addizione (`+`)", correct: true },
-                    { text: "Nessuno.", correct: false }
-                ],
-                rationale: "Corretto. `a + b` è uguale a `b + a`."
-            },
-            {
-                q: "Cosa verrebbe stampato se il programma venisse eseguito con `a=5`, `b=0`, e operazione `/`?",
-                options: [
-                    { text: "ZeroDivisionError", correct: false },
-                    { text: "Infinity", correct: false },
-                    { text: "Operazione non riconosciuta", correct: true },
-                    { text: "NaN", correct: false }
-                ],
-                rationale: "Corretto. Poiché `b != 0` è falso, l'`elif` fallisce e si va nell'`else` finale."
-            },
-            {
-                q: "Per rendere questo codice una vera RPN che accetta espressioni lunghe (es. `3 4 + 2 *`), cosa manca?",
-                options: [
-                    { text: "Un dizionario.", correct: false },
-                    { text: "Una classe.", correct: false },
-                    { text: "Un ciclo (Loop).", correct: true },
-                    { text: "Un database.", correct: false }
-                ],
-                rationale: "Corretto. Servirebbe un ciclo che continua a leggere input finché l'utente non esce."
+            // Update Analysis Panel
+            valRaw.innerText = `"${text}"`;
+            
+            const parsed = parseInt(text);
+            
+            if (isNaN(parsed)) {
+                // Not a number
+                valInt.innerText = "Errore (ValueError)";
+                valInt.classList.replace('text-green-600', 'text-red-500');
+                valCalc.innerText = "Impossibile calcolare";
+                
+                const errLine = document.createElement('div');
+                errLine.innerHTML = `<span class="text-red-500">Errore:</span> Non posso convertire "${text}" in numero!`;
+                outputDiv.appendChild(errLine);
+            } else {
+                // Is a number
+                valInt.innerText = parsed;
+                valInt.classList.replace('text-red-500', 'text-green-600');
+                const age = 2025 - parsed; // Assume context is birth year based on text
+                valCalc.innerText = `${age} anni (se input = anno nascita)`;
+                
+                const outLine = document.createElement('div');
+                outLine.innerHTML = `<span class="text-green-400">Out:</span> Ho letto il numero ${parsed}.`;
+                outputDiv.appendChild(outLine);
             }
-        ];
 
-        // --- STATO ---
-        let state = {
-            view: 'start', // 'start', 'playing', 'end'
-            currentIdx: 0,
-            score: 0,
-            isAnswered: false,
-            selectedOption: null
+            inputField.value = "";
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+        }
+
+        // --- SECTION 2: LOGIC ---
+        let logicChart = null;
+
+        function initLogicChart() {
+            const ctx = document.getElementById('logicChart').getContext('2d');
+            logicChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Soglia Bocciato (15)', 'Soglia Orale (18)', 'Tuo Voto'],
+                    datasets: [{
+                        label: 'Punteggio',
+                        data: [15, 18, 10],
+                        backgroundColor: ['#ef4444', '#eab308', '#3b82f6'],
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, max: 30 }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        const gradeSlider = document.getElementById('grade-slider');
+        const gradeDisplay = document.getElementById('grade-display');
+
+        gradeSlider.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value);
+            gradeDisplay.innerText = val;
+            updateLogicFlow(val);
+        });
+
+        function updateLogicFlow(voto) {
+            // Update Chart
+            if(logicChart) {
+                logicChart.data.datasets[0].data[2] = voto;
+                // Color Logic
+                if (voto >= 18) logicChart.data.datasets[0].backgroundColor[2] = '#22c55e'; // Green
+                else if (voto >= 15) logicChart.data.datasets[0].backgroundColor[2] = '#eab308'; // Yellow
+                else logicChart.data.datasets[0].backgroundColor[2] = '#ef4444'; // Red
+                logicChart.update();
+            }
+
+            // Update UI Blocks
+            const b1 = document.getElementById('branch-1');
+            const b2 = document.getElementById('branch-2');
+            const b3 = document.getElementById('branch-3');
+            const sub1 = document.getElementById('sub-branch-1');
+
+            // Reset styles
+            [b1, b2, b3].forEach(b => {
+                b.classList.remove('border-blue-500', 'shadow-lg', 'bg-white', 'opacity-100');
+                b.classList.add('border-transparent', 'bg-gray-50', 'opacity-50');
+            });
+            sub1.classList.add('hidden');
+
+            // Logic
+            if (voto >= 18) {
+                b1.classList.remove('border-transparent', 'bg-gray-50', 'opacity-50');
+                b1.classList.add('border-blue-500', 'shadow-lg', 'bg-white', 'opacity-100');
+                if (voto === 30) sub1.classList.remove('hidden');
+            } else if (voto >= 15) {
+                b2.classList.remove('border-transparent', 'bg-gray-50', 'opacity-50');
+                b2.classList.add('border-blue-500', 'shadow-lg', 'bg-white', 'opacity-100');
+            } else {
+                b3.classList.remove('border-transparent', 'bg-gray-50', 'opacity-50');
+                b3.classList.add('border-blue-500', 'shadow-lg', 'bg-white', 'opacity-100');
+            }
+        }
+
+        // --- SECTION 3: LISTS ---
+        let backpack = [];
+        let backpackChart = null;
+        
+        function initBackpackChart() {
+            const ctx = document.getElementById('backpackChart').getContext('2d');
+            backpackChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Torcia', 'Mappa', 'Bussola', 'Altro'],
+                    datasets: [{
+                        data: [0, 0, 0, 0],
+                        backgroundColor: ['#f59e0b', '#3b82f6', '#ef4444', '#9ca3af']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { boxWidth: 10, font: {size: 10} } }
+                    }
+                }
+            });
+        }
+
+        function renderList() {
+            const container = document.getElementById('backpack-container');
+            const repr = document.getElementById('list-repr');
+            
+            // Clear
+            container.innerHTML = '';
+            
+            // Update Text Representation
+            repr.innerText = JSON.stringify(backpack).replace(/,/g, ', ');
+
+            // Render Items
+            backpack.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'bg-white border border-gray-300 shadow-sm rounded-lg p-3 flex flex-col items-center w-24 fade-in relative group';
+                
+                // Icon mapping
+                let icon = 'fa-box';
+                let color = 'text-gray-500';
+                if(item === 'Torcia') { icon = 'fa-flashlight'; color = 'text-yellow-500'; }
+                if(item === 'Mappa') { icon = 'fa-map'; color = 'text-blue-500'; }
+                if(item === 'Bussola') { icon = 'fa-compass'; color = 'text-red-500'; }
+                if(item === 'Borraccia') { icon = 'fa-bottle-water'; color = 'text-cyan-500'; }
+                if(item === 'Chiave') { icon = 'fa-key'; color = 'text-amber-700'; }
+
+                div.innerHTML = `
+                    <span class="absolute top-1 left-2 text-[10px] text-gray-400 font-mono">#${index}</span>
+                    <i class="fa-solid ${icon} ${color} text-2xl mb-2"></i>
+                    <span class="text-xs font-bold truncate w-full text-center">${item}</span>
+                `;
+                container.appendChild(div);
+            });
+
+            updateBackpackChart();
+        }
+
+        function updateBackpackChart() {
+            if(!backpackChart) return;
+            
+            const counts = { 'Torcia': 0, 'Mappa': 0, 'Bussola': 0, 'Altro': 0 };
+            backpack.forEach(item => {
+                if (counts.hasOwnProperty(item)) counts[item]++;
+                else counts['Altro']++;
+            });
+            
+            backpackChart.data.datasets[0].data = [counts['Torcia'], counts['Mappa'], counts['Bussola'], counts['Altro']];
+            backpackChart.update();
+        }
+
+        function listAppend() {
+            const val = document.getElementById('item-select').value;
+            backpack.push(val);
+            renderList();
+        }
+
+        function listPop() {
+            if(backpack.length === 0) return alert("Lo zaino è vuoto!");
+            backpack.pop();
+            renderList();
+        }
+
+        function listRemove() {
+            const val = document.getElementById('item-select').value;
+            const index = backpack.indexOf(val);
+            if(index > -1) {
+                backpack.splice(index, 1); // Simulate remove() finding first occurrence
+                renderList();
+            } else {
+                alert(`Errore: ${val} non è nello zaino (ValueError)`);
+            }
+        }
+
+        // --- SECTION 4: LOOPS ---
+        
+        // While Loop
+        function checkWhileLoop() {
+            const input = document.getElementById('while-input');
+            const msg = document.getElementById('while-msg');
+            
+            if (input.value === "segreto123") {
+                msg.innerText = "Accesso consentito! (Ciclo terminato)";
+                msg.className = "text-center text-sm font-bold text-green-600";
+            } else {
+                msg.innerText = "Password errata, il ciclo continua...";
+                msg.className = "text-center text-sm font-bold text-red-500";
+                
+                // Shake effect
+                input.classList.add('border-red-500');
+                setTimeout(() => input.classList.remove('border-red-500'), 500);
+            }
+        }
+
+        // For Loop
+        const rangeSlider = document.getElementById('loop-range');
+        const rangeValCode = document.getElementById('range-val-code');
+        const loopCount = document.getElementById('loop-count');
+        
+        rangeSlider.addEventListener('input', (e) => {
+            loopCount.innerText = e.target.value;
+            rangeValCode.innerText = e.target.value;
+        });
+
+        async function runForLoop() {
+            const n = parseInt(rangeSlider.value);
+            const container = document.getElementById('for-output');
+            container.innerHTML = ''; // Reset
+
+            for (let i = 0; i < n; i++) {
+                // Visual delay to simulate iteration step
+                await new Promise(r => setTimeout(r, 400));
+                
+                const box = document.createElement('div');
+                box.className = 'w-10 h-10 bg-green-100 border border-green-400 rounded flex items-center justify-center font-bold text-green-700 shadow fade-in';
+                box.innerText = n - i; // Replicating the countdown logic in the notes
+                container.appendChild(box);
+            }
+            
+            // Final "Stella!"
+            await new Promise(r => setTimeout(r, 200));
+            const star = document.createElement('div');
+            star.className = 'w-auto px-2 h-10 bg-yellow-100 border border-yellow-400 rounded flex items-center justify-center font-bold text-yellow-700 shadow fade-in';
+            star.innerText = "Stella!";
+            container.appendChild(star);
+        }
+
+        // --- INIT ---
+        window.onload = function() {
+            initLogicChart();
+            initBackpackChart();
+            renderList(); // Init empty list
+            // Set initial state for logic chart
+            updateLogicFlow(10);
         };
 
-        // --- LOGICA ---
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Lab: Guida Interattiva</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Chosen Palette: Warm Neutrals & Academic Blue -->
+    <!-- Application Structure Plan: 
+         The app is designed as a "Developer's Dashboard" divided into 4 core functional modules matching the report's topics:
+         1. I/O Console: Simulates the Input/Print/Cast workflow.
+         2. Logic Flow: Visualizes If/Elif/Else branching using interactive sliders.
+         3. Data Structures (The Backpack): A visual list manipulator to understand append/remove/pop dynamically.
+         4. Loop Visualizer: Animations to demonstrate While and For cycles.
+         
+         Navigation is tab-based for easy switching. Each section includes a specific interactive visualization and a "Code Context" panel showing the underlying Python syntax.
+    -->
+    
+    <!-- Visualization & Content Choices:
+         - I/O Section: Uses a DOM-based "Terminal" simulation to show text vs number casting. Goal: Clarify int() concept.
+         - Logic Section: Uses a dynamic flowchart (CSS highlighting) + Bar Chart (Chart.js) to compare user input against thresholds. Goal: Visualize decision boundaries.
+         - List Section: Uses a "Backpack" visual container (Flexbox) + Doughnut Chart (Chart.js) to show item composition. Goal: Make abstract list operations concrete.
+         - Loop Section: Uses a step-by-step JS animation to generate DOM elements, mimicking the 'range()' function. Goal: Show iteration progress.
+         - NO SVG used (FontAwesome icons only). NO Mermaid used.
+    -->
 
-        function init() {
-            document.getElementById('pythonCodeContent').textContent = pythonCode;
-            render();
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            background-color: #fcfbf9; /* Warm neutral background */
+            color: #1f2937;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* Custom scrollbar for terminal */
+        .terminal-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .terminal-scroll::-webkit-scrollbar-track {
+            background: #2d3748; 
+        }
+        .terminal-scroll::-webkit-scrollbar-thumb {
+            background: #4a5568; 
+            border-radius: 4px;
         }
 
-        function startGame() {
-            state = { view: 'playing', currentIdx: 0, score: 0, isAnswered: false, selectedOption: null };
-            render();
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
         }
-
-        function selectAnswer(optIndex, isCorrect) {
-            if (state.isAnswered) return;
-            state.isAnswered = true;
-            state.selectedOption = optIndex;
-            if (isCorrect) state.score++;
-            render();
-        }
-
-        function nextQuestion() {
-            if (state.currentIdx < questions.length - 1) {
-                state.currentIdx++;
-                state.isAnswered = false;
-                state.selectedOption = null;
-                render();
-            } else {
-                state.view = 'end';
-                render();
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
             }
         }
 
-        function toggleCodeModal(show) {
-            const modal = document.getElementById('codeModal');
-            if (show) modal.classList.remove('hidden');
-            else modal.classList.add('hidden');
+        .nav-item.active {
+            border-bottom: 3px solid #3b82f6;
+            color: #1d4ed8;
+            font-weight: 700;
+        }
+        
+        .code-block {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
         }
 
-        function getPerformanceMessage() {
-            const percentage = (state.score / questions.length) * 100;
-            if (percentage === 100) return "Perfetto! Sei un compilatore umano!";
-            if (percentage >= 80) return "Ottimo lavoro! Conosci bene lo stack.";
-            if (percentage >= 60) return "Buono, ma ripassa un po' la logica RPN.";
-            return "Bisogna studiare! Rivedi il codice e riprova.";
-        }
+        .highlight-keyword { color: #569cd6; }
+        .highlight-string { color: #ce9178; }
+        .highlight-function { color: #dcdcaa; }
+        .highlight-number { color: #b5cea8; }
+        
+        /* Animation classes */
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
 
-        // --- RENDER ---
-        function render() {
-            const app = document.getElementById('app');
-            let html = '';
-
-            // Header Comune
-            const header = `
-                <div class="text-center mb-8">
-                    <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-500 bg-clip-text text-transparent mb-2">
-                        Quiz Calcolatrice RPN
-                    </h1>
-                    <p class="text-slate-400">Ripasso Python & Strutture Dati</p>
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-600 text-white p-2 rounded-lg">
+                        <i class="fa-brands fa-python text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">Python Lab</h1>
+                        <p class="text-xs text-gray-500">Appunti Interattivi</p>
+                    </div>
                 </div>
-            `;
+                <!-- Navigation -->
+                <nav class="hidden md:flex space-x-8" id="desktop-nav">
+                    <button onclick="switchTab('io')" class="nav-item active px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-700">Input & Cast</button>
+                    <button onclick="switchTab('logic')" class="nav-item px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-700">Logica (If)</button>
+                    <button onclick="switchTab('lists')" class="nav-item px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-700">Liste</button>
+                    <button onclick="switchTab('loops')" class="nav-item px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-700">Cicli</button>
+                </nav>
+            </div>
+        </div>
+        <!-- Mobile Nav -->
+        <div class="flex md:hidden justify-around border-t border-gray-200 bg-gray-50 p-2">
+            <button onclick="switchTab('io')" class="text-gray-600 hover:text-blue-600"><i class="fa-solid fa-keyboard"></i></button>
+            <button onclick="switchTab('logic')" class="text-gray-600 hover:text-blue-600"><i class="fa-solid fa-code-branch"></i></button>
+            <button onclick="switchTab('lists')" class="text-gray-600 hover:text-blue-600"><i class="fa-solid fa-list-ul"></i></button>
+            <button onclick="switchTab('loops')" class="text-gray-600 hover:text-blue-600"><i class="fa-solid fa-rotate"></i></button>
+        </div>
+    </header>
 
-            if (state.view === 'start') {
-                html = `
-                    ${header}
-                    <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-8 text-center animate-fade-in">
-                        <div class="mb-6 flex justify-center">
-                            <div class="w-24 h-24 bg-slate-700 rounded-full flex items-center justify-center animate-pulse">
-                                <i data-lucide="code" class="w-12 h-12 text-emerald-400"></i>
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <!-- SECTION 1: INPUT & CASTING -->
+        <section id="io-section" class="space-y-6 fade-in">
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+                <h2 class="text-2xl font-bold mb-2">1. Interazione e Tipi di Dati</h2>
+                <p class="text-gray-600">
+                    Le basi della comunicazione: <strong>input()</strong> riceve dati (sempre come testo!) e <strong>print()</strong> li mostra. 
+                    Usa il simulatore qui sotto per capire perché il <em>casting</em> (es. <code>int()</code>) è fondamentale per la matematica.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Interactive Terminal -->
+                <div class="bg-gray-900 rounded-lg p-4 shadow-xl text-gray-100 font-mono text-sm relative overflow-hidden flex flex-col h-96">
+                    <div class="flex justify-between items-center mb-2 border-b border-gray-700 pb-2">
+                        <span class="text-xs text-gray-400">Terminale Python</span>
+                        <div class="flex gap-2">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        </div>
+                    </div>
+                    <div id="terminal-output" class="terminal-scroll flex-grow overflow-y-auto space-y-2 p-2">
+                        <div class="text-green-400">>>> Inizializzazione sistema...</div>
+                        <div>Pronto.</div>
+                    </div>
+                    <div class="mt-2 border-t border-gray-700 pt-2 flex gap-2 items-center">
+                        <span class="text-green-400">>>></span>
+                        <input type="text" id="terminal-input" placeholder="Scrivi qui (es: 2023)..." class="bg-transparent border-none outline-none text-white w-full focus:ring-0">
+                        <button onclick="processInput()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs">Invio</button>
+                    </div>
+                </div>
+
+                <!-- Explanation Panel -->
+                <div class="space-y-4">
+                    <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
+                        <h3 class="font-bold text-lg mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-calculator text-blue-500"></i>
+                            Calcolatrice di Età
+                        </h3>
+                        <p class="text-sm text-gray-600 mb-4">Prova a inserire il tuo anno di nascita nel terminale. Guarda cosa succede se usiamo <code>input()</code> puro rispetto a <code>int(input())</code>.</p>
+                        
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                                <span class="font-semibold text-xs uppercase text-gray-500">Valore Grezzo (Str)</span>
+                                <span id="val-raw" class="font-mono text-blue-600">None</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                                <span class="font-semibold text-xs uppercase text-gray-500">Valore Intero (Int)</span>
+                                <span id="val-int" class="font-mono text-green-600">None</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                                <span class="font-semibold text-xs uppercase text-gray-500">Risultato Operazione</span>
+                                <span id="val-calc" class="font-mono text-purple-600">In attesa...</span>
                             </div>
                         </div>
-                        <h2 class="text-2xl font-bold mb-4">Pronto a testare il codice?</h2>
-                        <p class="text-slate-300 mb-8 leading-relaxed">
-                            Questo quiz contiene ${questions.length} domande basate sul codice Python della calcolatrice RPN.
-                            Preparati su Stack, Funzioni e Logica.
-                        </p>
-                        <button onclick="startGame()" class="group relative inline-flex items-center justify-center px-8 py-3 font-bold text-white transition-all duration-200 bg-emerald-600 font-lg rounded-full hover:bg-emerald-500 focus:outline-none ring-offset-2 focus:ring-2 w-full md:w-auto gap-2">
-                            <i data-lucide="play" class="w-5 h-5 fill-current"></i> Inizia il Quiz
-                        </button>
+
+                        <div class="mt-4 code-block p-4 rounded text-sm">
+                            <p><span class="highlight-keyword">anno_testo</span> = <span class="highlight-function">input</span>("...")</p>
+                            <p class="text-gray-500"># Senza int(), questo fallirebbe:</p>
+                            <p><span class="highlight-keyword">anno_num</span> = <span class="highlight-function">int</span>(anno_testo)</p>
+                            <p><span class="highlight-function">print</span>(2025 - anno_num)</p>
+                        </div>
                     </div>
-                `;
-            } else if (state.view === 'playing') {
-                const q = questions[state.currentIdx];
-                const progress = ((state.currentIdx + 1) / questions.length) * 100;
+                </div>
+            </div>
+        </section>
 
-                let optionsHtml = '';
-                q.options.forEach((opt, idx) => {
-                    let btnClass = "w-full text-left p-4 rounded-xl border-2 transition-all duration-200 relative mb-3 flex justify-between items-center ";
-                    let icon = '';
+        <!-- SECTION 2: LOGIC BRANCHING -->
+        <section id="logic-section" class="hidden space-y-6 fade-in">
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500">
+                <h2 class="text-2xl font-bold mb-2">2. Prendere Decisioni (If/Elif/Else)</h2>
+                <p class="text-gray-600">
+                    Il computer valuta le condizioni in ordine. Usa lo slider per cambiare il voto e vedi quale "ramo" del codice viene eseguito.
+                </p>
+            </div>
 
-                    if (!state.isAnswered) {
-                        btnClass += "border-slate-600 bg-slate-750 hover:border-slate-400 hover:bg-slate-700 cursor-pointer";
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Controls & Chart -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Simula il voto del test (0-30)</label>
+                        <input type="range" id="grade-slider" min="0" max="30" value="10" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        <div class="mt-2 text-center text-3xl font-bold text-purple-600" id="grade-display">10</div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow">
+                         <h4 class="text-sm font-bold text-gray-500 mb-2 text-center">Analisi Soglia</h4>
+                         <div class="chart-container">
+                             <canvas id="logicChart"></canvas>
+                         </div>
+                    </div>
+                </div>
+
+                <!-- Visual Code Flow -->
+                <div class="lg:col-span-7 space-y-4">
+                    <div id="branch-1" class="border-2 border-transparent p-4 rounded-lg bg-gray-50 transition-all duration-300 opacity-50">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center font-bold">1</div>
+                            <code class="text-sm font-bold">if voto >= 18:</code>
+                        </div>
+                        <p class="ml-11 text-sm text-gray-600">"Test superato! Complimenti."</p>
+                        <div id="sub-branch-1" class="ml-11 mt-2 p-2 bg-green-50 border border-green-200 rounded text-xs hidden">
+                            <strong>if voto == 30:</strong> "Hai preso il massimo!"
+                        </div>
+                    </div>
+
+                    <div id="branch-2" class="border-2 border-transparent p-4 rounded-lg bg-gray-50 transition-all duration-300 opacity-50">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center font-bold">2</div>
+                            <code class="text-sm font-bold">elif voto >= 15:</code>
+                        </div>
+                        <p class="ml-11 text-sm text-gray-600">"Non hai passato il test, ma ci sei andato vicino (Orale)."</p>
+                    </div>
+
+                    <div id="branch-3" class="border-2 border-transparent p-4 rounded-lg bg-gray-50 transition-all duration-300 opacity-50">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold">3</div>
+                            <code class="text-sm font-bold">else:</code>
+                        </div>
+                        <p class="ml-11 text-sm text-gray-600">"Test non superato. Devi ritentare."</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: LISTS -->
+        <section id="lists-section" class="hidden space-y-6 fade-in">
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+                <h2 class="text-2xl font-bold mb-2">3. Le Liste (Lo Zaino)</h2>
+                <p class="text-gray-600">
+                    Una lista mantiene l'ordine degli elementi. Aggiungi oggetti allo zaino con <code>append</code>, rimuovili con <code>remove</code> o estrai l'ultimo con <code>pop</code>.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Controls -->
+                <div class="lg:col-span-4 space-y-6">
+                    <div class="bg-white p-6 rounded-lg shadow space-y-4">
+                        <h3 class="font-bold text-gray-700">Gestione Inventario</h3>
+                        
+                        <div>
+                            <label class="text-xs font-semibold text-gray-500 uppercase">Oggetto</label>
+                            <div class="flex gap-2 mt-1">
+                                <select id="item-select" class="block w-full rounded border-gray-300 bg-gray-50 p-2 text-sm border">
+                                    <option value="Torcia">🔦 Torcia</option>
+                                    <option value="Mappa">🗺️ Mappa</option>
+                                    <option value="Bussola">🧭 Bussola</option>
+                                    <option value="Borraccia">💧 Borraccia</option>
+                                    <option value="Chiave">🔑 Chiave</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="listAppend()" class="col-span-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded text-sm flex justify-center items-center gap-2">
+                                <i class="fa-solid fa-plus"></i> zaino.append()
+                            </button>
+                            <button onclick="listPop()" class="bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded text-sm flex justify-center items-center gap-2">
+                                <i class="fa-solid fa-upload"></i> .pop()
+                            </button>
+                            <button onclick="listRemove()" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded text-sm flex justify-center items-center gap-2">
+                                <i class="fa-solid fa-trash"></i> .remove()
+                            </button>
+                        </div>
+                        
+                        <div class="pt-4 border-t">
+                            <p class="text-xs text-gray-400 mb-2">Composizione Zaino:</p>
+                            <div class="chart-container" style="height: 200px;">
+                                <canvas id="backpackChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Representation -->
+                <div class="lg:col-span-8 bg-gray-100 rounded-xl p-6 border-2 border-dashed border-gray-300 min-h-[400px] flex flex-col">
+                    <div class="flex justify-between items-end mb-4">
+                        <h3 class="font-bold text-gray-600">Contenuto Zaino: <span id="list-repr" class="font-mono text-sm text-blue-600">[]</span></h3>
+                        <span class="text-xs bg-gray-200 px-2 py-1 rounded">Indice 0 inizia a sinistra</span>
+                    </div>
+                    
+                    <!-- The Backpack Container -->
+                    <div id="backpack-container" class="flex flex-wrap gap-4 items-start content-start flex-grow">
+                        <!-- Items will be injected here JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: LOOPS -->
+        <section id="loops-section" class="hidden space-y-6 fade-in">
+            <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
+                <h2 class="text-2xl font-bold mb-2">4. I Cicli (For & While)</h2>
+                <p class="text-gray-600">
+                    Automatizza le ripetizioni. <strong>While</strong> continua finché la condizione è vera. <strong>For</strong> scorre una collezione o un range di numeri.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- While Loop Demo -->
+                <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-spin text-yellow-600"></i>
+                        Ciclo While (Password)
+                    </h3>
+                    <div class="code-block p-3 rounded text-xs mb-4">
+                        password = ""<br>
+                        <span class="highlight-keyword">while</span> password != "segreto123":<br>
+                        &nbsp;&nbsp;password = <span class="highlight-function">input</span>(...)
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <input type="text" id="while-input" placeholder="Indovina la password..." class="w-full border p-2 rounded">
+                        <button onclick="checkWhileLoop()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded">Controlla</button>
+                        <div id="while-msg" class="text-center text-sm font-bold min-h-[20px] text-gray-400">Inserisci 'segreto123'</div>
+                    </div>
+                </div>
+
+                <!-- For Loop Demo -->
+                <div class="bg-white p-6 rounded-lg shadow border border-gray-200">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-list-ol text-green-600"></i>
+                        Ciclo For (Range)
+                    </h3>
+                    <div class="code-block p-3 rounded text-xs mb-4">
+                        <span class="highlight-keyword">for</span> i <span class="highlight-keyword">in</span> <span class="highlight-function">range</span>(<span id="range-val-code" class="highlight-number">5</span>):<br>
+                        &nbsp;&nbsp;<span class="highlight-function">print</span>(5 - i)
+                    </div>
+
+                    <div class="flex items-center gap-4 mb-4">
+                        <input type="range" id="loop-range" min="1" max="10" value="5" class="flex-grow h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        <span id="loop-count" class="font-bold text-xl w-8">5</span>
+                    </div>
+                    
+                    <button onclick="runForLoop()" class="w-full bg-green-600 hover:bg-green-700 text-white p-2 rounded mb-4">Esegui Ciclo</button>
+
+                    <div id="for-output" class="flex gap-2 flex-wrap justify-center min-h-[60px]">
+                        <!-- Dynamic boxes -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-gray-500 text-sm">
+                Generato da Python Interactive Guide &copy; 2024. Basato sugli appunti forniti.
+            </p>
+        </div>
+    </footer>
+
+    <!-- LOGIC SCRIPT -->
+    <script>
+        // --- GLOBAL STATE & NAVIGATION ---
+        let currentTab = 'io';
+        
+        function switchTab(tabId) {
+            // Update UI
+            document.querySelectorAll('section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId + '-section').classList.remove('hidden');
+            
+            // Nav styles
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active', 'border-bottom', 'text-blue-600'));
+            // Find nav item (simple loop matching onclick attribute roughly or id logic)
+            // Ideally we'd use IDs on buttons, but simpler:
+            const buttons = document.querySelectorAll('button[onclick^="switchTab"]');
+            buttons.forEach(btn => {
+                if(btn.getAttribute('onclick').includes(tabId)) {
+                    // Check if it's desktop nav to add 'active' class
+                    if(btn.classList.contains('nav-item')) {
+                        btn.classList.add('active');
                     } else {
-                        if (opt.correct) {
-                            btnClass += "border-emerald-500 bg-emerald-500/10 text-emerald-100";
-                            icon = '<i data-lucide="check" class="text-emerald-400 w-5 h-5"></i>';
-                        } else if (idx === state.selectedOption && !opt.correct) {
-                            btnClass += "border-rose-500 bg-rose-500/10 text-rose-100";
-                            icon = '<i data-lucide="x" class="text-rose-400 w-5 h-5"></i>';
-                        } else {
-                            btnClass += "border-slate-700 bg-slate-800/50 opacity-50 cursor-not-allowed";
-                        }
+                        btn.classList.add('text-blue-600'); // Mobile highlight
                     }
-
-                    optionsHtml += `
-                        <button 
-                            onclick="selectAnswer(${idx}, ${opt.correct})" 
-                            ${state.isAnswered ? 'disabled' : ''}
-                            class="${btnClass}">
-                            <span>${opt.text}</span>
-                            ${state.isAnswered ? icon : ''}
-                        </button>
-                    `;
-                });
-
-                let feedbackHtml = '';
-                if (state.isAnswered) {
-                    const isCorrect = q.options[state.selectedOption].correct;
-                    const feedbackClass = isCorrect ? "bg-emerald-900/30 border-emerald-500" : "bg-rose-900/30 border-rose-500";
-                    const feedbackTitleClass = isCorrect ? "text-emerald-400" : "text-rose-400";
-                    const feedbackIcon = isCorrect ? "check" : "alert-circle";
-                    const feedbackText = isCorrect ? "Corretto!" : "Sbagliato";
-
-                    feedbackHtml = `
-                        <div class="mt-8 animate-fade-in">
-                            <div class="p-4 rounded-lg border-l-4 mb-4 ${feedbackClass}">
-                                <h4 class="font-bold mb-1 flex items-center gap-2 ${feedbackTitleClass}">
-                                    <i data-lucide="${feedbackIcon}" class="w-4 h-4"></i> ${feedbackText}
-                                </h4>
-                                <p class="text-slate-300 text-sm leading-relaxed">${q.rationale}</p>
-                            </div>
-                            <div class="flex justify-end">
-                                <button onclick="nextQuestion()" class="bg-slate-100 text-slate-900 hover:bg-white px-6 py-2.5 rounded-lg font-bold flex items-center gap-2 transition-colors shadow-lg shadow-white/10">
-                                    ${state.currentIdx < questions.length - 1 ? "Prossima Domanda" : "Vedi Risultati"} 
-                                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
+                } else {
+                    if(!btn.classList.contains('nav-item')) btn.classList.remove('text-blue-600');
                 }
+            });
 
-                html = `
-                    ${header}
-                    <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 overflow-hidden relative">
-                        <!-- Progress Bar -->
-                        <div class="h-2 bg-slate-900 w-full">
-                            <div class="h-full bg-emerald-500 transition-all duration-500" style="width: ${progress}%"></div>
-                        </div>
-
-                        <div class="p-6 md:p-8">
-                            <div class="flex justify-between items-start mb-6">
-                                <span class="bg-slate-700 text-slate-300 px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase">
-                                    Domanda ${state.currentIdx + 1}/${questions.length}
-                                </span>
-                                <button onclick="toggleCodeModal(true)" class="flex items-center gap-2 text-xs md:text-sm text-cyan-400 hover:text-cyan-300 transition-colors border border-cyan-400/30 hover:bg-cyan-400/10 px-3 py-1.5 rounded-lg">
-                                    <i data-lucide="code" class="w-4 h-4"></i> Mostra Codice
-                                </button>
-                            </div>
-
-                            <h2 class="text-xl md:text-2xl font-semibold mb-8 text-white leading-tight">
-                                ${q.q}
-                            </h2>
-
-                            <div class="space-y-3">
-                                ${optionsHtml}
-                            </div>
-
-                            ${feedbackHtml}
-                        </div>
-                    </div>
-                `;
-            } else if (state.view === 'end') {
-                html = `
-                    ${header}
-                    <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-8 text-center animate-fade-in">
-                        <div class="mb-6 flex justify-center">
-                           <div class="relative">
-                             <i data-lucide="trophy" class="w-16 h-16 text-yellow-400"></i>
-                             <div class="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                               ${Math.round((state.score / questions.length) * 100)}%
-                             </div>
-                           </div>
-                        </div>
-                        
-                        <h2 class="text-3xl font-bold mb-2">Quiz Completato!</h2>
-                        <p class="text-4xl font-mono font-bold text-emerald-400 mb-4">${state.score} / ${questions.length}</p>
-                        
-                        <p class="text-lg text-slate-300 mb-8 border-t border-b border-slate-700 py-4 italic">
-                          "${getPerformanceMessage()}"
-                        </p>
-
-                        <div class="flex justify-center">
-                          <button onclick="startGame()" class="bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors">
-                            <i data-lucide="rotate-ccw" class="w-5 h-5"></i> Ricomincia
-                          </button>
-                        </div>
-                    </div>
-                `;
-            }
-
-            app.innerHTML = html;
-            lucide.createIcons(); // Re-inizializza le icone dopo il render
+            // Trigger chart resize
+            if (tabId === 'logic' && logicChart) logicChart.resize();
+            if (tabId === 'lists' && backpackChart) backpackChart.resize();
         }
 
-        // Avvio
-        init();
+        // --- SECTION 1: I/O & CASTING ---
+        function processInput() {
+            const inputField = document.getElementById('terminal-input');
+            const outputDiv = document.getElementById('terminal-output');
+            const valRaw = document.getElementById('val-raw');
+            const valInt = document.getElementById('val-int');
+            const valCalc = document.getElementById('val-calc');
+            
+            const text = inputField.value;
+            if (!text) return;
+
+            // Simulate Print
+            const line = document.createElement('div');
+            line.innerHTML = `<span class="text-blue-400">In:</span> ${text}`;
+            outputDiv.appendChild(line);
+
+            // Update Analysis Panel
+            valRaw.innerText = `"${text}"`;
+            
+            const parsed = parseInt(text);
+            
+            if (isNaN(parsed)) {
+                // Not a number
+                valInt.innerText = "Errore (ValueError)";
+                valInt.classList.replace('text-green-600', 'text-red-500');
+                valCalc.innerText = "Impossibile calcolare";
+                
+                const errLine = document.createElement('div');
+                errLine.innerHTML = `<span class="text-red-500">Errore:</span> Non posso convertire "${text}" in numero!`;
+                outputDiv.appendChild(errLine);
+            } else {
+                // Is a number
+                valInt.innerText = parsed;
+                valInt.classList.replace('text-red-500', 'text-green-600');
+                const age = 2025 - parsed; // Assume context is birth year based on text
+                valCalc.innerText = `${age} anni (se input = anno nascita)`;
+                
+                const outLine = document.createElement('div');
+                outLine.innerHTML = `<span class="text-green-400">Out:</span> Ho letto il numero ${parsed}.`;
+                outputDiv.appendChild(outLine);
+            }
+
+            inputField.value = "";
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+        }
+
+        // --- SECTION 2: LOGIC ---
+        let logicChart = null;
+
+        function initLogicChart() {
+            const ctx = document.getElementById('logicChart').getContext('2d');
+            logicChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Soglia Bocciato (15)', 'Soglia Orale (18)', 'Tuo Voto'],
+                    datasets: [{
+                        label: 'Punteggio',
+                        data: [15, 18, 10],
+                        backgroundColor: ['#ef4444', '#eab308', '#3b82f6'],
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, max: 30 }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        const gradeSlider = document.getElementById('grade-slider');
+        const gradeDisplay = document.getElementById('grade-display');
+
+        gradeSlider.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value);
+            gradeDisplay.innerText = val;
+            updateLogicFlow(val);
+        });
+
+        function updateLogicFlow(voto) {
+            // Update Chart
+            if(logicChart) {
+                logicChart.data.datasets[0].data[2] = voto;
+                // Color Logic
+                if (voto >= 18) logicChart.data.datasets[0].backgroundColor[2] = '#22c55e'; // Green
+                else if (voto >= 15) logicChart.data.datasets[0].backgroundColor[2] = '#eab308'; // Yellow
+                else logicChart.data.datasets[0].backgroundColor[2] = '#ef4444'; // Red
+                logicChart.update();
+            }
+
+            // Update UI Blocks
+            const b1 = document.getElementById('branch-1');
+            const b2 = document.getElementById('branch-2');
+            const b3 = document.getElementById('branch-3');
+            const sub1 = document.getElementById('sub-branch-1');
+
+            // Reset styles
+            [b1, b2, b3].forEach(b => {
+                b.classList.remove('border-blue-500', 'shadow-lg', 'bg-white', 'opacity-100');
+                b.classList.add('border-transparent', 'bg-gray-50', 'opacity-50');
+            });
+            sub1.classList.add('hidden');
+
+            // Logic
+            if (voto >= 18) {
+                b1.classList.remove('border-transparent', 'bg-gray-50', 'opacity-50');
+                b1.classList.add('border-blue-500', 'shadow-lg', 'bg-white', 'opacity-100');
+                if (voto === 30) sub1.classList.remove('hidden');
+            } else if (voto >= 15) {
+                b2.classList.remove('border-transparent', 'bg-gray-50', 'opacity-50');
+                b2.classList.add('border-blue-500', 'shadow-lg', 'bg-white', 'opacity-100');
+            } else {
+                b3.classList.remove('border-transparent', 'bg-gray-50', 'opacity-50');
+                b3.classList.add('border-blue-500', 'shadow-lg', 'bg-white', 'opacity-100');
+            }
+        }
+
+        // --- SECTION 3: LISTS ---
+        let backpack = [];
+        let backpackChart = null;
+        
+        function initBackpackChart() {
+            const ctx = document.getElementById('backpackChart').getContext('2d');
+            backpackChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Torcia', 'Mappa', 'Bussola', 'Altro'],
+                    datasets: [{
+                        data: [0, 0, 0, 0],
+                        backgroundColor: ['#f59e0b', '#3b82f6', '#ef4444', '#9ca3af']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { boxWidth: 10, font: {size: 10} } }
+                    }
+                }
+            });
+        }
+
+        function renderList() {
+            const container = document.getElementById('backpack-container');
+            const repr = document.getElementById('list-repr');
+            
+            // Clear
+            container.innerHTML = '';
+            
+            // Update Text Representation
+            repr.innerText = JSON.stringify(backpack).replace(/,/g, ', ');
+
+            // Render Items
+            backpack.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'bg-white border border-gray-300 shadow-sm rounded-lg p-3 flex flex-col items-center w-24 fade-in relative group';
+                
+                // Icon mapping
+                let icon = 'fa-box';
+                let color = 'text-gray-500';
+                if(item === 'Torcia') { icon = 'fa-flashlight'; color = 'text-yellow-500'; }
+                if(item === 'Mappa') { icon = 'fa-map'; color = 'text-blue-500'; }
+                if(item === 'Bussola') { icon = 'fa-compass'; color = 'text-red-500'; }
+                if(item === 'Borraccia') { icon = 'fa-bottle-water'; color = 'text-cyan-500'; }
+                if(item === 'Chiave') { icon = 'fa-key'; color = 'text-amber-700'; }
+
+                div.innerHTML = `
+                    <span class="absolute top-1 left-2 text-[10px] text-gray-400 font-mono">#${index}</span>
+                    <i class="fa-solid ${icon} ${color} text-2xl mb-2"></i>
+                    <span class="text-xs font-bold truncate w-full text-center">${item}</span>
+                `;
+                container.appendChild(div);
+            });
+
+            updateBackpackChart();
+        }
+
+        function updateBackpackChart() {
+            if(!backpackChart) return;
+            
+            const counts = { 'Torcia': 0, 'Mappa': 0, 'Bussola': 0, 'Altro': 0 };
+            backpack.forEach(item => {
+                if (counts.hasOwnProperty(item)) counts[item]++;
+                else counts['Altro']++;
+            });
+            
+            backpackChart.data.datasets[0].data = [counts['Torcia'], counts['Mappa'], counts['Bussola'], counts['Altro']];
+            backpackChart.update();
+        }
+
+        function listAppend() {
+            const val = document.getElementById('item-select').value;
+            backpack.push(val);
+            renderList();
+        }
+
+        function listPop() {
+            if(backpack.length === 0) return alert("Lo zaino è vuoto!");
+            backpack.pop();
+            renderList();
+        }
+
+        function listRemove() {
+            const val = document.getElementById('item-select').value;
+            const index = backpack.indexOf(val);
+            if(index > -1) {
+                backpack.splice(index, 1); // Simulate remove() finding first occurrence
+                renderList();
+            } else {
+                alert(`Errore: ${val} non è nello zaino (ValueError)`);
+            }
+        }
+
+        // --- SECTION 4: LOOPS ---
+        
+        // While Loop
+        function checkWhileLoop() {
+            const input = document.getElementById('while-input');
+            const msg = document.getElementById('while-msg');
+            
+            if (input.value === "segreto123") {
+                msg.innerText = "Accesso consentito! (Ciclo terminato)";
+                msg.className = "text-center text-sm font-bold text-green-600";
+            } else {
+                msg.innerText = "Password errata, il ciclo continua...";
+                msg.className = "text-center text-sm font-bold text-red-500";
+                
+                // Shake effect
+                input.classList.add('border-red-500');
+                setTimeout(() => input.classList.remove('border-red-500'), 500);
+            }
+        }
+
+        // For Loop
+        const rangeSlider = document.getElementById('loop-range');
+        const rangeValCode = document.getElementById('range-val-code');
+        const loopCount = document.getElementById('loop-count');
+        
+        rangeSlider.addEventListener('input', (e) => {
+            loopCount.innerText = e.target.value;
+            rangeValCode.innerText = e.target.value;
+        });
+
+        async function runForLoop() {
+            const n = parseInt(rangeSlider.value);
+            const container = document.getElementById('for-output');
+            container.innerHTML = ''; // Reset
+
+            for (let i = 0; i < n; i++) {
+                // Visual delay to simulate iteration step
+                await new Promise(r => setTimeout(r, 400));
+                
+                const box = document.createElement('div');
+                box.className = 'w-10 h-10 bg-green-100 border border-green-400 rounded flex items-center justify-center font-bold text-green-700 shadow fade-in';
+                box.innerText = n - i; // Replicating the countdown logic in the notes
+                container.appendChild(box);
+            }
+            
+            // Final "Stella!"
+            await new Promise(r => setTimeout(r, 200));
+            const star = document.createElement('div');
+            star.className = 'w-auto px-2 h-10 bg-yellow-100 border border-yellow-400 rounded flex items-center justify-center font-bold text-yellow-700 shadow fade-in';
+            star.innerText = "Stella!";
+            container.appendChild(star);
+        }
+
+        // --- INIT ---
+        window.onload = function() {
+            initLogicChart();
+            initBackpackChart();
+            renderList(); // Init empty list
+            // Set initial state for logic chart
+            updateLogicFlow(10);
+        };
 
     </script>
 </body>
