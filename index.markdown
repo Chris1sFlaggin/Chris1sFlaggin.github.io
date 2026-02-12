@@ -113,17 +113,15 @@ header:
       </div>
     </div>
     
-    <div class="section-block">
-      <h2 class="section-title">PRODUCTS</h2>
+<div class="section-block">
+      <h2 class="section-title">PRODUCTS & PACKAGES</h2>
       <div class="products-grid">
         
         <a href="https://chris1sflaggin.it/LCSAJdump" class="card product-card">
-          <div class="product-icon">
-            <img src="/images/LCSAJfull.png" alt="Descrizione Immagine" style="width: 50px; height: 50px; object-fit: contain;">
-          </div>
-          <div class="product-info">
+          <div class="card-bg" style="background-image: url('/images/LCSAJfull.png');"></div>
+          
+          <div class="card-content product-content">
             <h3>LCSAJdump</h3>
-            <p>Recursive gadget finder for RISC-V architectures.</p>
           </div>
         </a>
 
@@ -219,46 +217,52 @@ header:
   .category-card { position: relative; height: 180px; overflow: hidden; border-radius: 12px; }
   .card-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; transition: transform 0.5s; background-color: #222; }
   
-  .products-grid { 
+.products-grid { 
     display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-    gap: 1rem; 
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); /* Un po' più larghe */
+    gap: 1.5rem; 
     margin-bottom: 2rem;
   }
   
   .product-card {
-    display: flex;
-    flex-direction: column;
-    padding: 1.5rem;
-    height: 100%; /* Uniform height */
-    box-sizing: border-box;
-    transition: all 0.3s ease;
+    position: relative;
+    height: 320px; /* Altezza fissa per dare spazio all'immagine */
+    overflow: hidden;
+    border-radius: 12px;
     border: 1px solid rgba(100, 255, 218, 0.1);
+    transition: transform 0.3s ease, border-color 0.3s ease;
   }
 
+  /* Effetto Hover */
   .product-card:hover {
-    background: rgba(100, 255, 218, 0.05);
-    border-color: #64ffda;
     transform: translateY(-5px);
+    border-color: #64ffda;
+  }
+  
+  .product-card:hover .card-bg {
+    transform: scale(1.05); /* Zoom leggero dell'immagine all'hover */
   }
 
-  .product-icon {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: #64ffda;
+  /* Stile specifico per il contenuto dei prodotti */
+  .product-content {
+    background: rgba(26, 30, 37, 0.85); /* Sfondo scuro semitrasparente sopra l'immagine */
+    text-align: center;
+    padding: 1.5rem;
+    justify-content: flex-end; /* Spinge il testo verso il basso (opzionale) */
   }
 
-  .product-info h3 {
+  .product-content h3 {
     color: #fff;
+    font-size: 1.4rem;
     margin: 0 0 0.5rem 0;
-    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
-  .product-info p {
-    color: #b0b3b8;
-    font-size: 0.9rem;
+  .product-content p {
+    color: #ccc;
+    font-size: 0.95rem;
     margin-bottom: 1rem;
-    line-height: 1.4;
   }
   
   /* Category Images */
