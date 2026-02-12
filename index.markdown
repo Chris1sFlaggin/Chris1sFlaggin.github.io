@@ -113,6 +113,24 @@ header:
       </div>
     </div>
     
+    <div class="section-block">
+      <h2 class="section-title">PRODUCTS & PACKAGES</h2>
+      <div class="products-grid">
+        
+        <a href="https://chris1sflaggin.it/LCSAJdump" class="card product-card">
+          <div class="product-icon">
+            <img src="/images/LCSAJfull.png" alt="Descrizione Immagine" style="width: 50px; height: 50px; object-fit: contain;">
+          </div>
+          <div class="product-info">
+            <h3>Starter Kit</h3>
+            <p>Il pacchetto base per iniziare.</p>
+            <span class="price">€19.99</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+    
     <div class="dashboard-footer">
       <small>© 2025 Chris1sFlaggin | System Online</small>
     </div>
@@ -201,6 +219,57 @@ header:
   .categories-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
   .category-card { position: relative; height: 180px; overflow: hidden; border-radius: 12px; }
   .card-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; transition: transform 0.5s; background-color: #222; }
+  
+  .products-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 1rem; 
+    margin-bottom: 2rem;
+  }
+  
+  .product-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    height: 100%; /* Uniform height */
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(100, 255, 218, 0.1);
+  }
+
+  .product-card:hover {
+    background: rgba(100, 255, 218, 0.05);
+    border-color: #64ffda;
+    transform: translateY(-5px);
+  }
+
+  .product-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #64ffda;
+  }
+
+  .product-info h3 {
+    color: #fff;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+  }
+
+  .product-info p {
+    color: #b0b3b8;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+  }
+
+  .price {
+    display: inline-block;
+    color: #64ffda;
+    font-weight: bold;
+    font-family: monospace;
+    font-size: 1.1rem;
+    margin-top: auto; /* Spinge il prezzo in basso */
+  }
   
   /* Category Images */
   .category-card[data-category="writeups"] .card-bg { background-image: url('/images/writeups.jpg'); }

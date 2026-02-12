@@ -21,12 +21,13 @@
 # Site settings
 title: Chris1sFlaggin
 logo: /images/chris.jpg
-email: your-email@example.com
+email: admin@chris1sflaggin.it
 description: # this means to ignore newlines until "baseurl:"
-  I'm a IT student with a deep passion for cybersecurity.
-  I'm still learning so pls be patient with me🙏.
-  Here I'll post my CTF write ups and my own projects.📖
-  Hope you enjoy your stay!👋
+  I'm a 21-year-old student currently working towards my degree, with graduation expected in July 2026. 
+  I'm a cybersecurity enthusiast, and this year I'll be serving as a junior pwn tutor at UniTo for 
+  [CyberChallenge.it](https://cyberchallenge.it/venues/unito). 
+  Starting in November 2025, I'll also be taking on a new challenge as a high school teacher! 
+  Here I'll post my CTF write-ups and personal projects. Hope you enjoy your stay!
 baseurl: "" # leave empty for user site
 url: "https://chris1sflaggin.github.io" # update this to your GitHub Pages URL
 github_username: chris1sflaggin
