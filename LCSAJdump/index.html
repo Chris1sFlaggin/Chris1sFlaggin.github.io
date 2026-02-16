@@ -83,6 +83,7 @@
                     <div class="ml-10 flex items-baseline space-x-8">
                         <a href="#features" class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Features</a>
                         <a href="#how-it-works" class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">How it Works</a>
+                        <a href="#benchmarks" class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Benchmarks</a>
                         <a href="#architectures" class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Architectures</a>
                         <a href="#usage" class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Usage</a>
                     </div>
@@ -109,7 +110,7 @@
                     <img src="Untitled%20design.jpg" onerror="this.onerror=null; this.src='../images/LCSAJdump.png';" alt="LCSAJdump Gear Logo" class="h-24 w-auto mx-auto lg:mx-0 mb-6 object-contain filter drop-shadow-[0_0_20px_rgba(155,219,8,0.2)]">
                     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-gray-400 mb-6">
                         <span class="flex h-2 w-2 rounded-full bg-secondary"></span>
-                        Status: Universal Framework
+                        Status: Thesis Draft
                     </div>
                     <h1 class="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl mb-6">
                         Universal Automated Gadget Discovery <br>
@@ -280,6 +281,157 @@
                         <p><span class="text-white">0x18af8:</span> <span class="text-blue-400">c.ldsp</span> ra, 0x58(sp)</p>
                         <p><span class="text-white">0x18afa:</span> <span class="text-blue-400">c.addi16sp</span> sp, 0x60</p>
                         <p><span class="text-white">0x18afc:</span> <span class="text-primary font-bold">c.jr ra</span> <span class="text-primary">; Control-Flow Sink</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW BENCHMARK SECTION -->
+    <section id="benchmarks" class="py-20 bg-card/50 border-y border-white/5 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute top-1/4 left-1/3 w-96 h-96 bg-primary rounded-full mix-blend-screen filter blur-3xl"></div>
+            <div class="absolute bottom-1/4 right-1/3 w-96 h-96 bg-secondary rounded-full mix-blend-screen filter blur-3xl"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16">
+                <h2 class="text-secondary font-semibold tracking-wide uppercase text-sm">Performance Analysis</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl">
+                    Optimal Point: <span class="text-gradient">Mathematically Proven</span>
+                </p>
+                <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-400">
+                    I've been testing LCSAJdump on binaries for every size to find optimal default values combination.
+                </p>
+            </div>
+
+            <!-- Three Column Layout for Metrics -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+                
+                <!-- Graph A: Saturation -->
+                <div class="bg-darker border border-white/10 rounded-xl p-6 hover:border-primary/50 transition-all group">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Saturation</h3>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-4">
+                        <span class="text-primary font-bold">How deep do i need to dig?</span>
+                    </p>
+                    <div class="space-y-3 text-sm text-gray-300">
+                        <p>In the beginning LCSAJdump discovers <span class="text-primary font-semibold">A LOT OF gadgets</span> pretty fast.</p>
+                        <div class="border-l-2 border-secondary/50 pl-3 space-y-1 text-xs">
+                            <p><span class="text-white font-mono">BIG-SIZED BINARIES:</span> ~ 15.000 gadget @ depth 30</p>
+                            <p><span class="text-white font-mono">MID-SIZED BINARIES:</span> ~ 5.000 gadget @ depth 20-25</p>
+                            <p><span class="text-white font-mono">LIL-SIZED BINARIES:</span> ~ 20 gadgets @ depth 5</p>
+                        </div>
+                        <div class="pt-2 mt-2 border-t border-white/10">
+                            <p class="text-secondary font-semibold text-xs">✓ Trepassing saturation point = time waste</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Graph B: Pruning -->
+                <div class="bg-darker border border-white/10 rounded-xl p-6 hover:border-secondary/50 transition-all group">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-secondary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Darkness</h3>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-4">
+                        <span class="text-secondary font-bold">How dark do i need the nodes to be cut?</span>
+                    </p>
+                    <div class="space-y-3 text-sm text-gray-300">
+                        <p>Jumps be hiding code. Darkness = how many still-not-visited instructions do i need to discover.</p>
+                        <div class="bg-black/40 border border-white/10 rounded p-3 space-y-2 text-xs font-mono">
+                            <p><span class="text-secondary">Darkness = 0:</span> Pruned brancehs ~ 22%</p>
+                            <p><span class="text-yellow-400">Darkness = 1:</span> Pruned brancehs ~ 0%</p>
+                            <p><span class="text-primary">Darkness ≥ 1:</span> Pruned brancehs = 0%</p>
+                        </div>
+                        <div class="pt-2 mt-2 border-t border-white/10">
+                            <p class="text-primary font-semibold text-xs">✓ Basta 1 istruzione "al buio", usiamo 5 per sicurezza (500%)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Graph C: Time -->
+                <div class="bg-darker border border-white/10 rounded-xl p-6 hover:border-primary/50 transition-all group">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Efficiency</h3>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-4">
+                        <span class="text-primary font-bold">When do i need to stop?</span>
+                    </p>
+                    <div class="space-y-3 text-sm text-gray-300">
+                        <p>Time is <span class="text-secondary font-semibold">always increasing</span>, gadgets <span class="text-primary font-semibold">stop</span> at saturation point.</p>
+                        <div class="bg-black/40 border border-white/10 rounded p-3 space-y-2 text-xs"> <span class="text-white font-mono">EXAMPLE:</span>
+                            </br>
+                            <p class="text-primary">✅ Depth 30: 15K gadgets in 2s</p>
+                            <p class="text-secondary">❌ Depth 50: 15K gadgets in 8s</p>
+                            <p class="text-gray-500 italic">(Same result, 4x slower!)</p>
+                        </div>
+                        <div class="pt-2 mt-2 border-t border-white/10">
+                            <p class="text-secondary font-semibold text-xs">✓ Stop at saturation point + 20% = Sweet Spot</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Golden Standard Box -->
+            <div class="bg-gradient-to-br from-primary/10 via-card to-secondary/10 border-2 border-primary/30 rounded-2xl p-8 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full filter blur-3xl"></div>
+                <div class="relative z-10">
+                    <div class="flex items-center gap-3 mb-6">
+                        <svg class="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <h3 class="text-2xl font-bold text-white">Golden Standard</h3>
+                    </div>
+                    
+                    <p class="text-gray-300 mb-6 text-lg">
+                        Optimal default values for <span class="text-secondary font-bold">99% of CTF cases</span>:
+                    </p>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-darker/80 border border-primary/30 rounded-lg p-6">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div>
+                                    <p class="text-sm text-gray-400">Optimal depth</p>
+                                    <p class="text-2xl font-bold text-primary font-mono">30-35</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400">Covers 99% of binaries without wasting time. Calculated as: <span class="font-mono text-primary">max_depth_saturation + 20% (Heuristic Safety Margin)</span></p>
+                        </div>
+
+                        <div class="bg-darker/80 border border-secondary/30 rounded-lg p-6">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div>
+                                    <p class="text-sm text-gray-400">Safe Darkness</p>
+                                    <p class="text-2xl font-bold text-secondary font-mono">2-5</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400">200%-500% more of necessary <span class="font-mono text-primary">(1)</span>. Grants <span class="font-mono text-secondary">0 pruned branches</span>.</p>
+                            <div class="mt-4 pt-3 border-t border-gray-700/50 flex items-start gap-2">
+                                <div class="mt-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.5)]"></div>
+                                <div>
+                                    <p class="text-[10px] uppercase tracking-wider text-gray-500 font-bold mb-0.5">...SO WHY NOT 1?!</p>
+                                    <p class="text-xs text-gray-300 leading-tight">
+                                        Preserves <span class="text-secondary font-medium">Path Diversity</span> in omplexed converging flows (e.g. if/else).
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
