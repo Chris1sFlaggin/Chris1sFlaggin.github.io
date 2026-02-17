@@ -29,7 +29,7 @@ description: # this means to ignore newlines until "baseurl:"
   Starting in November 2025, I'll also be taking on a new challenge as a high school teacher! 
   Here I'll post my CTF write-ups and personal projects. Hope you enjoy your stay!
 baseurl: "" # leave empty for user site
-url: "https://chris1sflaggin.github.io" # update this to your GitHub Pages URL
+url: "https://chris1sflaggin.it" # update this to your GitHub Pages URL
 github_username: chris1sflaggin
 
 # Build settings
