@@ -37,6 +37,7 @@ remote_theme: "mmistakes/minimal-mistakes@4.26.2"
 plugins:
   - jekyll-feed
   - jekyll-include-cache
+  - jekyll-sitemap
 
 minimal_mistakes_skin: "dark"
 # Exclude from processing.
