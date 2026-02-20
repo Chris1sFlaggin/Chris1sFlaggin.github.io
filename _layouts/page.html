@@ -1,0 +1,25 @@
+---
+layout: splash
+---
+<head>
+  <title>{{ page.title }} | {{ site.title }}</title>
+
+  {% if page.description %}
+    <meta name="description" content="{{ page.description }}">
+    <meta property="og:description" content="{{ page.description }}">
+  {% endif %}
+
+  {% if page.keywords %}
+    <meta name="keywords" content="{{ page.keywords }}">
+  {% endif %}
+
+  <meta property="og:title" content="{{ page.title }}">
+  <meta property="og:url" content="{{ site.url }}{{ page.url }}">
+  <meta property="og:type" content="website">
+  
+  {% if page.image %}
+    <meta property="og:image" content="{{ site.url }}/images/{{ page.image }}">
+  {% endif %}
+</head>
+
+{{ content }}
