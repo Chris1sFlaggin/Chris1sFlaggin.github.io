@@ -24,10 +24,12 @@ logo: /images/chris.jpg
 email: admin@chris1sflaggin.it
 description: # this means to ignore newlines until "baseurl:"
   I'm a 21-year-old student currently working towards my degree, with graduation expected in July 2026. 
-  I'm a cybersecurity enthusiast, and this year I'll be serving as a junior pwn tutor at UniTo for 
+  I'm a cybersecurity enthusiast, and this I'm serving as a junior pwn tutor at UniTo for 
   CyberChallenge.it. 
-  Starting in November 2025, I'll also be taking on a new challenge as a high school teacher! 
+  Starting in November 2025, I'm also an high school teacher! 
   Here I'll post my CTF write-ups and personal projects. Hope you enjoy your stay!
+  Author of LCSAJdump.
+keywords: "ROP, JOP, LCSAJ, exploit development, cybersecurity, reverse engineering, gadget finder, write up, nas, tutorial, pwn, stack, exploit, ropper, ropGadgets, graph, search"
 baseurl: "" # leave empty for user site
 url: "https://chris1sflaggin.it" # update this to your GitHub Pages URL
 github_username: chris1sflaggin
