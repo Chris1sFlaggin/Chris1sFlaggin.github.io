@@ -23,8 +23,8 @@ images: images/LCSAJfull.png
             theme: {
                 extend: {
                     colors: {
-                        primary: '#9BDB08',   // Lime Green
-                        secondary: '#F07C06', // Orange
+                        primary: '#9BDB08',
+                        secondary: '#F07C06',
                         dark: '#0a0a0a',
                         darker: '#050505',
                         card: '#141414',
@@ -42,13 +42,11 @@ images: images/LCSAJfull.png
         }
     </script>
     <style>
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #050505; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #9BDB08; }
         
-        /* Gradient Text Utility */
         .text-gradient {
             background: linear-gradient(90deg, #9BDB08, #F07C06);
             -webkit-background-clip: text;
@@ -56,16 +54,13 @@ images: images/LCSAJfull.png
             background-clip: text;
         }
 
-        /* Subtle Grid Background */
         .bg-grid {
             background-size: 40px 40px;
-            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-image: linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
         }
         
-        .glow-primary {
-            box-shadow: 0 0 20px rgba(155, 219, 8, 0.15);
-        }
+        .glow-primary { box-shadow: 0 0 20px rgba(155, 219, 8, 0.15); }
 
         .ascii-banner {
             font-size: 4px;
@@ -73,31 +68,30 @@ images: images/LCSAJfull.png
             white-space: pre;
             display: inline-block;
         }
-        @media (min-width: 640px) {
-            .ascii-banner { font-size: 6px; }
-        }
+        @media (min-width: 640px) { .ascii-banner { font-size: 6px; } }
     </style>
 </head>
 <body class="bg-darker text-gray-300 font-sans antialiased selection:bg-primary selection:text-darker bg-grid">
 
+    <!-- ═══ NAV ═══ -->
     <nav class="fixed w-full z-50 top-0 transition-all duration-300 backdrop-blur-md bg-darker/80 border-b border-white/10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <a href="#" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
                     <img src="Untitled%20design.jpg" onerror="this.onerror=null; this.src='../images/LCSAJ.png';" alt="LCSAJdump Logo" class="h-12 w-auto object-contain">
                 </a>
-                
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-8">
-                        <a href="#features" class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Features</a>
-                        <a href="#how-it-works" class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">How it Works</a>
-                        <a href="#benchmarks" class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Benchmarks</a>
+                        <a href="#problem"       class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">The Problem</a>
+                        <a href="#features"      class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Features</a>
+                        <a href="#benchmarks"    class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Benchmarks</a>
                         <a href="#architectures" class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Architectures</a>
-                        <a href="#usage" class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Usage</a>
+                        <a href="#usage"         class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Usage</a>
                     </div>
                 </div>
                 <div>
-                    <a href="https://github.com/chris1sflaggin/lcsajdump" target="_blank" class="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all">
+                    <a href="https://github.com/chris1sflaggin/lcsajdump" target="_blank"
+                       class="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
                         GitHub
                     </a>
@@ -106,29 +100,37 @@ images: images/LCSAJfull.png
         </div>
     </nav>
 
-    <main class="pt-32 pb-16 sm:pt-40 sm:pb-24 lg:pb-32 overflow-hidden">
+    <!-- ═══ 1. HERO — bg: black ═══ -->
+    <main class="pt-32 pb-16 sm:pt-40 sm:pb-24 lg:pb-32 overflow-hidden bg-darker">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-            
             <div class="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-pulse-slow"></div>
             <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/20 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-pulse-slow" style="animation-delay: 2s;"></div>
 
             <div class="lg:grid lg:grid-cols-12 lg:gap-16 items-center relative z-10">
-                
                 <div class="text-center lg:text-left lg:col-span-6">
-                    <img src="Untitled%20design.jpg" onerror="this.onerror=null; this.src='../images/LCSAJdump.png';" alt="LCSAJdump Gear Logo" class="h-24 w-auto mx-auto lg:mx-0 mb-6 object-contain filter drop-shadow-[0_0_20px_rgba(155,219,8,0.2)]">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-gray-400 mb-6">
-                        <span class="flex h-2 w-2 rounded-full bg-secondary"></span>
-                        Latest: v1.1.0
+                    <img src="Untitled%20design.jpg" onerror="this.onerror=null; this.src='../images/LCSAJdump.png';" alt="LCSAJdump Logo" class="h-36 w-auto mx-auto lg:mx-0 mb-6 object-contain filter drop-shadow-[0_0_20px_rgba(155,219,8,0.2)]">
+
+                    <!-- Badge row -->
+                    <div class="flex items-center gap-2 justify-center lg:justify-start mb-4 flex-wrap">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-gray-400">
+                            <span class="flex h-2 w-2 rounded-full bg-secondary"></span>
+                            Latest: v1.1.1
+                        </div>
+                        <a href="https://github.com/chris1sflaggin/lcsajdump" target="_blank"
+                           class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-gray-400 hover:border-yellow-400/50 hover:text-yellow-400 transition-all">
+                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                            <svg class="w-3 h-3 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            Star
+                        </a>
                     </div>
-                    <div class="mb-8">
-                        <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
-                        <script type='text/javascript'>
-                            kofiwidget2.init('Support me on Ko-fi', '#9BDB08', 'H2H21UHZP2');
-                            kofiwidget2.draw();
-                        </script>
+
+                    <!-- Ko-fi — riga dedicata, allineato a sinistra come il resto -->
+                    <div class="flex justify-center lg:justify-start mb-8">
+                        <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Buy me a coffee', '#F07C06', 'H2H21UHZP2');kofiwidget2.draw();</script> 
                     </div>
+
                     <h1 class="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl mb-6">
-                        Universal Automated Gadget Discovery <br>
+                        Universal Automated Gadget Discovery<br>
                         <span class="text-gradient">FRAMEWORK</span>
                     </h1>
                     <p class="mt-3 text-base text-gray-400 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
@@ -140,11 +142,8 @@ images: images/LCSAJfull.png
                         </a>
                         <button onclick="copyInstall()" class="w-full sm:w-auto mt-3 sm:mt-0 flex items-center justify-center px-8 py-3 border border-white/10 text-base font-medium rounded-lg text-white bg-white/5 hover:bg-white/10 transition-all md:py-4 md:text-lg group relative">
                             <span class="font-mono text-sm text-gray-300">pip install lcsajdump</span>
-                            <svg class="w-5 h-5 ml-2 text-gray-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                            
-                            <div id="copyToast" class="absolute -top-12 bg-primary text-darker text-xs font-bold px-3 py-1 rounded opacity-0 transition-opacity duration-300 pointer-events-none">
-                                Copied!
-                            </div>
+                            <svg class="w-5 h-5 ml-2 text-gray-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                            <div id="copyToast" class="absolute -top-12 bg-primary text-darker text-xs font-bold px-3 py-1 rounded opacity-0 transition-opacity duration-300 pointer-events-none">Copied!</div>
                         </button>
                     </div>
                 </div>
@@ -166,8 +165,9 @@ images: images/LCSAJfull.png
                             <p>  -d, --depth INTEGER      Max search depth (LCSAJ blocks).</p>
                             <p>  -k, --darkness INTEGER   Pruning threshold (Max visits per node).</p>
                             <p>  -l, --limit INTEGER      Desired number of gadgets to show.</p>
+                            <p>  -s, --min-score INTEGER  Min score for a gadget to be shown.</p>
+                            <p>  -v, --verbose            Verbose results for detailed output.</p>
                             <p>  -a, --arch TEXT          Architecture of the binary (default: riscv64).</p>
-                            
                             <p class="text-primary mt-4">❯ lcsajdump testCTFs/rop2/vuln</p>
                             <div class="ascii-banner text-secondary mt-2">
        ██╗      ██████╗███████╗ █████╗      ██╗██████╗ ██╗   ██╗███╗   ███╗██████╗
@@ -197,69 +197,18 @@ images: images/LCSAJfull.png
         </div>
     </main>
 
-    <section id="features" class="py-16 bg-card/50 border-y border-white/5">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-secondary font-semibold tracking-wide uppercase text-sm">Core Features</h2>
-                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl">
-                    Beyond Linear Scanning
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div class="bg-darker border border-white/10 rounded-xl p-6 hover:border-primary/50 transition-colors group">
-                    <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <svg class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-bold text-white mb-2">Multi-Arch Support</h3>
-                    <p class="text-sm text-gray-400">Modular design now supporting RISC-V 64GC and easily extendable to x86 and ARM (FORK!).</p>
-                </div>
-
-                <div class="bg-darker border border-white/10 rounded-xl p-6 hover:border-secondary/50 transition-colors group">
-                    <div class="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <svg class="w-6 h-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-bold text-white mb-2">Graph Reconstruction</h3>
-                    <p class="text-sm text-gray-400">Models the binary as a directed graph of Basic Blocks using LCSAJ (Linear Code Sequence and Jump) analysis.</p>
-                </div>
-
-                <div class="bg-darker border border-white/10 rounded-xl p-6 hover:border-primary/50 transition-colors group">
-                    <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <svg class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-bold text-white mb-2">Rainbow BFS</h3>
-                    <p class="text-sm text-gray-400">Proprietary backward search algorithm starting from control-flow sinks to reconstruct the chain.</p>
-                </div>
-
-                <div class="bg-darker border border-white/10 rounded-xl p-6 hover:border-secondary/50 transition-colors group">
-                    <div class="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <svg class="w-6 h-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-bold text-white mb-2">Shadow Gadgets</h3>
-                    <p class="text-sm text-gray-400">Identifies complex "Trampoline" chains that bypass bad bytes or "Conditional" branches, impossible to detect with a linear sliding-window.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="how-it-works" class="py-20 relative">
+    <!-- ═══ 2. THE PROBLEM — bg: grey ═══ -->
+    <section id="problem" class="py-20 bg-card/50 border-y border-white/5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
                 <div>
-                    <h2 class="text-3xl font-extrabold text-white sm:text-4xl mb-6">The Limitation of Linear Scanners</h2>
+                    <h2 class="text-secondary font-semibold tracking-wide uppercase text-sm mb-2">The Problem</h2>
+                    <h3 class="text-3xl font-extrabold text-white sm:text-4xl mb-6">The Blind Spot of Linear Scanners</h3>
                     <p class="text-gray-400 mb-4 text-lg">
-                        Traditional ROP scanners use a linear (sliding-window) approach over the executable's bytes. While effective for standard sequences, it fails to find executable gadgets crossing non-contiguous memory blocks.
+                        Traditional ROP scanners use a linear (sliding-window) approach over the executable's bytes. While effective for standard sequences, they fundamentally fail to discover gadgets that cross non-contiguous memory blocks via jumps.
                     </p>
                     <p class="text-gray-400 mb-6 text-lg">
-                        <strong class="text-white">LCSAJdump</strong> reconstructs the Control-Flow Graph (CFG) and identifies:
+                        <strong class="text-white">LCSAJdump</strong> reconstructs the Control-Flow Graph (CFG) and identifies both types:
                     </p>
                     <ul class="space-y-4">
                         <li class="flex items-start">
@@ -268,7 +217,7 @@ images: images/LCSAJfull.png
                             </span>
                             <div class="ml-3">
                                 <h4 class="text-white font-medium">Contiguous Gadgets (Linear)</h4>
-                                <p class="text-sm text-gray-500">Standard linear sequences ending with a control-flow transfer.</p>
+                                <p class="text-sm text-gray-500">Standard sequences ending with a control-flow transfer. Any scanner finds these.</p>
                             </div>
                         </li>
                         <li class="flex items-start">
@@ -276,256 +225,400 @@ images: images/LCSAJfull.png
                                 <span class="h-2 w-2 rounded-full bg-secondary"></span>
                             </span>
                             <div class="ml-3">
-                                <h4 class="text-white font-medium">Non-Contiguous (Shadow) Gadgets</h4>
-                                <p class="text-sm text-gray-500">Complex chains spanning multiple Basic Blocks (LCSAJs) to bypass 'bad bytes' via unconditional jumps or branches.</p>
+                                <h4 class="text-white font-medium">Non-Contiguous Shadow Gadgets</h4>
+                                <p class="text-sm text-gray-500">Complex chains spanning multiple Basic Blocks (LCSAJs), bypassing bad bytes via unconditional jumps or branches. <strong class="text-secondary">Invisible to linear scanners.</strong></p>
                             </div>
                         </li>
                     </ul>
                 </div>
                 
-                <div class="mt-10 lg:mt-0 bg-card border border-white/10 rounded-xl p-6 font-mono text-sm relative">
-                    <div class="absolute top-0 right-0 p-4 opacity-20">
+                <div class="mt-10 lg:mt-0 bg-darker border border-white/10 rounded-xl p-6 font-mono text-sm relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10">
                         <svg class="w-24 h-24 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                     </div>
-                    <div class="relative z-10 text-gray-400 space-y-3">
-                        <p class="text-secondary">// Trampoline Gadget Example Discovered</p>
+                    <p class="text-secondary mb-4 font-bold text-xs uppercase tracking-wider">// Trampoline Gadget — found by LCSAJ, invisible to ropper</p>
+                    <div class="relative z-10 text-gray-400 space-y-2">
                         <p><span class="text-white">0x4146a:</span> <span class="text-blue-400">ld</span> a0, 8(s10)</p>
-                        <p><span class="text-white">0x4146e:</span> <span class="text-blue-400">jal</span> -0x28974 <span class="text-gray-500">; Trampoline Jump!</span></p>
-                        <p><span class="text-white">0x18af2:</span> <span class="text-blue-400">c.mv</span> a0, t3</p>
-                        <p><span class="text-white">0x18af4:</span> <span class="text-blue-400">bltz</span> t3, 0x22e</p>
-                        <p><span class="text-white">0x18af8:</span> <span class="text-blue-400">c.ldsp</span> ra, 0x58(sp)</p>
-                        <p><span class="text-white">0x18afa:</span> <span class="text-blue-400">c.addi16sp</span> sp, 0x60</p>
-                        <p><span class="text-white">0x18afc:</span> <span class="text-primary font-bold">c.jr ra</span> <span class="text-primary">; Control-Flow Sink</span></p>
+                        <p><span class="text-white">0x4146e:</span> <span class="text-blue-400">jal</span> -0x28974 <span class="text-gray-600 italic">← Trampoline</span></p>
+                        <p class="pl-4 border-l-2 border-secondary/50 ml-2 mt-2">
+                            <span class="text-white">0x18af2:</span> <span class="text-blue-400">c.mv</span> a0, t3<br>
+                            <span class="text-white">0x18af4:</span> <span class="text-blue-400">bltz</span> t3, 0x22e<br>
+                            <span class="text-white">0x18af8:</span> <span class="text-blue-400">c.ldsp</span> ra, 0x58(sp)<br>
+                            <span class="text-white">0x18afa:</span> <span class="text-blue-400">c.addi16sp</span> sp, 0x60<br>
+                            <span class="text-white">0x18afc:</span> <span class="text-primary font-bold">c.jr ra</span> <span class="text-primary text-xs">← sink</span>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- NEW BENCHMARK SECTION -->
-    <section id="benchmarks" class="py-20 bg-card/50 border-y border-white/5 relative overflow-hidden">
+    <!-- ═══ 3. FEATURES — bg: black ═══ -->
+    <section id="features" class="py-16 bg-darker border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-secondary font-semibold tracking-wide uppercase text-sm">The Solution</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl">
+                    How LCSAJdump Goes Deeper
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="bg-card border border-white/10 rounded-xl p-6 hover:border-primary/50 transition-colors group">
+                    <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Graph Reconstruction</h3>
+                    <p class="text-sm text-gray-400">Models the binary as a directed graph of Basic Blocks using LCSAJ (Linear Code Sequence and Jump) analysis.</p>
+                </div>
+
+                <div class="bg-card border border-white/10 rounded-xl p-6 hover:border-secondary/50 transition-colors group">
+                    <div class="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Rainbow BFS</h3>
+                    <p class="text-sm text-gray-400">Proprietary backward search algorithm starting from control-flow sinks to reconstruct full chains across block boundaries.</p>
+                </div>
+
+                <div class="bg-card border border-white/10 rounded-xl p-6 hover:border-primary/50 transition-colors group">
+                    <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Shadow Gadgets</h3>
+                    <p class="text-sm text-gray-400">Identifies Trampoline and Conditional chains that bypass bad bytes — impossible to detect with a linear sliding-window.</p>
+                </div>
+
+                <div class="bg-card border border-white/10 rounded-xl p-6 hover:border-secondary/50 transition-colors group">
+                    <div class="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Multi-Arch Support</h3>
+                    <p class="text-sm text-gray-400">Modular design natively supporting RISC-V 64GC, extendable to x86 and ARM via community forks.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ 4. BENCHMARKS — bg: grey ═══ -->
+    <section id="benchmarks" class="py-20 bg-card/50 border-b border-white/5 relative overflow-hidden">
         <div class="absolute inset-0 opacity-5">
             <div class="absolute top-1/4 left-1/3 w-96 h-96 bg-primary rounded-full mix-blend-screen filter blur-3xl"></div>
             <div class="absolute bottom-1/4 right-1/3 w-96 h-96 bg-secondary rounded-full mix-blend-screen filter blur-3xl"></div>
         </div>
         
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center mb-16">
-                <h2 class="text-secondary font-semibold tracking-wide uppercase text-sm">Performance Analysis</h2>
+            <div class="text-center mb-12">
+                <h2 class="text-secondary font-semibold tracking-wide uppercase text-sm">Real-World Benchmarks</h2>
                 <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl">
-                    Optimal Point: <span class="text-gradient">Mathematically Proven</span>
+                    Choose Your <span class="text-gradient">Scan Strategy</span>
                 </p>
                 <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-400">
-                    I've been testing LCSAJdump on binaries for every size to find optimal default values combination.
+                    Three profiles measured on <code class="text-primary">libc.so.6</code>. Pick your balance between speed and coverage.
                 </p>
             </div>
 
-            <!-- Three Column Layout for Metrics -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-                
-                <!-- Graph A: Saturation -->
-                <div class="bg-darker border border-white/10 rounded-xl p-6 hover:border-primary/50 transition-all group">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <svg class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-white">Saturation</h3>
-                    </div>
-                    <p class="text-sm text-gray-400 mb-4">
-                        <span class="text-primary font-bold">How deep do i need to dig?</span>
-                    </p>
-                    <div class="space-y-3 text-sm text-gray-300">
-                        <p>In the beginning LCSAJdump discovers <span class="text-primary font-semibold">A LOT OF gadgets</span> pretty fast.</p>
-                        <div class="border-l-2 border-secondary/50 pl-3 space-y-1 text-xs">
-                            <p><span class="text-white font-mono">BIG-SIZED BINARIES:</span> ~ 15.000 gadget @ depth 30</p>
-                            <p><span class="text-white font-mono">MID-SIZED BINARIES:</span> ~ 5.000 gadget @ depth 20-25</p>
-                            <p><span class="text-white font-mono">LIL-SIZED BINARIES:</span> ~ 20 gadgets @ depth 5</p>
-                        </div>
-                        <div class="pt-2 mt-2 border-t border-white/10">
-                            <p class="text-secondary font-semibold text-xs">✓ Trepassing saturation point = time waste</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Graph B: Pruning -->
-                <div class="bg-darker border border-white/10 rounded-xl p-6 hover:border-secondary/50 transition-all group">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-lg bg-secondary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <svg class="w-6 h-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-white">Darkness</h3>
-                    </div>
-                    <p class="text-sm text-gray-400 mb-4">
-                        <span class="text-secondary font-bold">How dark do i need the nodes to be cut?</span>
-                    </p>
-                    <div class="space-y-3 text-sm text-gray-300">
-                        <p>Jumps be hiding code. Darkness = how many still-not-visited instructions do i need to discover.</p>
-                        <div class="bg-black/40 border border-white/10 rounded p-3 space-y-2 text-xs font-mono">
-                            <p><span class="text-secondary">Darkness = 0:</span> Pruned brancehs ~ 22%</p>
-                            <p><span class="text-yellow-400">Darkness = 1:</span> Pruned brancehs ~ 0%</p>
-                            <p><span class="text-primary">Darkness ≥ 1:</span> Pruned brancehs = 0%</p>
-                        </div>
-                        <div class="pt-2 mt-2 border-t border-white/10">
-                            <p class="text-primary font-semibold text-xs">✓ Basta 1 istruzione "al buio", usiamo 5 per sicurezza (500%)</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Graph C: Time -->
-                <div class="bg-darker border border-white/10 rounded-xl p-6 hover:border-primary/50 transition-all group">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <svg class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-white">Efficiency</h3>
-                    </div>
-                    <p class="text-sm text-gray-400 mb-4">
-                        <span class="text-primary font-bold">When do i need to stop?</span>
-                    </p>
-                    <div class="space-y-3 text-sm text-gray-300">
-                        <p>Time is <span class="text-secondary font-semibold">always increasing</span>, gadgets <span class="text-primary font-semibold">stop</span> at saturation point.</p>
-                        <div class="bg-black/40 border border-white/10 rounded p-3 space-y-2 text-xs"> <span class="text-white font-mono">EXAMPLE:</span>
-                            </br>
-                            <p class="text-primary">✅ Depth 30: 15K gadgets in 2s</p>
-                            <p class="text-secondary">❌ Depth 50: 15K gadgets in 8s</p>
-                            <p class="text-gray-500 italic">(Same result, 4x slower!)</p>
-                        </div>
-                        <div class="pt-2 mt-2 border-t border-white/10">
-                            <p class="text-secondary font-semibold text-xs">✓ Stop at saturation point + 20% = Sweet Spot</p>
-                        </div>
-                    </div>
-                </div>
+            <div class="flex justify-center mb-12">
+                <div id="strategy-buttons" class="bg-darker border border-white/10 p-1 rounded-xl inline-flex gap-1 flex-wrap justify-center"></div>
             </div>
 
-            <!-- Golden Standard Box -->
-            <div class="bg-gradient-to-br from-primary/10 via-card to-secondary/10 border-2 border-primary/30 rounded-2xl p-8 relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full filter blur-3xl"></div>
-                <div class="relative z-10">
-                    <div class="flex items-center gap-3 mb-6">
-                        <svg class="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <h3 class="text-2xl font-bold text-white">Golden Standard</h3>
-                    </div>
-                    
-                    <p class="text-gray-300 mb-6 text-lg">
-                        Optimal default values for <span class="text-secondary font-bold">99% of CTF cases</span>:
-                    </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
 
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="bg-darker/80 border border-primary/30 rounded-lg p-6">
-                            <div class="flex items-center gap-3 mb-3">
-                                <div>
-                                    <p class="text-sm text-gray-400">Optimal depth</p>
-                                    <p class="text-2xl font-bold text-primary font-mono">30-35</p>
-                                </div>
-                            </div>
-                            <p class="text-xs text-gray-400">Covers 99% of binaries without wasting time. Calculated as: <span class="font-mono text-primary">max_depth_saturation + 20% (Heuristic Safety Margin)</span></p>
+                <!-- RISC-V -->
+                <div class="bg-darker/80 border border-primary/30 rounded-2xl p-6 hover:border-primary/60 transition-colors">
+                    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                        RISC-V (64)
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="bg-black/50 border border-white/5 rounded-lg p-4">
+                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Depth (-d)</p>
+                            <p id="rv-depth" class="text-3xl font-mono text-secondary transition-opacity duration-150"></p>
                         </div>
-
-                        <div class="bg-darker/80 border border-secondary/30 rounded-lg p-6">
-                            <div class="flex items-center gap-3 mb-3">
-                                <div>
-                                    <p class="text-sm text-gray-400">Safe Darkness</p>
-                                    <p class="text-2xl font-bold text-secondary font-mono">2-5</p>
-                                </div>
-                            </div>
-                            <p class="text-xs text-gray-400">200%-500% more of necessary <span class="font-mono text-primary">(1)</span>. Grants <span class="font-mono text-secondary">0 pruned branches</span>.</p>
-                            <div class="mt-4 pt-3 border-t border-gray-700/50 flex items-start gap-2">
-                                <div class="mt-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.5)]"></div>
-                                <div>
-                                    <p class="text-[10px] uppercase tracking-wider text-gray-500 font-bold mb-0.5">...SO WHY NOT 1?!</p>
-                                    <p class="text-xs text-gray-300 leading-tight">
-                                        Preserves <span class="text-secondary font-medium">Path Diversity</span> in omplexed converging flows (e.g. if/else).
-                                    </p>
-                                </div>
-                            </div>
+                        <div class="bg-black/50 border border-white/5 rounded-lg p-4">
+                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Darkness (-k)</p>
+                            <p id="rv-dark" class="text-3xl font-mono text-primary transition-opacity duration-150"></p>
                         </div>
                     </div>
+                    <div class="grid grid-cols-2 gap-4 mb-5">
+                        <div class="bg-black/30 border border-white/5 rounded-lg px-4 py-3">
+                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Gadgets Found</p>
+                            <p id="rv-gadgets" class="text-xl font-mono text-white transition-opacity duration-150"></p>
+                        </div>
+                        <div class="bg-black/30 border border-white/5 rounded-lg px-4 py-3">
+                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Time</p>
+                            <p id="rv-time" class="text-xl font-mono text-white transition-opacity duration-150"></p>
+                        </div>
+                    </div>
+                    <p id="rv-desc" class="text-sm text-gray-400 min-h-[48px] transition-opacity duration-150"></p>
                 </div>
+
+                <!-- x86_64 -->
+                <div class="bg-darker/80 border border-secondary/30 rounded-2xl p-6 hover:border-secondary/60 transition-colors">
+                    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        x86_64
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="bg-black/30 border border-white/5 rounded-lg p-4">
+                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Depth (-d)</p>
+                            <p id="x86-depth" class="text-3xl font-mono text-secondary transition-opacity duration-150"></p>
+                        </div>
+                        <div class="bg-black/30 border border-white/5 rounded-lg p-4">
+                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Darkness (-k)</p>
+                            <p id="x86-dark" class="text-3xl font-mono text-primary transition-opacity duration-150"></p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-5">
+                        <div class="bg-black/30 border border-white/5 rounded-lg px-4 py-3">
+                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Gadgets Found</p>
+                            <p id="x86-gadgets" class="text-xl font-mono text-white transition-opacity duration-150"></p>
+                        </div>
+                        <div class="bg-black/30 border border-white/5 rounded-lg px-4 py-3">
+                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Time</p>
+                            <p id="x86-time" class="text-xl font-mono text-white transition-opacity duration-150"></p>
+                        </div>
+                    </div>
+                    <p id="x86-desc" class="text-sm text-gray-400 min-h-[48px] transition-opacity duration-150"></p>
+                </div>
+
             </div>
+
+            <p class="text-center text-xs text-gray-600 mt-6">
+                Pruned branches — RV: <span id="rv-pruned" class="transition-opacity duration-150"></span>
+                &nbsp;|&nbsp;
+                x86_64: <span id="x86-pruned" class="transition-opacity duration-150"></span>
+            </p>
         </div>
+
+        <script>
+            const scanConfigs = {
+                fast: {
+                    label: "Fast",
+                    rv:  { d:"15", k:"0",  gadgets:"2,659",   time:"5.88s",  pruned:"2,286",   desc:"No aggressive pruning. Ideal for standard CTF binaries: fast and sufficient." },
+                    x86: { d:"15", k:"0",  gadgets:"6,323",   time:"6.66s",  pruned:"9,687",   desc:"Depth restricted to prevent state explosion from variable-length overlapping instructions." }
+                },
+                balanced: {
+                    label: "Balanced",
+                    rv:  { d:"20", k:"5",  gadgets:"14,189",  time:"8.06s",  pruned:"504",     desc:"Solid compromise. Discovers the most useful gadgets without saturating memory." },
+                    x86: { d:"20", k:"5",  gadgets:"281,982", time:"48.66s", pruned:"112,289", desc:"The sweet spot for x86_64. Uncovers misaligned gadgets while maintaining acceptable execution times." }
+                },
+                deep: {
+                    label: "Deep",
+                    rv:  { d:"25", k:"10", gadgets:"15,652",  time:"8.53s",  pruned:"487",     desc:"Maximum saturation. Preserves path diversity to expose heavily obfuscated shadow gadgets." },
+                    x86: { d:"25", k:"10", gadgets:"516,814", time:"~89s",   pruned:"195,885", desc:"Forces the engine to map misaligned jumps, revealing complex ROP chains at the cost of execution time." }
+                }
+            };
+
+            const architectures = ['rv', 'x86'];
+            const fieldsMap = { depth:'d', dark:'k', gadgets:'gadgets', time:'time', desc:'desc', pruned:'pruned' };
+
+            function initStrategies() {
+                const container = document.getElementById('strategy-buttons');
+                Object.keys(scanConfigs).forEach(key => {
+                    const btn = document.createElement('button');
+                    btn.id = `btn-${key}`;
+                    btn.onclick = () => setStrategy(key);
+                    btn.className = "px-6 py-3 rounded-lg text-sm font-bold transition-all duration-300 text-gray-400 hover:text-white";
+                    btn.innerText = scanConfigs[key].label;
+                    container.appendChild(btn);
+                });
+                setStrategy('fast');
+            }
+
+            function setStrategy(type) {
+                const activeClasses   = ['bg-primary','text-darker','shadow-[0_0_15px_rgba(155,219,8,0.4)]'];
+                const inactiveClasses = ['text-gray-400','hover:text-white'];
+
+                Object.keys(scanConfigs).forEach(key => {
+                    const btn = document.getElementById(`btn-${key}`);
+                    if (!btn) return;
+                    btn.classList[key === type ? 'add' : 'remove'](...activeClasses);
+                    btn.classList[key === type ? 'remove' : 'add'](...inactiveClasses);
+                });
+
+                architectures.forEach(arch => {
+                    Object.keys(fieldsMap).forEach(f => {
+                        const el = document.getElementById(`${arch}-${f}`);
+                        if (el) el.style.opacity = 0;
+                    });
+                });
+
+                setTimeout(() => {
+                    architectures.forEach(arch => {
+                        const data = scanConfigs[type][arch];
+                        if (!data) return;
+                        Object.keys(fieldsMap).forEach(f => {
+                            const el = document.getElementById(`${arch}-${f}`);
+                            if (el) { el.innerText = data[fieldsMap[f]]; el.style.opacity = 1; }
+                        });
+                    });
+                }, 150);
+            }
+
+            document.addEventListener('DOMContentLoaded', initStrategies);
+        </script>
     </section>
 
-    <section id="architectures" class="py-16 bg-darker">
+    <!-- ═══ 5. ARCHITECTURES — bg: black ═══ -->
+    <section id="architectures" class="py-16 bg-darker border-b border-white/5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-extrabold text-white">Supported Architectures</h2>
-                <p class="mt-4 text-gray-400">LCSAJdump is modular. Extend the support adding new profiles in <code>config.py</code>!</p>
+                <h2 class="text-secondary font-semibold tracking-wide uppercase text-sm">Compatibility</h2>
+                <p class="mt-2 text-3xl font-extrabold text-white">Supported Architectures</p>
+                <p class="mt-4 text-gray-400">LCSAJdump is modular — extend support by adding new profiles in <code class="text-primary">config.py</code>.</p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <div class="bg-card border border-white/10 p-6 rounded-xl hover:border-secondary/50 transition-all group cursor-pointer">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+
+                <!-- RISC-V -->
+                <div class="bg-card border border-white/10 p-6 rounded-xl hover:border-secondary/50 transition-all group">
                     <div class="flex items-center gap-4 mb-4">
                         <div class="w-16 h-16 rounded-lg bg-secondary/10 flex items-center justify-center p-2">
                             <img src="../images/riscv.png" onerror="this.onerror=null; this.src='images/riscv.png';" alt="RISC-V Logo" class="w-full h-full object-contain" style="filter: brightness(0) saturate(100%) invert(49%) sepia(64%) saturate(2017%) hue-rotate(1deg) brightness(101%) contrast(101%);">
                         </div>
-                        <h3 class="text-secondary font-bold text-xl">RISC-V (64)</h3>
+                        <div>
+                            <h3 class="text-secondary font-bold text-xl">RISC-V (64)</h3>
+                            <span class="text-[10px] px-1.5 py-0.5 rounded bg-secondary/10 text-secondary uppercase tracking-widest font-bold">Native</span>
+                        </div>
                     </div>
-                    <p class="text-sm text-secondary/80">Native implementation with support for compressed instructions(RVC).</p>
+                    <p class="text-sm text-gray-400">Native implementation with full support for compressed instructions (RVC). Default architecture.</p>
                 </div>
-                <div class="bg-card border border-dashed border-gray-600 p-6 rounded-xl flex items-center justify-center">
-                    <p class="text-gray-500 font-medium italic">Wanna see an architecture implemented by yourself here? Open a Pull Request!</p>
+
+                <!-- x86_64 -->
+                <div class="bg-card border border-white/10 p-6 rounded-xl hover:border-blue-400/50 transition-all group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 rounded-lg bg-blue-400/10 flex items-center justify-center p-0">
+                            <img src="../images/amd64.png" onerror="this.onerror=null; this.src='images/amd64.png';" alt="x86_64 Logo" class="w-full h-full object-contain" style="filter: brightness(0) saturate(100%) invert(60%) sepia(60%) saturate(500%) hue-rotate(180deg) brightness(110%) contrast(100%);">
+                        </div>
+                        <div>
+                            <h3 class="text-blue-400 font-bold text-xl">x86_64</h3>
+                            <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-400/10 text-blue-400 uppercase tracking-widest font-bold">Beta</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-400">Latest update with x86_64 support. Handles variable-length overlapping instructions and misaligned gadgets.</p>
                 </div>
+
+                <!-- PR card -->
+                <div class="bg-card border border-dashed border-gray-600 p-6 rounded-xl flex flex-col items-center justify-center gap-3 hover:border-gray-400 transition-colors">
+                    <svg class="w-8 h-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    <p class="text-gray-500 font-medium italic text-center text-sm">Want to see your architecture here?<br>Open a Pull Request!</p>
+                </div>
+
             </div>
         </div>
     </section>
 
-    <section id="usage" class="py-16 bg-card/50 border-t border-white/5">
+    <!-- ═══ 6. USAGE — bg: grey ═══ -->
+    <section id="usage" class="py-16 bg-card/50 border-b border-white/5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-extrabold text-white">Ready to Use</h2>
+                <h2 class="text-secondary font-semibold tracking-wide uppercase text-sm">Get Started</h2>
+                <p class="mt-2 text-3xl font-extrabold text-white">Ready to Use</p>
                 <p class="mt-4 text-gray-400">Install LCSAJdump via pip and analyze your binaries in seconds.</p>
             </div>
             
             <div class="max-w-3xl mx-auto bg-darker rounded-xl border border-white/10 overflow-hidden">
                 <div class="flex border-b border-white/10 bg-black/40">
-                    <button class="px-4 py-3 text-sm font-medium text-primary border-b-2 border-primary bg-white/5">Installation</button>
+                    <button class="px-4 py-3 text-sm font-medium text-primary border-b-2 border-primary bg-white/5">Installation & Usage</button>
                 </div>
-                
-                <div class="p-6">
-                    <h3 class="text-white font-medium mb-3">Via Pip:</h3>
-                    <div class="bg-black border border-white/10 rounded-lg p-4 flex justify-between items-center group">
-                        <code class="text-primary font-mono text-sm">pip install lcsajdump</code>
+                <div class="p-6 space-y-6">
+
+                    <div>
+                        <h3 class="text-white font-medium mb-3">Install via pip:</h3>
+                        <div class="bg-black border border-white/10 rounded-lg p-4">
+                            <code class="text-primary font-mono text-sm">pip install lcsajdump</code>
+                        </div>
                     </div>
 
-                    <h3 class="text-white font-medium mt-6 mb-3">Basic Scan:</h3>
-                    <div class="bg-black border border-white/10 rounded-lg p-4">
-                        <code class="text-gray-300 font-mono text-sm">python LCSAJdump.py &lt;path_to_binary&gt;</code>
+                    <div>
+                        <h3 class="text-white font-medium mb-3">Basic scan:</h3>
+                        <div class="bg-black border border-white/10 rounded-lg p-4">
+                            <code class="text-gray-300 font-mono text-sm">lcsajdump &lt;path_to_binary&gt;</code>
+                        </div>
                     </div>
 
-                    <h3 class="text-white font-medium mt-6 mb-3">Parameter Tuning (Arch & Depth):</h3>
-                    <div class="bg-black border border-white/10 rounded-lg p-4">
-                        <code class="text-gray-300 font-mono text-sm">python LCSAJdump.py <span class="text-secondary">-a riscv64</span> <span class="text-secondary">-d 15</span> <span class="text-primary">-k 100</span> &lt;path&gt;</code>
+                    <div>
+                        <h3 class="text-white font-medium mb-3">Full example with all options:</h3>
+                        <div class="bg-black border border-white/10 rounded-lg p-4 overflow-x-auto">
+                            <code class="text-gray-300 font-mono text-sm whitespace-nowrap">
+                                lcsajdump
+                                <span class="text-secondary">-a x86_64</span>
+                                <span class="text-secondary">-d 25</span>
+                                <span class="text-primary">-k 10</span>
+                                <span class="text-blue-400">-l 20</span>
+                                <span class="text-blue-400">-s 5</span>
+                                <span class="text-gray-400">-v</span>
+                                &lt;path&gt;
+                            </code>
+                        </div>
                     </div>
-                    
-                    <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-400">
-                        <div><strong class="text-secondary">-a, --arch</strong>: Target architecture (default: riscv64)</div>
-                        <div><strong class="text-secondary">-d, --depth</strong>: Max search depth (LCSAJ blocks)</div>
-                        <div><strong class="text-primary">-k, --darkness</strong>: Pruning threshold (Max visits)</div>
-                        <div><strong class="text-primary">-l, --limit</strong>: Max gadgets to display</div>
+
+                    <!-- Options table -->
+                    <div>
+                        <h3 class="text-white font-medium mb-3">All options:</h3>
+                        <div class="rounded-lg border border-white/10 overflow-hidden text-sm">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="bg-black/50 border-b border-white/10">
+                                        <th class="text-left px-4 py-2 text-gray-500 font-mono text-xs uppercase tracking-wider">Flag</th>
+                                        <th class="text-left px-4 py-2 text-gray-500 font-mono text-xs uppercase tracking-wider">Type</th>
+                                        <th class="text-left px-4 py-2 text-gray-500 font-mono text-xs uppercase tracking-wider">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-white/5">
+                                    <tr class="bg-black/20 hover:bg-black/40 transition-colors">
+                                        <td class="px-4 py-3 font-mono text-secondary whitespace-nowrap">-a, --arch</td>
+                                        <td class="px-4 py-3 text-gray-500 text-xs">TEXT</td>
+                                        <td class="px-4 py-3 text-gray-400">Target architecture. <span class="text-gray-600">Default: riscv64</span></td>
+                                    </tr>
+                                    <tr class="bg-black/10 hover:bg-black/40 transition-colors">
+                                        <td class="px-4 py-3 font-mono text-secondary whitespace-nowrap">-d, --depth</td>
+                                        <td class="px-4 py-3 text-gray-500 text-xs">INTEGER</td>
+                                        <td class="px-4 py-3 text-gray-400">Max search depth in LCSAJ blocks. Controls chain length.</td>
+                                    </tr>
+                                    <tr class="bg-black/20 hover:bg-black/40 transition-colors">
+                                        <td class="px-4 py-3 font-mono text-primary whitespace-nowrap">-k, --darkness</td>
+                                        <td class="px-4 py-3 text-gray-500 text-xs">INTEGER</td>
+                                        <td class="px-4 py-3 text-gray-400">Pruning threshold — max visits per node. Higher = more gadgets, slower scan.</td>
+                                    </tr>
+                                    <tr class="bg-black/10 hover:bg-black/40 transition-colors">
+                                        <td class="px-4 py-3 font-mono text-blue-400 whitespace-nowrap">-l, --limit</td>
+                                        <td class="px-4 py-3 text-gray-500 text-xs">INTEGER</td>
+                                        <td class="px-4 py-3 text-gray-400">Max number of gadgets to display in the output.</td>
+                                    </tr>
+                                    <tr class="bg-black/20 hover:bg-black/40 transition-colors">
+                                        <td class="px-4 py-3 font-mono text-blue-400 whitespace-nowrap">-s, --min-score</td>
+                                        <td class="px-4 py-3 text-gray-500 text-xs">INTEGER</td>
+                                        <td class="px-4 py-3 text-gray-400">Minimum quality score for a gadget to appear in results.</td>
+                                    </tr>
+                                    <tr class="bg-black/10 hover:bg-black/40 transition-colors">
+                                        <td class="px-4 py-3 font-mono text-gray-400 whitespace-nowrap">-v, --verbose</td>
+                                        <td class="px-4 py-3 text-gray-500 text-xs">FLAG</td>
+                                        <td class="px-4 py-3 text-gray-400">Enable verbose output for detailed per-gadget results.</td>
+                                    </tr>
+                                    <tr class="bg-black/20 hover:bg-black/40 transition-colors">
+                                        <td class="px-4 py-3 font-mono text-gray-500 whitespace-nowrap">--version</td>
+                                        <td class="px-4 py-3 text-gray-500 text-xs">FLAG</td>
+                                        <td class="px-4 py-3 text-gray-400">Show the installed version and exit.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- ═══ FOOTER ═══ -->
     <footer class="bg-darker border-t border-white/10 pt-12 pb-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6">
                 <a href="#" class="flex items-center gap-2 opacity-70 hover:opacity-100 transition-opacity">
                     <img src="Untitled%20design.jpg" onerror="this.onerror=null; this.src='../images/LCSAJ.png';" alt="LCSAJdump Logo" class="h-8 w-auto object-contain">
                 </a>
-                
-                <p class="text-gray-500 text-sm">
-                    &copy; 2026 Chris1sflaggin. Released under the MIT license.
-                </p>
-                
+                <p class="text-gray-500 text-sm">&copy; 2026 <a href="https://chris1sflaggin.it"><b>Chris1sflaggin</b></a>. Released under the MIT license.</p>
                 <div class="flex space-x-6">
                     <a href="https://github.com/chris1sflaggin/lcsajdump" class="text-gray-500 hover:text-white transition-colors">
                         <span class="sr-only">GitHub</span>
@@ -538,27 +631,16 @@ images: images/LCSAJfull.png
 
     <script>
         function copyInstall() {
-            const textToCopy = "pip install lcsajdump";
-            
             const textArea = document.createElement("textarea");
-            textArea.value = textToCopy;
+            textArea.value = "pip install lcsajdump";
             document.body.appendChild(textArea);
             textArea.select();
-            
             try {
                 document.execCommand('copy');
                 const toast = document.getElementById('copyToast');
-                toast.classList.remove('opacity-0');
-                toast.classList.add('opacity-100');
-                
-                setTimeout(() => {
-                    toast.classList.remove('opacity-100');
-                    toast.classList.add('opacity-0');
-                }, 2000);
-            } catch (err) {
-                console.error('Failed to copy', err);
-            }
-            
+                toast.classList.replace('opacity-0','opacity-100');
+                setTimeout(() => toast.classList.replace('opacity-100','opacity-0'), 2000);
+            } catch(err) { console.error('Failed to copy', err); }
             document.body.removeChild(textArea);
         }
     </script>
