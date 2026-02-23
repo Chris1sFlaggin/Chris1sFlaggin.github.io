@@ -316,14 +316,13 @@ images: images/LCSAJfull.png
                     Three profiles measured on <code class="text-primary">libc.so.6</code>. Pick your balance between speed and coverage.
                 </p>
             </div>
-
+    
             <div class="flex justify-center mb-12">
                 <div id="strategy-buttons" class="bg-darker border border-white/10 p-1 rounded-xl inline-flex gap-1 flex-wrap justify-center"></div>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-
-                <!-- RISC-V -->
+    
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+    
                 <div class="bg-darker/80 border border-primary/30 rounded-2xl p-6 hover:border-primary/60 transition-colors">
                     <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
@@ -351,8 +350,7 @@ images: images/LCSAJfull.png
                     </div>
                     <p id="rv-desc" class="text-sm text-gray-400 min-h-[48px] transition-opacity duration-150"></p>
                 </div>
-
-                <!-- x86_64 -->
+    
                 <div class="bg-darker/80 border border-secondary/30 rounded-2xl p-6 hover:border-secondary/60 transition-colors">
                     <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
                         x86_64
@@ -379,38 +377,70 @@ images: images/LCSAJfull.png
                     </div>
                     <p id="x86-desc" class="text-sm text-gray-400 min-h-[48px] transition-opacity duration-150"></p>
                 </div>
-
+    
+                <div class="bg-darker/80 border border-blue-400/30 rounded-2xl p-6 hover:border-blue-400/60 transition-colors">
+                    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        ARM64
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="bg-black/30 border border-white/5 rounded-lg p-4">
+                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Depth (-d)</p>
+                            <p id="arm-depth" class="text-3xl font-mono text-secondary transition-opacity duration-150"></p>
+                        </div>
+                        <div class="bg-black/30 border border-white/5 rounded-lg p-4">
+                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Darkness (-k)</p>
+                            <p id="arm-dark" class="text-3xl font-mono text-primary transition-opacity duration-150"></p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-5">
+                        <div class="bg-black/30 border border-white/5 rounded-lg px-4 py-3">
+                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Gadgets Found</p>
+                            <p id="arm-gadgets" class="text-xl font-mono text-white transition-opacity duration-150"></p>
+                        </div>
+                        <div class="bg-black/30 border border-white/5 rounded-lg px-4 py-3">
+                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Time</p>
+                            <p id="arm-time" class="text-xl font-mono text-white transition-opacity duration-150"></p>
+                        </div>
+                    </div>
+                    <p id="arm-desc" class="text-sm text-gray-400 min-h-[48px] transition-opacity duration-150"></p>
+                </div>
+    
             </div>
-
+    
             <p class="text-center text-xs text-gray-600 mt-6">
                 Pruned branches — RV: <span id="rv-pruned" class="transition-opacity duration-150"></span>
                 &nbsp;|&nbsp;
                 x86_64: <span id="x86-pruned" class="transition-opacity duration-150"></span>
+                &nbsp;|&nbsp;
+                ARM64: <span id="arm-pruned" class="transition-opacity duration-150"></span>
             </p>
         </div>
-
+    
         <script>
             const scanConfigs = {
                 fast: {
                     label: "Fast",
                     rv:  { d:"15", k:"0",  gadgets:"2,659",   time:"5.88s",  pruned:"2,286",   desc:"No aggressive pruning. Ideal for standard CTF binaries: fast and sufficient." },
-                    x86: { d:"15", k:"0",  gadgets:"6,323",   time:"6.66s",  pruned:"9,687",   desc:"Depth restricted to prevent state explosion from variable-length overlapping instructions." }
+                    x86: { d:"15", k:"0",  gadgets:"6,323",   time:"6.66s",  pruned:"9,687",   desc:"Depth restricted to prevent state explosion from variable-length overlapping instructions." },
+                    arm: { d:"15", k:"0",  gadgets:"6,132",   time:"5.66s",  pruned:"11,060",  desc:"Quick extraction. Excellent speed while finding a solid base of standard ARM64 gadgets." }
                 },
                 balanced: {
                     label: "Balanced",
                     rv:  { d:"20", k:"5",  gadgets:"14,189",  time:"8.06s",  pruned:"504",     desc:"Solid compromise. Discovers the most useful gadgets without saturating memory." },
-                    x86: { d:"20", k:"5",  gadgets:"281,982", time:"48.66s", pruned:"112,289", desc:"The sweet spot for x86_64. Uncovers misaligned gadgets while maintaining acceptable execution times." }
+                    x86: { d:"20", k:"5",  gadgets:"281,982", time:"48.66s", pruned:"112,289", desc:"The sweet spot for x86_64. Uncovers misaligned gadgets while maintaining acceptable execution times." },
+                    arm: { d:"20", k:"5",  gadgets:"235,819", time:"42.14s", pruned:"84,574",  desc:"A great balance. Captures hundreds of thousands of gadgets by navigating complex branches efficiently." }
                 },
                 deep: {
                     label: "Deep",
                     rv:  { d:"25", k:"10", gadgets:"15,652",  time:"8.53s",  pruned:"487",     desc:"Maximum saturation. Preserves path diversity to expose heavily obfuscated shadow gadgets." },
-                    x86: { d:"25", k:"10", gadgets:"516,814", time:"~89s",   pruned:"195,885", desc:"Forces the engine to map misaligned jumps, revealing complex ROP chains at the cost of execution time." }
+                    x86: { d:"25", k:"10", gadgets:"516,814", time:"~89s",   pruned:"195,885", desc:"Forces the engine to map misaligned jumps, revealing complex ROP chains at the cost of execution time." },
+                    arm: { d:"25", k:"10", gadgets:"409,865", time:"1m 10s", pruned:"138,332", desc:"Deep exploration. Maps extensive execution paths to uncover maximum gadget variations across states." }
                 }
             };
-
-            const architectures = ['rv', 'x86'];
+    
+            const architectures = ['rv', 'x86', 'arm'];
             const fieldsMap = { depth:'d', dark:'k', gadgets:'gadgets', time:'time', desc:'desc', pruned:'pruned' };
-
+    
             function initStrategies() {
                 const container = document.getElementById('strategy-buttons');
                 Object.keys(scanConfigs).forEach(key => {
@@ -423,25 +453,25 @@ images: images/LCSAJfull.png
                 });
                 setStrategy('fast');
             }
-
+    
             function setStrategy(type) {
                 const activeClasses   = ['bg-primary','text-darker','shadow-[0_0_15px_rgba(155,219,8,0.4)]'];
                 const inactiveClasses = ['text-gray-400','hover:text-white'];
-
+    
                 Object.keys(scanConfigs).forEach(key => {
                     const btn = document.getElementById(`btn-${key}`);
                     if (!btn) return;
                     btn.classList[key === type ? 'add' : 'remove'](...activeClasses);
                     btn.classList[key === type ? 'remove' : 'add'](...inactiveClasses);
                 });
-
+    
                 architectures.forEach(arch => {
                     Object.keys(fieldsMap).forEach(f => {
                         const el = document.getElementById(`${arch}-${f}`);
                         if (el) el.style.opacity = 0;
                     });
                 });
-
+    
                 setTimeout(() => {
                     architectures.forEach(arch => {
                         const data = scanConfigs[type][arch];
@@ -453,7 +483,7 @@ images: images/LCSAJfull.png
                     });
                 }, 150);
             }
-
+    
             document.addEventListener('DOMContentLoaded', initStrategies);
         </script>
     </section>
@@ -467,8 +497,7 @@ images: images/LCSAJfull.png
                 <p class="mt-4 text-gray-400">LCSAJdump is modular — extend support by adding new profiles in <code class="text-primary">config.py</code>.</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-
-                <!-- RISC-V -->
+    
                 <div class="bg-card border border-white/10 p-6 rounded-xl hover:border-secondary/50 transition-all group">
                     <div class="flex items-center gap-4 mb-4">
                         <div class="w-16 h-16 rounded-lg bg-secondary/10 flex items-center justify-center p-2">
@@ -481,8 +510,7 @@ images: images/LCSAJfull.png
                     </div>
                     <p class="text-sm text-gray-400">Native implementation with full support for compressed instructions (RVC). Default architecture.</p>
                 </div>
-
-                <!-- x86_64 -->
+    
                 <div class="bg-card border border-white/10 p-6 rounded-xl hover:border-blue-400/50 transition-all group">
                     <div class="flex items-center gap-4 mb-4">
                         <div class="w-16 h-16 rounded-lg bg-blue-400/10 flex items-center justify-center p-0">
@@ -495,15 +523,27 @@ images: images/LCSAJfull.png
                     </div>
                     <p class="text-sm text-gray-400">Latest update with x86_64 support. Handles variable-length overlapping instructions and misaligned gadgets.</p>
                 </div>
-
-                <!-- PR card -->
-                <div class="bg-card border border-dashed border-gray-600 p-6 rounded-xl flex flex-col items-center justify-center gap-3 hover:border-gray-400 transition-colors">
+    
+                <div class="bg-card border border-white/10 p-6 rounded-xl hover:border-primary/50 transition-all group">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center p-0">
+                            <img src="../images/arm.png" onerror="this.onerror=null; this.src='images/arm.png';" alt="arm Logo" class="w-full h-full object-contain" style="filter: brightness(0) saturate(100%) invert(62%) sepia(95%) saturate(600%) hue-rotate(35deg) brightness(105%) contrast(101%);">
+                        </div>
+                        <div>
+                            <h3 class="text-primary font-bold text-xl">ARM</h3>
+                            <span class="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary uppercase tracking-widest font-bold">Beta</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-400">Latest update with ARM support. Handles variable-length instructions and Thumb/Thumb-2 mixed-mode gadgets.</p>
+                </div>
+    
+                <div class="md:col-span-3 bg-card border border-dashed border-gray-600 p-6 rounded-xl flex flex-col items-center justify-center gap-3 hover:border-gray-400 transition-colors">
                     <svg class="w-8 h-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                     </svg>
                     <p class="text-gray-500 font-medium italic text-center text-sm">Want to see your architecture here?<br>Open a Pull Request!</p>
                 </div>
-
+    
             </div>
         </div>
     </section>
