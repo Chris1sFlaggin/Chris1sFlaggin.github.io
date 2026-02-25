@@ -420,19 +420,19 @@ images: images/LCSAJfull.png
             const scanConfigs = {
                 fast: {
                     label: "Fast",
-                    rv:  { d:"15", k:"0",  gadgets:"2,659",   time:"5.88s",  pruned:"2,286",   desc:"No aggressive pruning. Ideal for standard CTF binaries: fast and sufficient." },
+                    rv:  { d:"15", k:"0",  gadgets:"2,659",   time:"5.88s",  pruned:"3,479",   desc:"No aggressive pruning. Ideal for standard CTF binaries: fast and sufficient." },
                     x86: { d:"15", k:"0",  gadgets:"6,323",   time:"6.66s",  pruned:"9,687",   desc:"Depth restricted to prevent state explosion from variable-length overlapping instructions." },
                     arm: { d:"15", k:"0",  gadgets:"6,132",   time:"5.66s",  pruned:"11,060",  desc:"Quick extraction. Excellent speed while finding a solid base of standard ARM64 gadgets." }
                 },
                 balanced: {
                     label: "Balanced",
-                    rv:  { d:"20", k:"5",  gadgets:"14,189",  time:"8.06s",  pruned:"504",     desc:"Solid compromise. Discovers the most useful gadgets without saturating memory." },
+                    rv:  { d:"20", k:"5",  gadgets:"14,189",  time:"8.06s",  pruned:"0",     desc:"Solid compromise. Discovers the most useful gadgets without saturating memory." },
                     x86: { d:"20", k:"5",  gadgets:"281,982", time:"48.66s", pruned:"112,289", desc:"The sweet spot for x86_64. Uncovers misaligned gadgets while maintaining acceptable execution times." },
                     arm: { d:"20", k:"5",  gadgets:"235,819", time:"42.14s", pruned:"84,574",  desc:"A great balance. Captures hundreds of thousands of gadgets by navigating complex branches efficiently." }
                 },
                 deep: {
                     label: "Deep",
-                    rv:  { d:"25", k:"10", gadgets:"15,652",  time:"8.53s",  pruned:"487",     desc:"Maximum saturation. Preserves path diversity to expose heavily obfuscated shadow gadgets." },
+                    rv:  { d:"25", k:"10", gadgets:"15,652",  time:"8.53s",  pruned:"0",     desc:"Maximum saturation. Preserves path diversity to expose heavily obfuscated shadow gadgets." },
                     x86: { d:"25", k:"10", gadgets:"516,814", time:"~89s",   pruned:"195,885", desc:"Forces the engine to map misaligned jumps, revealing complex ROP chains at the cost of execution time." },
                     arm: { d:"25", k:"10", gadgets:"409,865", time:"1m 10s", pruned:"138,332", desc:"Deep exploration. Maps extensive execution paths to uncover maximum gadget variations across states." }
                 }
