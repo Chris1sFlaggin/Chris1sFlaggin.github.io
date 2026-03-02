@@ -9,69 +9,142 @@
         h2 {
             color: blue;
         }
+        /* Stili base per i contenitori delle sezioni */
+        div.sezione {
+            background-color: #DCDCDC;
+            border: 1px solid black;
+            padding: 10px;
+            margin: 10px;
+        }
+        div#presentazione { background-color: #F0F8FF; }
+        div#liste { background-color: #FAEBD7; }
+        div#attributi { background-color: #E6E6FA; }
+        div#links { background-color: #FFF0F5; }
+        div#buttons { background-color: #F5F5DC; }
+        div#spaziatura { background-color: #E0FFFF; }
+        div#posizione { background-color: #FFFACD; }
+
+        /* --- CLASSI PER ESEMPI DI SPAZIATURA --- */
+        .box-normale {
+            border: 2px solid black;
+            background-color: white;
+        }
+        .box-padding {
+            border: 2px solid green;
+            padding: 30px; /* Spazio interno */
+            background-color: #c8e6c9;
+        }
+        .box-margin {
+            border: 2px solid orange;
+            margin: 30px; /* Spazio esterno */
+            background-color: #ffe0b2;
+        }
+
+        /* --- CLASSI PER ESEMPI DI POSIZIONAMENTO --- */
+        .container-pos {
+            border: 2px dashed gray;
+            height: 250px;
+            position: relative; /* Fondamentale per fare da riferimento all'absolute */
+            background-color: white;
+            padding: 10px;
+        }
+        .box-pos {
+            padding: 10px;
+            border: 2px solid black;
+            width: 200px;
+        }
+        .pos-static {
+            position: static; /* Comportamento di default */
+            background-color: #ffcdd2;
+        }
+        .pos-relative {
+            position: relative; 
+            top: 20px;   /* Si sposta di 20px dal suo punto di origine originale */
+            left: 20px;
+            background-color: #bbdefb;
+        }
+        .pos-absolute {
+            position: absolute;
+            top: 10px;   /* Si posiziona rispetto al container-pos (che è relative) */
+            right: 10px;
+            background-color: #e1bee7;
+        }
+        .pos-fixed {
+            position: fixed;
+            bottom: 10px; /* Fisso in basso a destra nello schermo */
+            right: 10px;
+            background-color: #fff9c4;
+            border: 2px dashed red;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
     </style>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1 id="inizio">APPUNTI DI INFORMATICA - 4ASA</h1>
-    <h2><i>PER VEDERE CODICE SCRIVERE 'view-source:' PRIMA DI 'https' ALL' INTERNO DEL LINK</i></h2>
-    <h6><u>ciao</u></h6>
-    <p>Ciao is an informal Italian greeting that can mean both "hello" and "goodbye</p>
+    <div id="presentazione" class="sezione">
+        <h1 id="inizio">APPUNTI DI INFORMATICA - 4ASA</h1>
+        <h2><i>PER VEDERE CODICE SCRIVERE 'view-source:' PRIMA DI 'https' ALL' INTERNO DEL LINK</i></h2>
+        <h6><u>ciao</u></h6>
+        <p>Ciao is an informal Italian greeting that can mean both "hello" and "goodbye"</p>
+    </div>
 
-    <ul type="disc">
-        <li><span style="color:black">carote</span></li>
-        <li>zucchine</li>
-        <li>melanzane</li>
-    </ul>
-
-    <ul type="circle">
-        <li>carote</li>
-        <li>zucchine</li>
-        <li>melanzane</li>
-    </ul>
-
-    <ul style="color:#9CDCFE" type="square">
-        <li>carote</li>
-        <li>zucchine</li>
-        <li>melanzane</li>
-    </ul>
-
-    <ol type="1">
-        <li>carote</li>
-        <li>zucchine</li>
-        <li>melanzane</li>
-    </ol>
-
-    <ol type="a">
-        <li>carote</li>
-        <li>zucchine</li>
-        <li>melanzane</li>
-    </ol>
-
-    <ol type="A">
-        <li>carote</li>
-        <li>zucchine</li>
-        <li>melanzane</li>
-    </ol>
-
-    <ol type="I">
-        <li>carote</li>
-        <li>zucchine</li>
-        <li>melanzane</li>
-    </ol>
-
-    <ol type="i">
-        <li>carote</li>
-        <li>zucchine</li>
-        <li>melanzane</li>
-    </ol>
-
-    <div class="attributi">
-        <h2>Attributi Comuni</h2>
+    <div id="liste" class="sezione">
+        <h2>Liste</h2>
+        <ul type="disc">
+            <li><span style="color:black">carote</span></li>
+            <li>zucchine</li>
+            <li>melanzane</li>
+        </ul>
 
         <ul type="circle">
-            <li><b>ID: </b>Numero identificativo dell' oggetto, viene usato principalmente per le operazioni di <i>scripting</i> gestite da <u>JavaScript</u>.</li>
-            <li><b>CLASS: </b>Serve per assegnare classi di stile omogenee (<u>CSS</u>).</li>
+            <li>carote</li>
+            <li>zucchine</li>
+            <li>melanzane</li>
+        </ul>
+
+        <ul style="color:#9CDCFE" type="square">
+            <li>carote</li>
+            <li>zucchine</li>
+            <li>melanzane</li>
+        </ul>
+
+        <ol type="1">
+            <li>carote</li>
+            <li>zucchine</li>
+            <li>melanzane</li>
+        </ol>
+
+        <ol type="a">
+            <li>carote</li>
+            <li>zucchine</li>
+            <li>melanzane</li>
+        </ol>
+
+        <ol type="A">
+            <li>carote</li>
+            <li>zucchine</li>
+            <li>melanzane</li>
+        </ol>
+
+        <ol type="I">
+            <li>carote</li>
+            <li>zucchine</li>
+            <li>melanzane</li>
+        </ol>
+
+        <ol type="i">
+            <li>carote</li>
+            <li>zucchine</li>
+            <li>melanzane</li>
+        </ol>
+    </div>
+
+    <div id="attributi" class="sezione">
+        <h2>Attributi Comuni</h2>
+        <ul type="circle">
+            <li><b>ID: </b>Numero identificativo dell'oggetto, viene usato principalmente per le operazioni di <i>scripting</i> gestite da <u>JavaScript</u> e per identificare univocamente un tag in CSS.</li>
+            <li><b>CLASS: </b>Serve per assegnare classi di stile omogenee a più elementi (<u>CSS</u>).</li>
             <li><b>TITLE: </b>Serve per l'accessibilità dei browser.</li>
             <li><b>HIDDEN: </b>Nasconde un elemento della pagina.</li>
             <li><b>STYLE: </b>Stile (font, colore, disposizione, ecc..)</li>
@@ -79,25 +152,72 @@
             <li><b>ONCLICK: </b>EVENTO MOUSE CLICK</li>
         </ul>
     </div>
-    <h2>Links</h2>
 
-    <h3>Link interno</h3>
-    <a href="#inizio">Torna all'inizio</a>
+    <div id="links" class="sezione">
+        <h2>Links</h2>
 
-    <h3>Link esterno</h3>
-    <a 
-    href="https://www.google.com" 
-    onmouseover="this.style.color='black'" 
-    onmouseout="this.style.color='red'">
-    GOOGLE
-    </a>
-    </br>
-    <a href="appunti3asa.html">Appunti 3 ASA</a>
-    </br>
-    <a href="mailto:nomecognome@mail.com">Mail a Nome Cognome</a>
+        <h3>Link interno</h3>
+        <a href="#inizio">Torna all'inizio</a>
 
-    <h2>Buttons</h2>
+        <h3>Link esterno</h3>
+        <a 
+        href="https://www.google.com" 
+        onmouseover="this.style.color='black'" 
+        onmouseout="this.style.color='red'">
+        GOOGLE
+        </a>
+        <br/>
+        <a href="appunti3asa.html">Appunti 3 ASA</a>
+        <br/>
+        <a href="mailto:nomecognome@mail.com">Mail a Nome Cognome</a>
+    </div>
 
-    <button type="button" onclick="alert('Ciao!')">Clicca qui</button>
+    <div id="buttons" class="sezione">
+        <h2>Buttons</h2>
+        <button type="button" onclick="alert('Ciao classe 4ASA!')">Clicca qui</button>
+    </div>
+
+    <div id="spaziatura" class="sezione">
+        <h2>Spaziatura (Margin e Padding)</h2>
+        <p>In CSS, ogni elemento è considerato come una scatola (Box Model).</p>
+        
+        <div class="box-normale">Box normale senza margin o padding extra.</div>
+        <br>
+        <p><b>PADDING</b>: È lo spazio <i>interno</i>, tra il contenuto e il bordo.</p>
+        <div class="box-padding">Questo box ha <code>padding: 30px;</code></div>
+        
+        <p><b>MARGIN</b>: È lo spazio <i>esterno</i>, tra il bordo e gli altri elementi della pagina.</p>
+        <div class="box-margin">Questo box ha <code>margin: 30px;</code></div>
+    </div>
+
+    <div id="posizione" class="sezione">
+        <h2>Posizionamento (Position)</h2>
+        <ul>
+            <li><b>Static:</b> Il normale flusso della pagina (default).</li>
+            <li><b>Relative:</b> L'elemento viene spostato rispetto alla sua posizione normale, ma lo spazio originale rimane vuoto.</li>
+            <li><b>Absolute:</b> L'elemento viene rimosso dal flusso normale e posizionato rispetto al primo "padre" che ha una posizione non statica (es. relative).</li>
+            <li><b>Fixed:</b> Rimane fisso in una posizione dello schermo anche se si scorre la pagina.</li>
+        </ul>
+
+        <h3>Contenitore Padre (position: relative)</h3>
+        <div class="container-pos">
+            <div class="box-pos pos-static">
+                <b>1. Static</b><br>Segue il normale flusso.
+            </div>
+            
+            <div class="box-pos pos-relative">
+                <b>2. Relative</b><br>Spostato di 20px a destra e in basso rispetto a dove dovrebbe essere.
+            </div>
+            
+            <div class="box-pos pos-absolute">
+                <b>3. Absolute</b><br>Posizionato in alto a destra rispetto a questo riquadro tratteggiato.
+            </div>
+        </div>
+
+        <div class="box-pos pos-fixed">
+            <b>4. Fixed</b><br>Questo box ti seguirà anche se scorri!
+        </div>
+    </div>
 
 </body>
+</html>
