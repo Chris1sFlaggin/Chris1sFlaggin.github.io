@@ -14,6 +14,16 @@ layout: splash
   <span>&#8592;</span> HOME
 </a>
 
+<div class="lang-switch-container">
+  <span class="lang-label">IT</span>
+  <label class="switch">
+    <input type="checkbox" id="lang-toggle">
+    <span class="slider round"></span>
+  </label>
+  <span class="lang-label">EN</span>
+</div>
+<article class="cyber-article">
+
 <article class="cyber-article">
   
   <header class="article-header">
@@ -173,6 +183,73 @@ layout: splash
   /* Animazioni Like */
   @keyframes bounce { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1.2); } }
   @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+  /* --- LANGUAGE SWITCHER --- */
+  .lang-switch-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 100;
+    background: rgba(26, 30, 37, 0.9);
+    border: 1px solid #64ffda;
+    padding: 8px 15px;
+    border-radius: 30px;
+    backdrop-filter: blur(5px);
+    color: #64ffda;
+    font-weight: bold;
+    font-size: 0.9rem;
+  }
+  
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+  }
+  
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: transparent;
+    transition: .4s;
+    border-radius: 20px;
+    border: 1px solid #64ffda;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #64ffda;
+    transition: .4s;
+    border-radius: 50%;
+  }
+  
+  input:checked + .slider {
+    background-color: rgba(100, 255, 218, 0.1);
+  }
+  
+  input:checked + .slider:before {
+    transform: translateX(20px);
+  }
+
+  /* LOGICA DI VISUALIZZAZIONE LINGUE */
+  /* Di default (o se il body non ha classe 'lang-en') nascondi l'inglese */
+  body:not(.lang-en) .lang-en { display: none !important; }
+  /* Se il body ha classe 'lang-en' nascondi l'italiano */
+  body.lang-en .lang-it { display: none !important; }
 </style>
 
 <script>
@@ -277,6 +354,29 @@ layout: splash
   document.getElementById('close-star-alert').addEventListener('click', () => {
     document.getElementById('star-alert').style.display = 'none';
     localStorage.setItem('star-alert-dismissed', 'true');
+  });
+
+  // --- LANGUAGE SWITCHER LOGIC ---
+  const langToggle = document.getElementById('lang-toggle');
+  
+  // Controlla se l'utente aveva già scelto l'inglese in precedenza
+  const currentLang = localStorage.getItem('preferred-lang');
+  if (currentLang === 'en') {
+    document.body.classList.add('lang-en');
+    langToggle.checked = true;
+  }
+
+  // Ascolta i cambiamenti sul pulsante switch
+  langToggle.addEventListener('change', function() {
+    if (this.checked) {
+      // Passa a Inglese
+      document.body.classList.add('lang-en');
+      localStorage.setItem('preferred-lang', 'en');
+    } else {
+      // Torna a Italiano
+      document.body.classList.remove('lang-en');
+      localStorage.setItem('preferred-lang', 'it');
+    }
   });
 })();
 </script>
