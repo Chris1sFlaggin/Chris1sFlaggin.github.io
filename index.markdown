@@ -91,7 +91,7 @@ header:
     </div>
     
 <div class="section-block">
-      <h2 class="section-title">PRODUCTS</h2>
+      <h2 class="section-title">MY PACKAGES</h2>
       <div class="products-grid">
         
         <a href="https://chris1sflaggin.it/LCSAJdump" class="card product-card">
