@@ -5,20 +5,17 @@ header:
   overlay_filter: rgba(0, 0, 0, 0)
 ---
 
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-BL2501MC35"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-BL2501MC35');
-</script>
-
+<!-- Star Repository Alert -->
 <div id="star-alert" class="star-alert">
   <div class="star-alert-content">
     <span class="star-icon">⭐</span>
-    <span class="star-text">Ti piace il sito?</span><br>
-    <span class="star-text">Lascia una stella su GitHub!</span><br>
-    <a href="https://github.com/Chris1sFlaggin/Chris1sFlaggin.github.io" target="_blank" class="star-button">⭐ Stella</a>
+    <span class="star-text">Ti piace il sito?</span>
+    <br>
+    <span class="star-text">Lascia una stella su GitHub!</span>
+    <br>
+    <a href="https://github.com/Chris1sFlaggin/Chris1sFlaggin.github.io" target="_blank" class="star-button">
+      ⭐ Stella
+    </a>
     <button id="close-star-alert" class="close-button">&times;</button>
   </div>
 </div>
@@ -30,26 +27,6 @@ header:
   .star-button { display: inline-block; margin-top: 10px; padding: 10px 20px; background: #252a34; color: #64ffda; border-radius: 8px; text-decoration: none; border: 1px solid #64ffda; }
   .hidden { display: none !important; }
 </style>
-
-<script>
-(function() {
-  const STORAGE_KEY = 'star-alert-dismissed';
-  const SHOW_DELAY = 3000;
-  function showStarAlert() {
-    if (localStorage.getItem(STORAGE_KEY) === 'true') return;
-    const alert = document.getElementById('star-alert');
-    const closeButton = document.getElementById('close-star-alert');
-    if (!alert || !closeButton) return;
-    setTimeout(() => { alert.style.display = 'flex'; }, SHOW_DELAY);
-    closeButton.addEventListener('click', function() {
-      alert.classList.add('hidden');
-      localStorage.setItem(STORAGE_KEY, 'true');
-    });
-  }
-  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', showStarAlert); }
-  else { showStarAlert(); }
-})();
-</script>
 
 <div class="fullscreen-dashboard">
   
