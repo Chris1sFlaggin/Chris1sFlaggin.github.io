@@ -5,7 +5,7 @@ permalink: /categories/writeups/
 ---
 
 <div class="content-side" style="padding: 2rem 1.5rem; width: 100%; box-sizing: border-box;">
-  <h2 class="section-title" style="color: #64ffda; text-transform: uppercase; border-bottom: 1px solid rgba(100, 255, 218, 0.2); padding-bottom: 0.5rem; margin-bottom: 2rem;">Seleziona Settore</h2>
+  <h2 class="section-title" style="color: #64ffda; text-transform: uppercase; border-bottom: 1px solid rgba(100, 255, 218, 0.2); padding-bottom: 0.5rem; margin-bottom: 2rem;">Select (HEAP CHALLENGES INCOMING...)</h2>
   
   <div class="categories-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
     
