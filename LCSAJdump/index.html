@@ -114,7 +114,7 @@ images: images/LCSAJfull.png
                     <div class="flex items-center gap-2 justify-center lg:justify-start mb-4 flex-wrap">
                         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-gray-400">
                             <span class="flex h-2 w-2 rounded-full bg-secondary"></span>
-                            Latest: v1.1.1
+                            Latest: v1.1.2
                         </div>
                         <a href="https://github.com/chris1sflaggin/lcsajdump" target="_blank"
                            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-gray-400 hover:border-yellow-400/50 hover:text-yellow-400 transition-all">
@@ -277,7 +277,7 @@ images: images/LCSAJfull.png
                         <svg class="w-6 h-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
                     </div>
                     <h3 class="text-lg font-bold text-white mb-2">Rainbow BFS</h3>
-                    <p class="text-sm text-gray-400">Proprietary backward search algorithm starting from control-flow sinks to reconstruct full chains across block boundaries.</p>
+                    <p class="text-sm text-gray-400">Backward search algorithm featuring an O(1) Early-Drop filter and Hard-Cap limits to reconstruct chains at lightning speed without RAM explosion.</p>
                 </div>
 
                 <div class="bg-card border border-white/10 rounded-xl p-6 hover:border-primary/50 transition-colors group">
@@ -292,8 +292,8 @@ images: images/LCSAJfull.png
                     <div class="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         <svg class="w-6 h-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>
                     </div>
-                    <h3 class="text-lg font-bold text-white mb-2">Multi-Arch Support</h3>
-                    <p class="text-sm text-gray-400">Modular design natively supporting RISC-V 64GC, extendable to x86 and ARM via community forks.</p>
+                    <h3 class="text-lg font-bold text-white mb-2">Dynamic Scoring</h3>
+                    <p class="text-sm text-gray-400">Architecture-specific heuristic engine that ranks gadgets based on critical registers (rdi, x0) and strictly penalizes bloated chains.</p>
                 </div>
             </div>
         </div>
@@ -420,21 +420,21 @@ images: images/LCSAJfull.png
             const scanConfigs = {
                 fast: {
                     label: "Fast",
-                    rv:  { d:"15", k:"0",  gadgets:"2,659",   time:"5.88s",  pruned:"3,479",   desc:"No aggressive pruning. Ideal for standard CTF binaries: fast and sufficient." },
-                    x86: { d:"15", k:"0",  gadgets:"6,323",   time:"6.66s",  pruned:"9,687",   desc:"Depth restricted to prevent state explosion from variable-length overlapping instructions." },
-                    arm: { d:"15", k:"0",  gadgets:"6,132",   time:"5.66s",  pruned:"11,060",  desc:"Quick extraction. Excellent speed while finding a solid base of standard ARM64 gadgets." }
+                    rv:  { d:"15", k:"0",  gadgets:"3,653",   time:"~5.5s",  pruned:"3,205",   desc:"Fast baseline without aggressive pruning. Ideal for standard CTF binaries." },
+                    x86: { d:"15", k:"0",  gadgets:"3,822",   time:"~8.0s",  pruned:"10,574",  desc:"Restricted depth. Solves state explosion via Hard-Cap instruction limits." },
+                    arm: { d:"15", k:"0",  gadgets:"3,886",   time:"~5.5s",  pruned:"10,606",  desc:"Instant extraction. Excellent speed while filtering out bloated chains." }
                 },
                 balanced: {
                     label: "Balanced",
-                    rv:  { d:"20", k:"5",  gadgets:"14,189",  time:"8.06s",  pruned:"0",     desc:"Solid compromise. Discovers the most useful gadgets without saturating memory." },
-                    x86: { d:"20", k:"5",  gadgets:"281,982", time:"48.66s", pruned:"112,289", desc:"The sweet spot for x86_64. Uncovers misaligned gadgets while maintaining acceptable execution times." },
-                    arm: { d:"20", k:"5",  gadgets:"235,819", time:"42.14s", pruned:"84,574",  desc:"A great balance. Captures hundreds of thousands of gadgets by navigating complex branches efficiently." }
+                    rv:  { d:"20", k:"5",  gadgets:"7,867",   time:"~7.0s",  pruned:"1,223",   desc:"Solid compromise. Discovers the most useful gadgets securely." },
+                    x86: { d:"20", k:"5",  gadgets:"27,175",  time:"~9.0s",  pruned:"18,289",  desc:"The sweet spot. Uncovers hidden shadow gadgets in under 10 seconds." },
+                    arm: { d:"20", k:"5",  gadgets:"26,514",  time:"~6.0s",  pruned:"14,397",  desc:"Perfect balance. Captures essential gadgets by navigating complex branches efficiently." }
                 },
                 deep: {
                     label: "Deep",
-                    rv:  { d:"25", k:"10", gadgets:"15,652",  time:"8.53s",  pruned:"0",     desc:"Maximum saturation. Preserves path diversity to expose heavily obfuscated shadow gadgets." },
-                    x86: { d:"25", k:"10", gadgets:"516,814", time:"~89s",   pruned:"195,885", desc:"Forces the engine to map misaligned jumps, revealing complex ROP chains at the cost of execution time." },
-                    arm: { d:"25", k:"10", gadgets:"409,865", time:"1m 10s", pruned:"138,332", desc:"Deep exploration. Maps extensive execution paths to uncover maximum gadget variations across states." }
+                    rv:  { d:"25", k:"10", gadgets:"7,867",   time:"~7.0s",  pruned:"1,223",   desc:"Plateau reached! The algorithm seamlessly mapped the entire functional graph." },
+                    x86: { d:"25", k:"10", gadgets:"27,432",  time:"~9.5s",  pruned:"18,557",  desc:"Max saturation. Fused thousands of duplicates in O(1) dropping execution time massively." },
+                    arm: { d:"25", k:"10", gadgets:"26,733",  time:"~6.0s",  pruned:"14,448",  desc:"Deepest map. Penalties heavily filter out irrelevant noise leaving only top-tier gadgets." }
                 }
             };
     
@@ -465,6 +465,7 @@ images: images/LCSAJfull.png
                     btn.classList[key === type ? 'remove' : 'add'](...inactiveClasses);
                 });
     
+               
                 architectures.forEach(arch => {
                     Object.keys(fieldsMap).forEach(f => {
                         const el = document.getElementById(`${arch}-${f}`);
@@ -518,7 +519,7 @@ images: images/LCSAJfull.png
                         </div>
                         <div>
                             <h3 class="text-blue-400 font-bold text-xl">x86_64</h3>
-                            <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-400/10 text-blue-400 uppercase tracking-widest font-bold">Beta</span>
+                            <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-400/10 text-blue-400 uppercase tracking-widest font-bold">Fully Supported</span>
                         </div>
                     </div>
                     <p class="text-sm text-gray-400">Latest update with x86_64 support. Handles variable-length overlapping instructions and misaligned gadgets.</p>
@@ -531,7 +532,7 @@ images: images/LCSAJfull.png
                         </div>
                         <div>
                             <h3 class="text-primary font-bold text-xl">ARM</h3>
-                            <span class="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary uppercase tracking-widest font-bold">Beta</span>
+                            <span class="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary uppercase tracking-widest font-bold">Fully Supported</span>
                         </div>
                     </div>
                     <p class="text-sm text-gray-400">Latest update with ARM support. Handles variable-length instructions and Thumb/Thumb-2 mixed-mode gadgets.</p>
