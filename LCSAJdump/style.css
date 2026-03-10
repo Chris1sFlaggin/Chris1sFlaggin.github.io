@@ -1,0 +1,34 @@
+/* style.css */
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #050505; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #9BDB08; }
+
+.text-gradient {
+    background: linear-gradient(90deg, #9BDB08, #F07C06);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.bg-grid {
+    background-size: 40px 40px;
+    background-image: linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+}
+
+.glow-primary { 
+    box-shadow: 0 0 20px rgba(155, 219, 8, 0.15); 
+}
+
+.ascii-banner {
+    font-size: 4px;
+    line-height: 1.1;
+    white-space: pre;
+    display: inline-block;
+}
+
+@media (min-width: 640px) { 
+    .ascii-banner { font-size: 6px; } 
+}

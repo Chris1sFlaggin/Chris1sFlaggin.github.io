@@ -17,6 +17,8 @@ images: images/LCSAJfull.png
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     
+    <link rel="stylesheet" href="style.css">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -41,39 +43,9 @@ images: images/LCSAJfull.png
             }
         }
     </script>
-    <style>
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #050505; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #9BDB08; }
-        
-        .text-gradient {
-            background: linear-gradient(90deg, #9BDB08, #F07C06);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .bg-grid {
-            background-size: 40px 40px;
-            background-image: linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
-        }
-        
-        .glow-primary { box-shadow: 0 0 20px rgba(155, 219, 8, 0.15); }
-
-        .ascii-banner {
-            font-size: 4px;
-            line-height: 1.1;
-            white-space: pre;
-            display: inline-block;
-        }
-        @media (min-width: 640px) { .ascii-banner { font-size: 6px; } }
-    </style>
 </head>
 <body class="bg-darker text-gray-300 font-sans antialiased selection:bg-primary selection:text-darker bg-grid">
 
-    <!-- ═══ NAV ═══ -->
     <nav class="fixed w-full z-50 top-0 transition-all duration-300 backdrop-blur-md bg-darker/80 border-b border-white/10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -81,11 +53,12 @@ images: images/LCSAJfull.png
                     <img src="Untitled%20design.jpg" onerror="this.onerror=null; this.src='../images/LCSAJ.png';" alt="LCSAJdump Logo" class="h-12 w-auto object-contain">
                 </a>
                 <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-8">
+                    <div class="ml-10 flex items-baseline space-x-6">
                         <a href="#problem"       class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">The Problem</a>
                         <a href="#features"      class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Features</a>
                         <a href="#benchmarks"    class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Benchmarks</a>
                         <a href="#architectures" class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Architectures</a>
+                        <a href="#plugins"       class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Plugins</a>
                         <a href="#usage"         class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Usage</a>
                     </div>
                 </div>
@@ -100,7 +73,6 @@ images: images/LCSAJfull.png
         </div>
     </nav>
 
-    <!-- ═══ 1. HERO — bg: black ═══ -->
     <main class="pt-32 pb-16 sm:pt-40 sm:pb-24 lg:pb-32 overflow-hidden bg-darker">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <div class="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-pulse-slow"></div>
@@ -110,11 +82,10 @@ images: images/LCSAJfull.png
                 <div class="text-center lg:text-left lg:col-span-6">
                     <img src="Untitled%20design.jpg" onerror="this.onerror=null; this.src='../images/LCSAJdump.png';" alt="LCSAJdump Logo" class="h-36 w-auto mx-auto lg:mx-0 mb-6 object-contain filter drop-shadow-[0_0_20px_rgba(155,219,8,0.2)]">
 
-                    <!-- Badge row -->
                     <div class="flex items-center gap-2 justify-center lg:justify-start mb-4 flex-wrap">
                         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-gray-400">
                             <span class="flex h-2 w-2 rounded-full bg-secondary"></span>
-                            Latest: v1.1.2
+                            Latest: v1.1.2.2
                         </div>
                         <a href="https://github.com/chris1sflaggin/lcsajdump" target="_blank"
                            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-gray-400 hover:border-yellow-400/50 hover:text-yellow-400 transition-all">
@@ -124,7 +95,6 @@ images: images/LCSAJfull.png
                         </a>
                     </div>
 
-                    <!-- Ko-fi — riga dedicata, allineato a sinistra come il resto -->
                     <div class="flex justify-center lg:justify-start mb-8">
                         <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Buy me a coffee', '#F07C06', 'H2H21UHZP2');kofiwidget2.draw();</script> 
                     </div>
@@ -162,12 +132,16 @@ images: images/LCSAJfull.png
                             <p class="text-primary">❯ lcsajdump --help</p>
                             <p class="mt-1">Usage: lcsajdump [OPTIONS] BINARY_PATH</p>
                             <p class="mt-1 text-gray-500 italic">Options:</p>
-                            <p>  -d, --depth INTEGER      Max search depth (LCSAJ blocks).</p>
-                            <p>  -k, --darkness INTEGER   Pruning threshold (Max visits per node).</p>
-                            <p>  -l, --limit INTEGER      Desired number of gadgets to show.</p>
-                            <p>  -s, --min-score INTEGER  Min score for a gadget to be shown.</p>
-                            <p>  -v, --verbose            Verbose results for detailed output.</p>
-                            <p>  -a, --arch TEXT          Architecture of the binary (default: riscv64).</p>
+                            <p>  -d, --depth INTEGER         Max search depth (LCSAJ blocks).</p>
+                            <p>  -k, --darkness INTEGER      Pruning threshold (Max visits per node).</p>
+                            <p>  -l, --limit INTEGER         Desired number of gadgets to show.</p>
+                            <p>  -s, --min-score INTEGER     Min score for a gadget to be shown.</p>
+                            <p>  -i, --instructions INTEGER  Max number of instructions contained in a single node.</p>
+                            <p>  -a, --arch TEXT             Architecture of the binary (auto[default], riscv64, x86_64, arm64).</p>
+                            <p>  -v, --verbose               Verbose results for a better detailed result.</p>
+                            <p>  -f, --file                  Write found gadgets to a file "found_gadgets.txt".</p>
+                            <p>  --version                   Show the version and exit.</p>
+                            <p>  --help                      Show this message and exit.</p>
                             <p class="text-primary mt-4">❯ lcsajdump testCTFs/rop2/vuln</p>
                             <div class="ascii-banner text-secondary mt-2">
        ██╗      ██████╗███████╗ █████╗      ██╗██████╗ ██╗   ██╗███╗   ███╗██████╗
@@ -197,7 +171,6 @@ images: images/LCSAJfull.png
         </div>
     </main>
 
-    <!-- ═══ 2. THE PROBLEM — bg: grey ═══ -->
     <section id="problem" class="py-20 bg-card/50 border-y border-white/5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
@@ -253,7 +226,6 @@ images: images/LCSAJfull.png
         </div>
     </section>
 
-    <!-- ═══ 3. FEATURES — bg: black ═══ -->
     <section id="features" class="py-16 bg-darker border-b border-white/5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
@@ -269,7 +241,7 @@ images: images/LCSAJfull.png
                         <svg class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                     </div>
                     <h3 class="text-lg font-bold text-white mb-2">Graph Reconstruction</h3>
-                    <p class="text-sm text-gray-400">Models the binary as a directed graph of Basic Blocks using LCSAJ (Linear Code Sequence and Jump) analysis.</p>
+                    <p class="text-sm text-gray-400">Models the binary as a directed graph of Basic Blocks using LCSAJ analysis.</p>
                 </div>
 
                 <div class="bg-card border border-white/10 rounded-xl p-6 hover:border-secondary/50 transition-colors group">
@@ -277,7 +249,7 @@ images: images/LCSAJfull.png
                         <svg class="w-6 h-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
                     </div>
                     <h3 class="text-lg font-bold text-white mb-2">Rainbow BFS</h3>
-                    <p class="text-sm text-gray-400">Backward search algorithm featuring an O(1) Early-Drop filter and Hard-Cap limits to reconstruct chains at lightning speed without RAM explosion.</p>
+                    <p class="text-sm text-gray-400">Backward search algorithm featuring an O(1) Early-Drop filter and Hard-Cap limits.</p>
                 </div>
 
                 <div class="bg-card border border-white/10 rounded-xl p-6 hover:border-primary/50 transition-colors group">
@@ -285,7 +257,7 @@ images: images/LCSAJfull.png
                         <svg class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                     </div>
                     <h3 class="text-lg font-bold text-white mb-2">Shadow Gadgets</h3>
-                    <p class="text-sm text-gray-400">Identifies Trampoline and Conditional chains that bypass bad bytes — impossible to detect with a linear sliding-window.</p>
+                    <p class="text-sm text-gray-400">Identifies Trampoline and Conditional chains that bypass bad bytes.</p>
                 </div>
 
                 <div class="bg-card border border-white/10 rounded-xl p-6 hover:border-secondary/50 transition-colors group">
@@ -293,13 +265,12 @@ images: images/LCSAJfull.png
                         <svg class="w-6 h-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>
                     </div>
                     <h3 class="text-lg font-bold text-white mb-2">Dynamic Scoring</h3>
-                    <p class="text-sm text-gray-400">Architecture-specific heuristic engine that ranks gadgets based on critical registers (rdi, x0) and strictly penalizes bloated chains.</p>
+                    <p class="text-sm text-gray-400">Architecture-specific heuristic engine that ranks gadgets based on critical registers.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ═══ 4. BENCHMARKS — bg: grey ═══ -->
     <section id="benchmarks" class="py-20 bg-card/50 border-b border-white/5 relative overflow-hidden">
         <div class="absolute inset-0 opacity-5">
             <div class="absolute top-1/4 left-1/3 w-96 h-96 bg-primary rounded-full mix-blend-screen filter blur-3xl"></div>
@@ -322,7 +293,6 @@ images: images/LCSAJfull.png
             </div>
     
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-    
                 <div class="bg-darker/80 border border-primary/30 rounded-2xl p-6 hover:border-primary/60 transition-colors">
                     <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
@@ -404,7 +374,6 @@ images: images/LCSAJfull.png
                     </div>
                     <p id="arm-desc" class="text-sm text-gray-400 min-h-[48px] transition-opacity duration-150"></p>
                 </div>
-    
             </div>
     
             <p class="text-center text-xs text-gray-600 mt-6">
@@ -415,81 +384,8 @@ images: images/LCSAJfull.png
                 ARM64: <span id="arm-pruned" class="transition-opacity duration-150"></span>
             </p>
         </div>
-    
-        <script>
-            const scanConfigs = {
-                fast: {
-                    label: "Fast",
-                    rv:  { d:"15", k:"0",  gadgets:"3,653",   time:"~5.5s",  pruned:"3,205",   desc:"Fast baseline without aggressive pruning. Ideal for standard CTF binaries." },
-                    x86: { d:"15", k:"0",  gadgets:"3,822",   time:"~8.0s",  pruned:"10,574",  desc:"Restricted depth. Solves state explosion via Hard-Cap instruction limits." },
-                    arm: { d:"15", k:"0",  gadgets:"3,886",   time:"~5.5s",  pruned:"10,606",  desc:"Instant extraction. Excellent speed while filtering out bloated chains." }
-                },
-                balanced: {
-                    label: "Balanced",
-                    rv:  { d:"20", k:"5",  gadgets:"7,867",   time:"~7.0s",  pruned:"1,223",   desc:"Solid compromise. Discovers the most useful gadgets securely." },
-                    x86: { d:"20", k:"5",  gadgets:"27,175",  time:"~9.0s",  pruned:"18,289",  desc:"The sweet spot. Uncovers hidden shadow gadgets in under 10 seconds." },
-                    arm: { d:"20", k:"5",  gadgets:"26,514",  time:"~6.0s",  pruned:"14,397",  desc:"Perfect balance. Captures essential gadgets by navigating complex branches efficiently." }
-                },
-                deep: {
-                    label: "Deep",
-                    rv:  { d:"25", k:"10", gadgets:"7,867",   time:"~7.0s",  pruned:"1,223",   desc:"Plateau reached! The algorithm seamlessly mapped the entire functional graph." },
-                    x86: { d:"25", k:"10", gadgets:"27,432",  time:"~9.5s",  pruned:"18,557",  desc:"Max saturation. Fused thousands of duplicates in O(1) dropping execution time massively." },
-                    arm: { d:"25", k:"10", gadgets:"26,733",  time:"~6.0s",  pruned:"14,448",  desc:"Deepest map. Penalties heavily filter out irrelevant noise leaving only top-tier gadgets." }
-                }
-            };
-    
-            const architectures = ['rv', 'x86', 'arm'];
-            const fieldsMap = { depth:'d', dark:'k', gadgets:'gadgets', time:'time', desc:'desc', pruned:'pruned' };
-    
-            function initStrategies() {
-                const container = document.getElementById('strategy-buttons');
-                Object.keys(scanConfigs).forEach(key => {
-                    const btn = document.createElement('button');
-                    btn.id = `btn-${key}`;
-                    btn.onclick = () => setStrategy(key);
-                    btn.className = "px-6 py-3 rounded-lg text-sm font-bold transition-all duration-300 text-gray-400 hover:text-white";
-                    btn.innerText = scanConfigs[key].label;
-                    container.appendChild(btn);
-                });
-                setStrategy('fast');
-            }
-    
-            function setStrategy(type) {
-                const activeClasses   = ['bg-primary','text-darker','shadow-[0_0_15px_rgba(155,219,8,0.4)]'];
-                const inactiveClasses = ['text-gray-400','hover:text-white'];
-    
-                Object.keys(scanConfigs).forEach(key => {
-                    const btn = document.getElementById(`btn-${key}`);
-                    if (!btn) return;
-                    btn.classList[key === type ? 'add' : 'remove'](...activeClasses);
-                    btn.classList[key === type ? 'remove' : 'add'](...inactiveClasses);
-                });
-    
-               
-                architectures.forEach(arch => {
-                    Object.keys(fieldsMap).forEach(f => {
-                        const el = document.getElementById(`${arch}-${f}`);
-                        if (el) el.style.opacity = 0;
-                    });
-                });
-    
-                setTimeout(() => {
-                    architectures.forEach(arch => {
-                        const data = scanConfigs[type][arch];
-                        if (!data) return;
-                        Object.keys(fieldsMap).forEach(f => {
-                            const el = document.getElementById(`${arch}-${f}`);
-                            if (el) { el.innerText = data[fieldsMap[f]]; el.style.opacity = 1; }
-                        });
-                    });
-                }, 150);
-            }
-    
-            document.addEventListener('DOMContentLoaded', initStrategies);
-        </script>
     </section>
 
-    <!-- ═══ 5. ARCHITECTURES — bg: black ═══ -->
     <section id="architectures" class="py-16 bg-darker border-b border-white/5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
@@ -498,7 +394,6 @@ images: images/LCSAJfull.png
                 <p class="mt-4 text-gray-400">LCSAJdump is modular — extend support by adding new profiles in <code class="text-primary">config.py</code>.</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-    
                 <div class="bg-card border border-white/10 p-6 rounded-xl hover:border-secondary/50 transition-all group">
                     <div class="flex items-center gap-4 mb-4">
                         <div class="w-16 h-16 rounded-lg bg-secondary/10 flex items-center justify-center p-2">
@@ -511,7 +406,6 @@ images: images/LCSAJfull.png
                     </div>
                     <p class="text-sm text-gray-400">Native implementation with full support for compressed instructions (RVC). Default architecture.</p>
                 </div>
-    
                 <div class="bg-card border border-white/10 p-6 rounded-xl hover:border-blue-400/50 transition-all group">
                     <div class="flex items-center gap-4 mb-4">
                         <div class="w-16 h-16 rounded-lg bg-blue-400/10 flex items-center justify-center p-0">
@@ -524,7 +418,6 @@ images: images/LCSAJfull.png
                     </div>
                     <p class="text-sm text-gray-400">Latest update with x86_64 support. Handles variable-length overlapping instructions and misaligned gadgets.</p>
                 </div>
-    
                 <div class="bg-card border border-white/10 p-6 rounded-xl hover:border-primary/50 transition-all group">
                     <div class="flex items-center gap-4 mb-4">
                         <div class="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center p-0">
@@ -537,20 +430,40 @@ images: images/LCSAJfull.png
                     </div>
                     <p class="text-sm text-gray-400">Latest update with ARM support. Handles variable-length instructions and Thumb/Thumb-2 mixed-mode gadgets.</p>
                 </div>
-    
-                <div class="md:col-span-3 bg-card border border-dashed border-gray-600 p-6 rounded-xl flex flex-col items-center justify-center gap-3 hover:border-gray-400 transition-colors">
-                    <svg class="w-8 h-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    <p class="text-gray-500 font-medium italic text-center text-sm">Want to see your architecture here?<br>Open a Pull Request!</p>
-                </div>
-    
             </div>
         </div>
     </section>
 
-    <!-- ═══ 6. USAGE — bg: grey ═══ -->
-    <section id="usage" class="py-16 bg-card/50 border-b border-white/5">
+    <section id="plugins" class="py-20 bg-card/50 border-b border-white/5 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16">
+                <h2 class="text-secondary font-semibold tracking-wide uppercase text-sm">Expansion</h2>
+                <p class="mt-2 text-3xl font-extrabold text-white">Integrations <span class="text-gradient">Coming Soon</span></p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                <div class="bg-darker border border-white/10 rounded-xl p-8 flex flex-col items-center justify-center relative overflow-hidden group hover:border-orange-500/50 transition-all aspect-video">
+                    <div class="absolute top-3 right-3 bg-orange-500/10 text-orange-400 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider border border-orange-500/20">WIP</div>
+                    <img src="../images/ida.png" onerror="this.onerror=null; this.src='https://ctftime.org/media/team/IDA.png';" alt="IDA Pro Logo" class="h-16 w-auto mb-4 opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 filter drop-shadow-[0_0_15px_rgba(249,115,22,0)] group-hover:drop-shadow-[0_0_15px_rgba(249,115,22,0.4)]">
+                    <h3 class="text-lg font-bold text-gray-500 group-hover:text-white transition-colors">IDA Pro</h3>
+                </div>
+                
+                <div class="bg-darker border border-white/10 rounded-xl p-8 flex flex-col items-center justify-center relative overflow-hidden group hover:border-red-500/50 transition-all aspect-video">
+                    <div class="absolute top-3 right-3 bg-red-500/10 text-red-400 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider border border-red-500/20">Planned</div>
+                    <img src="../images/ghidra.png" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/a/a3/Ghidra_Logo.png';" alt="Ghidra Logo" class="h-16 w-auto mb-4 opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 filter drop-shadow-[0_0_15px_rgba(239,68,68,0)] group-hover:drop-shadow-[0_0_15px_rgba(239,68,68,0.4)]">
+                    <h3 class="text-lg font-bold text-gray-500 group-hover:text-white transition-colors">Ghidra</h3>
+                </div>
+                
+                <div class="bg-darker border border-white/10 rounded-xl p-8 flex flex-col items-center justify-center relative overflow-hidden group hover:border-yellow-400/50 transition-all aspect-video">
+                    <div class="absolute top-3 right-3 bg-yellow-400/10 text-yellow-400 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider border border-yellow-400/20">Planned</div>
+                    <img src="../images/cutter.png" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/2/21/Cutter_Logo.png';" alt="Cutter Logo" class="h-16 w-auto mb-4 opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 filter drop-shadow-[0_0_15px_rgba(250,204,21,0)] group-hover:drop-shadow-[0_0_15px_rgba(250,204,21,0.4)]">
+                    <h3 class="text-lg font-bold text-gray-500 group-hover:text-white transition-colors">Cutter</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="usage" class="py-16 bg-darker border-b border-white/5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
                 <h2 class="text-secondary font-semibold tracking-wide uppercase text-sm">Get Started</h2>
@@ -558,43 +471,41 @@ images: images/LCSAJfull.png
                 <p class="mt-4 text-gray-400">Install LCSAJdump via pip and analyze your binaries in seconds.</p>
             </div>
             
-            <div class="max-w-3xl mx-auto bg-darker rounded-xl border border-white/10 overflow-hidden">
+            <div class="max-w-3xl mx-auto bg-card rounded-xl border border-white/10 overflow-hidden shadow-2xl">
                 <div class="flex border-b border-white/10 bg-black/40">
                     <button class="px-4 py-3 text-sm font-medium text-primary border-b-2 border-primary bg-white/5">Installation & Usage</button>
                 </div>
                 <div class="p-6 space-y-6">
-
                     <div>
                         <h3 class="text-white font-medium mb-3">Install via pip:</h3>
                         <div class="bg-black border border-white/10 rounded-lg p-4">
                             <code class="text-primary font-mono text-sm">pip install lcsajdump</code>
                         </div>
                     </div>
-
                     <div>
                         <h3 class="text-white font-medium mb-3">Basic scan:</h3>
                         <div class="bg-black border border-white/10 rounded-lg p-4">
                             <code class="text-gray-300 font-mono text-sm">lcsajdump &lt;path_to_binary&gt;</code>
                         </div>
                     </div>
-
                     <div>
                         <h3 class="text-white font-medium mb-3">Full example with all options:</h3>
                         <div class="bg-black border border-white/10 rounded-lg p-4 overflow-x-auto">
                             <code class="text-gray-300 font-mono text-sm whitespace-nowrap">
                                 lcsajdump
-                                <span class="text-secondary">-a x86_64</span>
+                                <span class="text-secondary">-a auto</span>
                                 <span class="text-secondary">-d 25</span>
                                 <span class="text-primary">-k 10</span>
                                 <span class="text-blue-400">-l 20</span>
                                 <span class="text-blue-400">-s 5</span>
+                                <span class="text-orange-400">-i 15</span>
                                 <span class="text-gray-400">-v</span>
+                                <span class="text-green-400">-f</span>
                                 &lt;path&gt;
                             </code>
                         </div>
                     </div>
-
-                    <!-- Options table -->
+                    
                     <div>
                         <h3 class="text-white font-medium mb-3">All options:</h3>
                         <div class="rounded-lg border border-white/10 overflow-hidden text-sm">
@@ -610,7 +521,7 @@ images: images/LCSAJfull.png
                                     <tr class="bg-black/20 hover:bg-black/40 transition-colors">
                                         <td class="px-4 py-3 font-mono text-secondary whitespace-nowrap">-a, --arch</td>
                                         <td class="px-4 py-3 text-gray-500 text-xs">TEXT</td>
-                                        <td class="px-4 py-3 text-gray-400">Target architecture. <span class="text-gray-600">Default: riscv64</span></td>
+                                        <td class="px-4 py-3 text-gray-400">Target architecture (auto, riscv64, x86_64, arm64). <span class="text-gray-600">Default: auto</span></td>
                                     </tr>
                                     <tr class="bg-black/10 hover:bg-black/40 transition-colors">
                                         <td class="px-4 py-3 font-mono text-secondary whitespace-nowrap">-d, --depth</td>
@@ -633,9 +544,19 @@ images: images/LCSAJfull.png
                                         <td class="px-4 py-3 text-gray-400">Minimum quality score for a gadget to appear in results.</td>
                                     </tr>
                                     <tr class="bg-black/10 hover:bg-black/40 transition-colors">
+                                        <td class="px-4 py-3 font-mono text-orange-400 whitespace-nowrap">-i, --instructions</td>
+                                        <td class="px-4 py-3 text-gray-500 text-xs">INTEGER</td>
+                                        <td class="px-4 py-3 text-gray-400">Max number of instructions contained in a single node.</td>
+                                    </tr>
+                                    <tr class="bg-black/20 hover:bg-black/40 transition-colors">
                                         <td class="px-4 py-3 font-mono text-gray-400 whitespace-nowrap">-v, --verbose</td>
                                         <td class="px-4 py-3 text-gray-500 text-xs">FLAG</td>
                                         <td class="px-4 py-3 text-gray-400">Enable verbose output for detailed per-gadget results.</td>
+                                    </tr>
+                                    <tr class="bg-black/10 hover:bg-black/40 transition-colors">
+                                        <td class="px-4 py-3 font-mono text-green-400 whitespace-nowrap">-f, --file</td>
+                                        <td class="px-4 py-3 text-gray-500 text-xs">FLAG</td>
+                                        <td class="px-4 py-3 text-gray-400">Write found gadgets to a file <code class="text-xs bg-white/10 px-1 rounded">found_gadgets.txt</code>.</td>
                                     </tr>
                                     <tr class="bg-black/20 hover:bg-black/40 transition-colors">
                                         <td class="px-4 py-3 font-mono text-gray-500 whitespace-nowrap">--version</td>
@@ -646,44 +567,73 @@ images: images/LCSAJfull.png
                             </table>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ═══ FOOTER ═══ -->
-    <footer class="bg-darker border-t border-white/10 pt-12 pb-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-                <a href="#" class="flex items-center gap-2 opacity-70 hover:opacity-100 transition-opacity">
-                    <img src="Untitled%20design.jpg" onerror="this.onerror=null; this.src='../images/LCSAJ.png';" alt="LCSAJdump Logo" class="h-8 w-auto object-contain">
-                </a>
-                <p class="text-gray-500 text-sm">&copy; 2026 <a href="https://chris1sflaggin.it"><b>Chris1sflaggin</b></a>. Released under the MIT license.</p>
-                <div class="flex space-x-6">
-                    <a href="https://github.com/chris1sflaggin/lcsajdump" class="text-gray-500 hover:text-white transition-colors">
-                        <span class="sr-only">GitHub</span>
-                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
+    <footer class="bg-darker border-t border-white/10 pt-16 pb-8 relative overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/5 rounded-full mix-blend-screen filter blur-[100px] opacity-50 pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                
+                <div class="md:col-span-2">
+                    <a href="#" class="flex items-center gap-2 mb-4 hover:opacity-80 transition-opacity">
+                        <img src="Untitled%20design.jpg" onerror="this.onerror=null; this.src='../images/LCSAJ.png';" alt="LCSAJdump Logo" class="h-10 w-auto object-contain">
+                    </a>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-6 max-w-sm">
+                        A universal, graph-based static analysis framework. Overcome the limitations of linear scanners and discover hidden shadow gadgets with automated precision.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="https://github.com/chris1sflaggin/lcsajdump" target="_blank" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-primary/20 hover:text-primary transition-all border border-white/5 hover:border-primary/30">
+                            <span class="sr-only">GitHub</span>
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
+                        </a>
+                        <a href="https://pypi.org/project/lcsajdump/" target="_blank" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-blue-500/20 hover:text-blue-400 transition-all border border-white/5 hover:border-blue-500/30">
+                            <span class="sr-only">PyPI</span>
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2.1c-.2 0-.5.1-.7.2l-6.8 4c-.5.3-.8.8-.8 1.4v8.1c0 .5.3 1.1.8 1.4l6.8 4c.4.2.9.2 1.3 0l6.8-4c.5-.3.8-.8.8-1.4v-8.1c0-.5-.3-1.1-.8-1.4l-6.8-4c-.2-.1-.5-.2-.8-.2m.5 1.8 6 3.5-3 1.8-6-3.5 3-1.8m-4.5 2.7 6 3.5-3 1.8-6-3.5 3-1.8m-3.5 3.3v7l-3-1.8v-7l3 1.8m4 2.3v7l-3-1.8v-7l3 1.8m4 2.3v7l-3-1.8v-7l3 1.8m4-2.3-3 1.8v7l3-1.8v-7z"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Project</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#features" class="text-sm text-gray-500 hover:text-primary transition-colors">Features</a></li>
+                        <li><a href="#benchmarks" class="text-sm text-gray-500 hover:text-primary transition-colors">Benchmarks</a></li>
+                        <li><a href="#architectures" class="text-sm text-gray-500 hover:text-primary transition-colors">Architectures</a></li>
+                        <li><a href="#plugins" class="text-sm text-gray-500 hover:text-primary transition-colors">Plugins</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Resources</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#usage" class="text-sm text-gray-500 hover:text-primary transition-colors">Installation & Usage</a></li>
+                        <li><a href="https://github.com/chris1sflaggin/lcsajdump/issues" target="_blank" class="text-sm text-gray-500 hover:text-primary transition-colors">Issue Tracker</a></li>
+                        <li><a href="https://github.com/chris1sflaggin/lcsajdump/pulls" target="_blank" class="text-sm text-gray-500 hover:text-primary transition-colors">Contribute</a></li>
+                        <li><a href="https://chris1sflaggin.it" target="_blank" class="text-sm text-gray-500 hover:text-primary transition-colors">Author Website</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-gray-500 text-sm">
+                    &copy; 2026 <a href="https://chris1sflaggin.it" target="_blank" class="text-gray-300 hover:text-primary transition-colors font-medium">Chris1sflaggin</a>. All rights reserved.
+                </p>
+                <div class="flex items-center gap-2 text-sm text-gray-500">
+                    Released under the 
+                    <a href="https://github.com/chris1sflaggin/lcsajdump/blob/main/LICENSE" target="_blank" class="inline-flex items-center gap-1.5 text-gray-300 hover:text-primary transition-colors font-medium">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        MIT License
                     </a>
                 </div>
             </div>
         </div>
     </footer>
+    
+    <script src="script.js"></script>
 
-    <script>
-        function copyInstall() {
-            const textArea = document.createElement("textarea");
-            textArea.value = "pip install lcsajdump";
-            document.body.appendChild(textArea);
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                const toast = document.getElementById('copyToast');
-                toast.classList.replace('opacity-0','opacity-100');
-                setTimeout(() => toast.classList.replace('opacity-100','opacity-0'), 2000);
-            } catch(err) { console.error('Failed to copy', err); }
-            document.body.removeChild(textArea);
-        }
-    </script>
 </body>
 </html>
