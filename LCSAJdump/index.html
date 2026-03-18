@@ -56,7 +56,6 @@ images: images/LCSAJfull.png
                     <div class="ml-10 flex items-baseline space-x-6">
                         <a href="#problem"       class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">The Problem</a>
                         <a href="#features"      class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Features</a>
-                        <a href="#benchmarks"    class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Benchmarks</a>
                         <a href="#architectures" class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Architectures</a>
                         <a href="#plugins"       class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Plugins</a>
                         <a href="#usage"         class="hover:text-primary transition-colors px-3 py-2 rounded-md text-sm font-medium">Usage</a>
@@ -281,121 +280,6 @@ images: images/LCSAJfull.png
                     <p class="text-sm text-gray-400">Architecture-specific heuristic engine that ranks gadgets based on critical registers.</p>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <section id="benchmarks" class="py-20 bg-card/50 border-b border-white/5 relative overflow-hidden">
-        <div class="absolute inset-0 opacity-5">
-            <div class="absolute top-1/4 left-1/3 w-96 h-96 bg-primary rounded-full mix-blend-screen filter blur-3xl"></div>
-            <div class="absolute bottom-1/4 right-1/3 w-96 h-96 bg-secondary rounded-full mix-blend-screen filter blur-3xl"></div>
-        </div>
-        
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center mb-12">
-                <h2 class="text-secondary font-semibold tracking-wide uppercase text-sm">Real-World Benchmarks</h2>
-                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl">
-                    Choose Your <span class="text-gradient">Scan Strategy</span>
-                </p>
-                <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-400">
-                    Three profiles measured on <code class="text-primary">libc.so.6</code>. Pick your balance between speed and coverage.
-                </p>
-            </div>
-    
-            <div class="flex justify-center mb-12">
-                <div id="strategy-buttons" class="bg-darker border border-white/10 p-1 rounded-xl inline-flex gap-1 flex-wrap justify-center"></div>
-            </div>
-    
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                <div class="bg-darker/80 border border-primary/30 rounded-2xl p-6 hover:border-primary/60 transition-colors">
-                    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                        RISC-V (64)
-                    </h3>
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div class="bg-black/50 border border-white/5 rounded-lg p-4">
-                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Depth (-d)</p>
-                            <p id="rv-depth" class="text-3xl font-mono text-secondary transition-opacity duration-150"></p>
-                        </div>
-                        <div class="bg-black/50 border border-white/5 rounded-lg p-4">
-                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Darkness (-k)</p>
-                            <p id="rv-dark" class="text-3xl font-mono text-primary transition-opacity duration-150"></p>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 mb-5">
-                        <div class="bg-black/30 border border-white/5 rounded-lg px-4 py-3">
-                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Gadgets Found</p>
-                            <p id="rv-gadgets" class="text-xl font-mono text-white transition-opacity duration-150"></p>
-                        </div>
-                        <div class="bg-black/30 border border-white/5 rounded-lg px-4 py-3">
-                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Time</p>
-                            <p id="rv-time" class="text-xl font-mono text-white transition-opacity duration-150"></p>
-                        </div>
-                    </div>
-                    <p id="rv-desc" class="text-sm text-gray-400 min-h-[48px] transition-opacity duration-150"></p>
-                </div>
-    
-                <div class="bg-darker/80 border border-secondary/30 rounded-2xl p-6 hover:border-secondary/60 transition-colors">
-                    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                        x86_64
-                    </h3>
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div class="bg-black/30 border border-white/5 rounded-lg p-4">
-                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Depth (-d)</p>
-                            <p id="x86-depth" class="text-3xl font-mono text-secondary transition-opacity duration-150"></p>
-                        </div>
-                        <div class="bg-black/30 border border-white/5 rounded-lg p-4">
-                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Darkness (-k)</p>
-                            <p id="x86-dark" class="text-3xl font-mono text-primary transition-opacity duration-150"></p>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 mb-5">
-                        <div class="bg-black/30 border border-white/5 rounded-lg px-4 py-3">
-                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Gadgets Found</p>
-                            <p id="x86-gadgets" class="text-xl font-mono text-white transition-opacity duration-150"></p>
-                        </div>
-                        <div class="bg-black/30 border border-white/5 rounded-lg px-4 py-3">
-                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Time</p>
-                            <p id="x86-time" class="text-xl font-mono text-white transition-opacity duration-150"></p>
-                        </div>
-                    </div>
-                    <p id="x86-desc" class="text-sm text-gray-400 min-h-[48px] transition-opacity duration-150"></p>
-                </div>
-    
-                <div class="bg-darker/80 border border-blue-400/30 rounded-2xl p-6 hover:border-blue-400/60 transition-colors">
-                    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                        ARM64
-                    </h3>
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div class="bg-black/30 border border-white/5 rounded-lg p-4">
-                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Depth (-d)</p>
-                            <p id="arm-depth" class="text-3xl font-mono text-secondary transition-opacity duration-150"></p>
-                        </div>
-                        <div class="bg-black/30 border border-white/5 rounded-lg p-4">
-                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Darkness (-k)</p>
-                            <p id="arm-dark" class="text-3xl font-mono text-primary transition-opacity duration-150"></p>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 mb-5">
-                        <div class="bg-black/30 border border-white/5 rounded-lg px-4 py-3">
-                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Gadgets Found</p>
-                            <p id="arm-gadgets" class="text-xl font-mono text-white transition-opacity duration-150"></p>
-                        </div>
-                        <div class="bg-black/30 border border-white/5 rounded-lg px-4 py-3">
-                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Time</p>
-                            <p id="arm-time" class="text-xl font-mono text-white transition-opacity duration-150"></p>
-                        </div>
-                    </div>
-                    <p id="arm-desc" class="text-sm text-gray-400 min-h-[48px] transition-opacity duration-150"></p>
-                </div>
-            </div>
-    
-            <p class="text-center text-xs text-gray-600 mt-6">
-                Pruned branches — RV: <span id="rv-pruned" class="transition-opacity duration-150"></span>
-                &nbsp;|&nbsp;
-                x86_64: <span id="x86-pruned" class="transition-opacity duration-150"></span>
-                &nbsp;|&nbsp;
-                ARM64: <span id="arm-pruned" class="transition-opacity duration-150"></span>
-            </p>
         </div>
     </section>
 
