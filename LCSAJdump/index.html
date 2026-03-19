@@ -84,7 +84,7 @@ images: images/LCSAJfull.png
                     <div class="flex items-center gap-2 justify-center lg:justify-start mb-4 flex-wrap">
                         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-gray-400">
                             <span class="flex h-2 w-2 rounded-full bg-secondary"></span>
-                            Latest: v1.1.3
+                            Latest: v1.2.0
                         </div>
                         <a href="https://github.com/chris1sflaggin/lcsajdump" target="_blank"
                            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-gray-400 hover:border-yellow-400/50 hover:text-yellow-400 transition-all">
@@ -138,7 +138,10 @@ images: images/LCSAJfull.png
                             <p>  -i, --instructions INTEGER  Max number of instructions contained in a single node.</p>
                             <p>  -a, --arch TEXT             Architecture of the binary (auto[default], riscv64, x86_64, arm64).</p>
                             <p>  -v, --verbose               Verbose results for a better detailed result.</p>
-                            <p>  -f, --file                  Write found gadgets to a file "found_gadgets.txt".</p>
+                            <p>  -o, --output PATH           Write gadgets to the specified file path.</p>
+                            <p>  -b, --bad-chars TEXT        Hex bytes to filter from gadget addresses (e.g. "000a0d").</p>
+                            <p>  --json                      Output gadgets as structured JSON.</p>
+                            <p>  --all-exec                  Analyze all executable sections, not just .text.</p>
                             <p>  --version                   Show the version and exit.</p>
                             <p>  --help                      Show this message and exit.</p>
                             <p class="text-primary mt-4">❯ lcsajdump testCTFs/rop2/vuln</p>
@@ -427,7 +430,7 @@ images: images/LCSAJfull.png
                                 <span class="text-blue-400">-s 5</span>
                                 <span class="text-orange-400">-i 15</span>
                                 <span class="text-gray-400">-v</span>
-                                <span class="text-green-400">-f</span>
+                                <span class="text-green-400">-o output.txt</span>
                                 &lt;path&gt;
                             </code>
                         </div>
@@ -481,9 +484,24 @@ images: images/LCSAJfull.png
                                         <td class="px-4 py-3 text-gray-400">Enable verbose output for detailed per-gadget results.</td>
                                     </tr>
                                     <tr class="bg-black/10 hover:bg-black/40 transition-colors">
-                                        <td class="px-4 py-3 font-mono text-green-400 whitespace-nowrap">-f, --file</td>
+                                        <td class="px-4 py-3 font-mono text-green-400 whitespace-nowrap">-o, --output</td>
+                                        <td class="px-4 py-3 text-gray-500 text-xs">PATH</td>
+                                        <td class="px-4 py-3 text-gray-400">Write gadgets to the specified file path.</td>
+                                    </tr>
+                                    <tr class="bg-black/20 hover:bg-black/40 transition-colors">
+                                        <td class="px-4 py-3 font-mono text-green-400 whitespace-nowrap">-b, --bad-chars</td>
+                                        <td class="px-4 py-3 text-gray-500 text-xs">TEXT</td>
+                                        <td class="px-4 py-3 text-gray-400">Hex bytes to filter from gadget addresses (e.g. <code class="text-xs bg-white/10 px-1 rounded">"000a0d"</code>).</td>
+                                    </tr>
+                                    <tr class="bg-black/10 hover:bg-black/40 transition-colors">
+                                        <td class="px-4 py-3 font-mono text-green-400 whitespace-nowrap">--json</td>
                                         <td class="px-4 py-3 text-gray-500 text-xs">FLAG</td>
-                                        <td class="px-4 py-3 text-gray-400">Write found gadgets to a file <code class="text-xs bg-white/10 px-1 rounded">found_gadgets.txt</code>.</td>
+                                        <td class="px-4 py-3 text-gray-400">Output gadgets as structured JSON instead of plain text.</td>
+                                    </tr>
+                                    <tr class="bg-black/20 hover:bg-black/40 transition-colors">
+                                        <td class="px-4 py-3 font-mono text-green-400 whitespace-nowrap">--all-exec</td>
+                                        <td class="px-4 py-3 text-gray-500 text-xs">FLAG</td>
+                                        <td class="px-4 py-3 text-gray-400">Analyze all executable sections, not just <code class="text-xs bg-white/10 px-1 rounded">.text</code>.</td>
                                     </tr>
                                     <tr class="bg-black/20 hover:bg-black/40 transition-colors">
                                         <td class="px-4 py-3 font-mono text-gray-500 whitespace-nowrap">--version</td>
