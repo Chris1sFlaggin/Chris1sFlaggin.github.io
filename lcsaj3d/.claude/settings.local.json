@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//home/chris/**)",
+      "Bash(find /home/chris -maxdepth 3 -name *.md)",
+      "Bash(cat '/home/chris/thesis_ctfs/src_ctf/typicalROP \\(ctfriscv\\)/strategia_rop.md')",
+      "Bash(cat '/home/chris/thesis_ctfs/src_ctf/arm_strong \\(ctfarm\\)/gadgets_found.txt')",
+      "Bash(lcsajdump chal:*)"
+    ]
+  }
+}
