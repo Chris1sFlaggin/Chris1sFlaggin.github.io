@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LCSAJ Graph — 3D Gadget Visualizer</title>
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Three.js must load before 3d-force-graph -->
+  <script src="https://unpkg.com/three@0.175.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/3d-force-graph@1.73.4"></script>
+</head>
+<body>
+
+<!-- ─── TOP BAR ─────────────────────────────────────────────────────────── -->
+<div id="top-bar">
+  <span class="app-title">LCSAJ Graph</span>
+
+  <div class="stat-group">
+    <span class="stat-label">binary:</span>
+    <span class="stat-value" id="stat-binary">—</span>
+  </div>
+  <div class="stat-group">
+    <span class="stat-label">arch:</span>
+    <span class="stat-value" id="stat-arch">—</span>
+  </div>
+  <div class="stat-group">
+    <span class="stat-label">blocks:</span>
+    <span class="stat-value" id="stat-blocks">—</span>
+  </div>
+  <div class="stat-group">
+    <span class="stat-label">edges:</span>
+    <span class="stat-value" id="stat-edges">—</span>
+  </div>
+  <div class="stat-group">
+    <span class="stat-label">gadgets:</span>
+    <span class="stat-value" id="stat-gadgets">—</span>
+  </div>
+
+  <button class="load-btn" onclick="document.getElementById('file-input').click()">
+    📂 Load JSON
+  </button>
+  <input type="file" id="file-input" accept=".json">
+</div>
+
+<!-- ─── WELCOME SCREEN (shown until a file is loaded) ───────────────────── -->
+<div id="welcome-screen">
+  <div class="welcome-title">LCSAJ Graph</div>
+  <div class="welcome-sub">
+    3D force-directed visualizer for lcsajdump gadget graphs.<br>
+    Drop a <code>_lcsaj.json</code> file or click <b>Load JSON</b>.
+  </div>
+  <div class="welcome-cmd">lcsajdump &lt;binary&gt; --viz --all-exec</div>
+  <div class="welcome-cmd" style="font-size:11px;color:#445566">
+    --viz-compare &nbsp;·&nbsp; add multi-tool coverage<br>
+    --viz-animate &nbsp;·&nbsp; add BFS replay animation
+  </div>
+  <button class="load-btn" onclick="document.getElementById('file-input').click()">
+    📂 Load JSON
+  </button>
+</div>
+
+<!-- ─── MAIN LAYOUT (hidden until file loaded) ──────────────────────────── -->
+<div id="main-layout" class="hidden">
+
+  <!-- Left panel: gadget list -->
+  <div id="left-panel" class="side-panel">
+    <div class="panel-header">
+      Gadgets
+      <button class="panel-toggle" id="toggle-left" title="Collapse">◀</button>
+    </div>
+    <div id="gadget-list-container"></div>
+  </div>
+
+  <!-- Center: 3D graph canvas -->
+  <div id="graph-container"></div>
+
+  <!-- Right panel: node / gadget detail -->
+  <div id="right-panel" class="side-panel">
+    <div class="panel-header">
+      Inspector
+      <button class="panel-toggle" id="toggle-right" title="Collapse">▶</button>
+    </div>
+    <div id="info-panel-content"></div>
+  </div>
+
+</div>
+
+<!-- ─── LAYER CONTROLS BAR (comparison mode) ────────────────────────────── -->
+<div id="layer-controls-bar" class="hidden">
+  <div id="layer-controls" class="layer-controls"></div>
+  <div class="comparison-legend-row">
+    <span class="clegend-item"><span class="legend-dot" style="background:#cc44ff"></span>lcsaj-only</span>
+    <span class="clegend-item"><span class="legend-dot" style="background:#ff8844"></span>ropper-only</span>
+    <span class="clegend-item"><span class="legend-dot" style="background:#44ccff"></span>ropgadget-only</span>
+    <span class="clegend-item"><span class="legend-dot" style="background:#44ff99"></span>rp++-only</span>
+    <span class="clegend-item"><span class="legend-dot" style="background:#888899"></span>shared</span>
+  </div>
+</div>
+
+<!-- ─── ANIMATION BAR ────────────────────────────────────────────────────── -->
+<div id="animation-bar" class="hidden">
+  <div id="animation-controls"></div>
+</div>
+
+<!-- ─── LEGEND BAR ──────────────────────────────────────────────────────── -->
+<div id="legend-bar">
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#ff4444"></div>
+    <span>ret / syscall</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#4488ff"></div>
+    <span>call</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#ff8c00"></div>
+    <span>jmp (uncond)</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#ffdd44"></div>
+    <span>branch (cond)</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#44cc66"></div>
+    <span>fallthrough</span>
+  </div>
+  <span style="margin-left:auto;font-size:11px;color:#444">
+    node size ∝ instruction count · opacity ∝ gadget membership
+  </span>
+</div>
+
+<!-- ─── DRAG-DROP OVERLAY ───────────────────────────────────────────────── -->
+<div id="drop-overlay">⬇ Drop _lcsaj.json here</div>
+
+<!-- ─── APP ENTRY POINT ─────────────────────────────────────────────────── -->
+<script type="module" src="js/app.js"></script>
+
+</body>
+</html>
