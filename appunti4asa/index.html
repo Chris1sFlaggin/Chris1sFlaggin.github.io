@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'Impero del Cavolo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="hero" id="inizio">
+        <div class="hero-content">
+            <h1>L'Impero del Cavolo</h1>
+            <h2>Dal nostro orto direttamente alla tua tavola!</h2>
+            <p>Freschezza, qualità e la vera tradizione agricola italiana.</p>
+            <a href="#shop" class="btn-hero">Scopri i Prodotti</a>
+        </div>
+    </header>
+
+    <main>
+        
+        <section id="storia" class="sezione-alternata">
+            <div class="container">
+                <h2>La Nostra Storia</h2>
+                <p>Tutto è iniziato nel 1985 con un piccolo campo e una grande passione per le brassicacee. Da allora, coltiviamo i nostri cavoli rispettando la natura e i tempi delle stagioni.</p>
+                <p>Cosa ci rende speciali?</p>
+                <ul class="lista-vantaggi">
+                    <li>Coltivazione 100% biologica</li>
+                    <li>Raccolta a mano alle prime luci dell'alba</li>
+                    <li>Nessun uso di pesticidi chimici</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="shop">
+            <div class="container">
+                <h2>Il Nostro Shop</h2>
+                <p>Scegli tra le nostre varietà migliori.</p>
+                
+                <div class="griglia-prodotti">
+                    <div class="card-prodotto">
+                        <div class="badge-sconto">SCONTO 20%</div>
+                        <h3>Cavolo Romanesco</h3>
+                        <p>La geometria perfetta della natura.</p>
+                        <button type="button" class="btn-compra" onclick="alert('Cavolo Romanesco aggiunto al carrello!')">Acquista</button>
+                    </div>
+
+                    <div class="card-prodotto">
+                        <h3>Cavolo Nero</h3>
+                        <p>Il re indiscusso della ribollita toscana.</p>
+                        <button type="button" class="btn-compra" onclick="alert('Cavolo Nero aggiunto al carrello!')">Acquista</button>
+                    </div>
+
+                    <div class="card-prodotto">
+                        <h3>Cavolini di Bruxelles</h3>
+                        <p>Piccoli, compatti e ricchi di sapore.</p>
+                        <button type="button" class="btn-compra" onclick="alert('Cavolini di Bruxelles aggiunti al carrello!')">Acquista</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="rcc" class="sezione-alternata">
+            <div class="container">
+                <h2>Recensioni & Contatti</h2>
+                
+                <div class="recensioni">
+                    <h3>Cosa dicono di noi</h3>
+                    <blockquote>"I migliori cavoli della Lombardia! Hanno svoltato i miei pizzoccheri." - <i>Mario R.</i></blockquote>
+                    <blockquote>"Spedizione veloce e verdura freschissima." - <i>Giulia T.</i></blockquote>
+                </div>
+
+                <hr>
+
+                <div class="box-contatti">
+                    <h3>Scrivici</h3>
+                    <p>Hai bisogno di una fornitura speciale o vuoi info?</p>
+                    <p>Email: 
+                        <a href="mailto:ordini@imperodelcavolo.it" 
+                           onmouseover="this.style.color='#2e7d32'" 
+                           onmouseout="this.style.color='#1b5e20'">
+                           ordini@imperodelcavolo.it
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 L'Impero del Cavolo. Tutti i diritti riservati.</p>
+            <a href="#inizio" class="link-top">Torna in cima ↑</a>
+        </div>
+    </footer>
+
+</body>
+</html>

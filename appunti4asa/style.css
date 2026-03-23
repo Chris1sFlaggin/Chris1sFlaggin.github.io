@@ -1,0 +1,181 @@
+/* --- RESET BASE --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    background-color: #fcfcfc;
+    line-height: 1.6;
+}
+
+/* --- UTILITIES --- */
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background-color: #a5d6a7;
+    margin: 30px 0;
+}
+
+/* --- HERO SECTION (Inserita in <header>) --- */
+.hero {
+    background-color: #e8f5e9;
+    padding: 100px 20px;
+    text-align: center;
+    border-bottom: 5px solid #4caf50;
+}
+
+.hero h1 {
+    color: #1b5e20;
+    font-size: 3em;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.hero h2 {
+    color: #2e7d32;
+    font-weight: normal;
+    margin-bottom: 25px;
+}
+
+.btn-hero {
+    display: inline-block;
+    background-color: #4caf50;
+    color: white;
+    text-decoration: none;
+    padding: 15px 35px;
+    font-size: 1.2em;
+    border-radius: 30px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.btn-hero:hover {
+    background-color: #388e3c;
+}
+
+/* --- SEZIONI GENERALI --- */
+section {
+    padding: 60px 0;
+}
+
+.sezione-alternata {
+    background-color: #f1f8e9;
+}
+
+section h2 {
+    color: #2e7d32;
+    border-bottom: 2px solid #a5d6a7;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+}
+
+section h3 {
+    color: #43a047;
+    margin-bottom: 15px;
+}
+
+/* --- STORIA --- */
+.lista-vantaggi {
+    list-style-type: square;
+    color: #1b5e20;
+    margin-left: 20px;
+}
+
+/* --- SHOP (Flexbox e Position) --- */
+.griglia-prodotti {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.card-prodotto {
+    background-color: white;
+    border: 1px solid #c8e6c9;
+    border-radius: 8px;
+    padding: 25px 20px;
+    width: 31%; /* Divide lo spazio in 3 colonne */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    position: relative; /* Base per il posizionamento assoluto del badge */
+    text-align: center;
+}
+
+.badge-sconto {
+    background-color: #ff5252;
+    color: white;
+    font-size: 0.9em;
+    font-weight: bold;
+    padding: 8px 12px;
+    border-radius: 5px;
+    position: absolute; /* Posizionamento assoluto */
+    top: -15px;
+    right: -10px;
+    transform: rotate(5deg);
+}
+
+.btn-compra {
+    background-color: #81c784;
+    color: white;
+    border: none;
+    padding: 10px 0;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    width: 100%;
+    transition: background-color 0.3s;
+}
+
+.btn-compra:hover {
+    background-color: #4caf50;
+}
+
+/* --- RCC (Recensioni e Contatti) --- */
+blockquote {
+    font-style: italic;
+    background-color: white;
+    border-left: 4px solid #81c784;
+    padding: 15px;
+    margin: 10px 0 20px 0;
+    color: #555;
+}
+
+.box-contatti a {
+    color: #1b5e20;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* --- FOOTER --- */
+footer {
+    background-color: #2e7d32;
+    color: white;
+    text-align: center;
+    padding: 30px 0;
+}
+
+footer p {
+    margin-bottom: 10px;
+}
+
+.link-top {
+    color: #c8e6c9;
+    text-decoration: none;
+    font-size: 0.9em;
+}
+
+.link-top:hover {
+    color: white;
+    text-decoration: underline;
+}
