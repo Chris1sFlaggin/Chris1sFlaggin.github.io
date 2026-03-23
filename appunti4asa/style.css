@@ -110,19 +110,6 @@ section h3 {
     text-align: center;
 }
 
-.badge-sconto {
-    background-color: #ff5252;
-    color: white;
-    font-size: 0.9em;
-    font-weight: bold;
-    padding: 8px 12px;
-    border-radius: 5px;
-    position: absolute; /* Posizionamento assoluto */
-    top: -15px;
-    right: -10px;
-    transform: rotate(5deg);
-}
-
 .btn-compra {
     background-color: #81c784;
     color: white;
