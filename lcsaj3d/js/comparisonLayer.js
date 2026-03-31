@@ -6,7 +6,7 @@ export const COMPARISON_COLORS = {
   lcsaj:     '#cc44ff', // magenta  — found only by lcsajdump
   ropper:    '#ff8844', // orange
   ropgadget: '#44ccff', // cyan
-  rp_plus:   '#44ff99', // green
+  riscyrop:  '#44ff99', // green
   shared:    '#888899', // grey     — covered by 2+ tools
   none:      null,      // use default terminator color
 };
@@ -15,25 +15,25 @@ export const TOOL_LABELS = {
   lcsaj:     'lcsajdump',
   ropper:    'ropper',
   ropgadget: 'ROPgadget',
-  rp_plus:   'rp++',
+  riscyrop:  'RiscyROP',
 };
 
 export const TOOL_DESCRIPTIONS = {
   lcsaj:     'lcsajdump: forward LCSAJ graph traversal — seeds from ALL terminators including call rel32 (E8) and REX.B calls',
   ropper:    'ropper: backward scanner — seeds from ret + indirect jmp/call via rax–rdi only; misses REX.B (r8–r15) and E8',
   ropgadget: 'ROPgadget: backward scanner — seeds from ret + indirect jmp/call (all regs incl. r8–r15) + syscall; misses E8',
-  rp_plus:   'rp++ (rp-plus): backward scanner — seeds from ret + indirect jmp/call (all regs) + syscall + int 0x80; misses E8. Very similar to ROPgadget for x86_64; broader on RISC-V (any jr/jalr, not just ra)',
+  riscyrop:  'RiscyROP (RAID 2022): symbolic-execution-based gadget finder and chain builder for RISC-V64 and ARM64; not designed for x86-64 — coverage on x86 benchmarks is simulated',
 };
 
 // All comparison tools (excluding lcsajdump itself)
-export const OTHER_TOOLS = ['ropper', 'ropgadget', 'rp_plus'];
+export const OTHER_TOOLS = ['ropper', 'ropgadget', 'riscyrop'];
 
 // Active layer state
 const _layers = {
   lcsaj:     true,
   ropper:    true,
   ropgadget: true,
-  rp_plus:   true,
+  riscyrop:  true,
 };
 
 // null = show all; string = show only gadgets exclusive to this tool
@@ -101,7 +101,7 @@ export function renderLayerControls(container, data, onLayerChange, onExclusiveC
     { key: 'lcsaj',     color: COMPARISON_COLORS.lcsaj     },
     { key: 'ropper',    color: COMPARISON_COLORS.ropper    },
     { key: 'ropgadget', color: COMPARISON_COLORS.ropgadget },
-    { key: 'rp_plus',   color: COMPARISON_COLORS.rp_plus   },
+    { key: 'riscyrop',  color: COMPARISON_COLORS.riscyrop  },
   ];
 
   container.innerHTML = toolDefs.map(({ key, color }) => {
@@ -169,7 +169,7 @@ export function renderLayerControls(container, data, onLayerChange, onExclusiveC
 // ─────────────────────────────────────────────────────────────────────────────
 
 function _computeStats(data) {
-  const exclusive = { lcsaj: 0, ropper: 0, ropgadget: 0, rp_plus: 0 };
+  const exclusive = { lcsaj: 0, ropper: 0, ropgadget: 0, riscyrop: 0 };
   let sharedCount = 0;
 
   const allTools = ['lcsaj', ...OTHER_TOOLS];
