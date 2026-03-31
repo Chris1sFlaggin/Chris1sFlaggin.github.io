@@ -19,9 +19,9 @@ export const TOOL_LABELS = {
 };
 
 export const TOOL_DESCRIPTIONS = {
-  lcsaj:     'lcsajdump: forward LCSAJ graph traversal — seeds from ALL terminators including call rel32 (E8) and REX.B calls',
-  ropper:    'ropper: backward scanner — seeds from ret + indirect jmp/call via rax–rdi only; misses REX.B (r8–r15) and E8',
-  ropgadget: 'ROPgadget: backward scanner — seeds from ret + indirect jmp/call (all regs incl. r8–r15) + syscall; misses E8',
+  lcsaj:     'lcsajdump: forward LCSAJ graph traversal — seeds from ALL terminators including call rel32 (E8), bl imm26 (ARM64), ecall (RISC-V), and REX.B indirect calls (r8–r15)',
+  ropper:    'ropper: backward scanner — x86-64: seeds from ret + indirect jmp/call via rax–rdi only; misses REX.B (r8–r15) and E8 (confirmed). ARM64: seeds from ret/br/blr; misses bl imm26. RISC-V: no support (crashes)',
+  ropgadget: 'ROPgadget (--all): backward scanner — x86-64: seeds from ret + indirect jmp/call all regs incl. r8–r15 + syscall; misses E8 (confirmed). ARM64: seeds from ret/br/blr/svc; misses bl imm26 as standalone terminator. RISC-V: --rop seeds from ecall; --jop does not',
   riscyrop:  'RiscyROP (RAID 2022): symbolic-execution-based gadget finder and chain builder for RISC-V64 and ARM64; not designed for x86-64 — coverage on x86 benchmarks is simulated',
 };
 
