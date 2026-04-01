@@ -162,14 +162,13 @@ video { border-radius: 0 !important; }
 
 /* ── Glitch animation ──────────────────────────────────────── */
 @keyframes glitch-1 {
-    0%, 92%, 100% { clip-path: none; transform: none; }
-    93% { clip-path: polygon(0 28%, 100% 28%, 100% 34%, 0 34%); transform: translateX(-3px); }
-    94% { clip-path: polygon(0 58%, 100% 58%, 100% 66%, 0 66%); transform: translateX(2px); }
-    95% { clip-path: none; transform: none; }
+    0%, 90%, 100% { transform: none; text-shadow: none; }
+    91%  { transform: translateX(-2px); text-shadow: 2px 0 rgba(155,219,8,0.4); }
+    92%  { transform: translateX(2px);  text-shadow: -2px 0 rgba(240,124,6,0.4); }
+    93%  { transform: none; text-shadow: none; }
 }
 .glitch-title {
-    animation: glitch-1 12s infinite;
-    will-change: transform;
+    animation: glitch-1 10s infinite;
 }
 
 /* ── Terminal cursor blink ─────────────────────────────────── */
