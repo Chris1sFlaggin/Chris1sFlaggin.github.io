@@ -1,34 +1,198 @@
 /* style.css */
 
-::-webkit-scrollbar { width: 8px; }
+/* ── Border radius policy ──────────────────────────────────── */
+/* Cards, containers, terminals → sharp (0px)               */
+/* Buttons, badges, inputs      → subtle (3px)              */
+/* Circular icons               → full (9999px, via .rounded-full) */
+
+.sharp { border-radius: 0 !important; }
+
+/* Strip all large radii from structural containers */
+.rounded-xl, .rounded-2xl, .rounded-3xl { border-radius: 0 !important; }
+
+/* Buttons, inputs, badges → 3px */
+button,
+input,
+select,
+textarea,
+a[class*="px-"][class*="py-"],
+span[class*="px-"][class*="py-"],
+div[class*="inline-flex"][class*="px-"],
+.badge { border-radius: 3px !important; }
+
+video { border-radius: 0 !important; }
+
+/* ── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #050505; }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: #1e1e1e; border-radius: 0; }
 ::-webkit-scrollbar-thumb:hover { background: #9BDB08; }
 
+/* ── Typography utilities ──────────────────────────────────── */
+.font-display {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
 .text-gradient {
-    background: linear-gradient(90deg, #9BDB08, #F07C06);
+    background: linear-gradient(90deg, #9BDB08 0%, #c4f03a 50%, #F07C06 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
+/* ── Grid background ───────────────────────────────────────── */
 .bg-grid {
-    background-size: 40px 40px;
-    background-image: linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
-                      linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-image:
+        linear-gradient(to right,  rgba(155,219,8,0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(155,219,8,0.04) 1px, transparent 1px);
 }
 
-.glow-primary { 
-    box-shadow: 0 0 20px rgba(155, 219, 8, 0.15); 
+/* ── Glow effects ──────────────────────────────────────────── */
+.glow-primary {
+    box-shadow: 0 0 24px rgba(155, 219, 8, 0.25), 0 0 48px rgba(155, 219, 8, 0.08);
+}
+.glow-primary:hover {
+    box-shadow: 0 0 32px rgba(155, 219, 8, 0.4), 0 0 64px rgba(155, 219, 8, 0.15);
 }
 
+/* ── Scanline overlay (on terminal windows) ────────────────── */
+.scanlines {
+    position: relative;
+}
+.scanlines::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.18) 2px,
+        rgba(0,0,0,0.18) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+}
+
+/* ── Noise texture overlay ─────────────────────────────────── */
+.noise::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    border-radius: inherit;
+}
+
+/* ── ASCII banner ──────────────────────────────────────────── */
 .ascii-banner {
     font-size: 4px;
     line-height: 1.1;
     white-space: pre;
     display: inline-block;
 }
-
-@media (min-width: 640px) { 
-    .ascii-banner { font-size: 6px; } 
+@media (min-width: 640px) {
+    .ascii-banner { font-size: 6px; }
 }
+
+/* ── Section accent label ──────────────────────────────────── */
+.section-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #9BDB08;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.section-label::before {
+    content: '';
+    display: inline-block;
+    width: 1.5rem;
+    height: 2px;
+    background: #9BDB08;
+}
+
+/* ── Feature card numbered ─────────────────────────────────── */
+.feature-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1;
+    color: rgba(155,219,8,0.1);
+    transition: color 0.3s;
+    user-select: none;
+}
+.feature-card:hover .feature-num {
+    color: rgba(155,219,8,0.25);
+}
+
+/* ── Code snippet in integration cards ─────────────────────── */
+.integration-code {
+    background: #000;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    line-height: 1.6;
+    color: #9ca3af;
+    text-align: left;
+    width: 100%;
+    margin-top: 0.75rem;
+}
+
+/* ── Nav top accent line ───────────────────────────────────── */
+.nav-accent::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #9BDB08, transparent);
+}
+
+/* ── Glitch animation ──────────────────────────────────────── */
+@keyframes glitch-1 {
+    0%, 94%, 100% { clip-path: none; transform: none; }
+    95% { clip-path: polygon(0 30%, 100% 30%, 100% 36%, 0 36%); transform: translateX(-4px); }
+    97% { clip-path: polygon(0 60%, 100% 60%, 100% 68%, 0 68%); transform: translateX(3px); }
+}
+.glitch-title {
+    animation: glitch-1 8s infinite;
+}
+
+/* ── Terminal cursor blink ─────────────────────────────────── */
+@keyframes cursor-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+.cursor-blink {
+    animation: cursor-blink 1s step-end infinite;
+}
+
+/* ── Hex float animation ───────────────────────────────────── */
+@keyframes float-up {
+    0%   { opacity: 0; transform: translateY(0); }
+    10%  { opacity: 0.4; }
+    90%  { opacity: 0.1; }
+    100% { opacity: 0; transform: translateY(-120px); }
+}
+.hex-float {
+    animation: float-up linear infinite;
+}
+
+/* ── Pulse slow ────────────────────────────────────────────── */
+@keyframes pulse-slow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.5; }
+}
+.animate-pulse-slow { animation: pulse-slow 4s ease-in-out infinite; }
