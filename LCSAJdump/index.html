@@ -73,7 +73,20 @@ images: images/LCSAJfull.png
         </div>
     </nav>
 
-    <main class="pt-32 pb-16 sm:pt-40 sm:pb-16 lg:pb-24 overflow-hidden bg-darker">
+    <!-- ── Download stats bar (compact, under navbar) ──────── -->
+    <div class="fixed w-full z-40 top-16 bg-darker/95 backdrop-blur-sm border-b border-white/6">
+        <div class="max-w-7xl mx-auto px-4 flex items-center justify-center gap-6 sm:gap-10 h-8 text-[11px] font-mono">
+            <span class="text-gray-600 uppercase tracking-widest hidden sm:inline">PyPI</span>
+            <span class="flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-primary animate-pulse"></span><span class="text-gray-500">month</span><span class="text-white font-semibold" id="stat-month">—</span></span>
+            <span class="text-white/10">|</span>
+            <span class="flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-secondary animate-pulse" style="animation-delay:.4s"></span><span class="text-gray-500">week</span><span class="text-white font-semibold" id="stat-week">—</span></span>
+            <span class="text-white/10">|</span>
+            <span class="flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-blue-400 animate-pulse" style="animation-delay:.8s"></span><span class="text-gray-500">today</span><span class="text-white font-semibold" id="stat-day">—</span></span>
+            <a href="https://pypi.org/project/lcsajdump/" target="_blank" class="text-gray-600 hover:text-primary transition-colors hidden sm:inline">↗</a>
+        </div>
+    </div>
+
+    <main class="pt-44 pb-16 sm:pt-48 sm:pb-16 lg:pb-24 overflow-hidden bg-darker">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <div class="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-pulse-slow"></div>
             <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/20 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-pulse-slow" style="animation-delay: 2s;"></div>
@@ -173,59 +186,6 @@ images: images/LCSAJfull.png
             </div>
         </div>
     </main>
-
-    <!-- ── Download stats strip ──────────────────────────────── -->
-    <section class="border-y border-white/8 bg-card/40 py-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-16">
-
-                <div class="flex items-center gap-4">
-                    <div class="w-px h-10 bg-primary/30 hidden sm:block"></div>
-                    <div>
-                        <div class="flex items-center gap-2 mb-0.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-                            <span class="font-mono text-[10px] text-gray-600 uppercase tracking-widest">Last month</span>
-                        </div>
-                        <div class="font-display text-3xl text-white" id="stat-month">—</div>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-4">
-                    <div class="w-px h-10 bg-white/10 hidden sm:block"></div>
-                    <div>
-                        <div class="flex items-center gap-2 mb-0.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" style="animation-delay:.4s"></span>
-                            <span class="font-mono text-[10px] text-gray-600 uppercase tracking-widest">Last week</span>
-                        </div>
-                        <div class="font-display text-3xl text-white" id="stat-week">—</div>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-4">
-                    <div class="w-px h-10 bg-white/10 hidden sm:block"></div>
-                    <div>
-                        <div class="flex items-center gap-2 mb-0.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" style="animation-delay:.8s"></span>
-                            <span class="font-mono text-[10px] text-gray-600 uppercase tracking-widest">Yesterday</span>
-                        </div>
-                        <div class="font-display text-3xl text-white" id="stat-day">—</div>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-4">
-                    <div class="w-px h-10 bg-white/10 hidden sm:block"></div>
-                    <div>
-                        <div class="flex items-center gap-2 mb-0.5">
-                            <span class="font-mono text-[10px] text-gray-600 uppercase tracking-widest">PyPI downloads</span>
-                        </div>
-                        <a href="https://pypi.org/project/lcsajdump/" target="_blank"
-                           class="font-mono text-xs text-gray-500 hover:text-primary transition-colors">lcsajdump ↗</a>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
 
     <section id="demo" class="pb-20 bg-darker">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
