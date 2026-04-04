@@ -348,7 +348,7 @@ images: images/LCSAJfull.png
                 <p class="font-display text-5xl sm:text-6xl text-white uppercase leading-none">Drop-In<br><span class="text-gradient">Workflow</span></p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
                 <!-- pwntools card -->
                 <div class="group bg-card border border-white/8 hover:border-primary/40 transition-all duration-300 p-6 relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -391,6 +391,28 @@ images: images/LCSAJfull.png
                         <br>
                         <span class="text-gray-600"># auto-detects the running inferior</span><br>
                         <span class="text-blue-400">pwndbg&gt;</span> <span class="text-primary">lcsaj</span> <span class="text-secondary">-l</span> <span class="text-orange-400">20</span> <span class="text-secondary">--all-exec</span>
+                    </div>
+                </div>
+
+                <!-- IDA Pro card -->
+                <div class="group bg-card border border-white/8 hover:border-purple-500/40 transition-all duration-300 p-6 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+                                <span class="font-mono text-purple-400 font-bold text-[10px] leading-none">IDA</span>
+                            </div>
+                            <span class="font-display text-xl text-white uppercase">IDA Pro</span>
+                        </div>
+                        <span class="font-mono text-[10px] font-bold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2 py-1 uppercase tracking-wider">Available</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-3 leading-relaxed">Drop <code class="text-purple-400">ida_lcsajdump.py</code> into <code class="text-purple-400">~/.idapro/plugins/</code> — gadgets appear in a dockable panel with live register filtering.</p>
+                    <div class="integration-code">
+                        <span class="text-gray-600"># open any binary in IDA Pro, then</span><br>
+                        <span class="text-purple-400">Ctrl</span><span class="text-white">+</span><span class="text-purple-400">Shift</span><span class="text-white">+</span><span class="text-purple-400">L</span><span class="text-gray-600">  — launch analysis</span><br>
+                        <br>
+                        <span class="text-gray-600"># results panel: check registers</span><br>
+                        <span class="text-gray-600"># to filter gadgets in real time</span>
                     </div>
                 </div>
             </div>
