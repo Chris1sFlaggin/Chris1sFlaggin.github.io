@@ -302,27 +302,27 @@ images: images/LCSAJfull.png
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
                 <div class="space-y-8">
                     <p class="text-gray-400 text-lg font-mono leading-relaxed border-l-2 border-white/10 pl-4">
-                        <span class="text-primary">></span> Il framework evolve da pesi empirici a un motore di ranking guidato dai dati.<br>
-                        <span class="text-primary">></span> Sfruttando <span class="text-white">LightGBM LambdaRank</span> e 23 feature strutturali, LCSAJdump trasforma la discovery dei gadget in un problema di Learning-to-Rank.
+                        <span class="text-primary">></span> The framework evolves from empirical weights to a data-driven ranking engine.<br>
+                        <span class="text-primary">></span> Leveraging <span class="text-white">LightGBM LambdaRank</span> and structural/semantic features, LCSAJdump turns gadget discovery into a Learning-to-Rank problem.
                     </p>
     
                     <div class="space-y-6 pt-4">
                         <div class="border-l-2 border-primary/50 pl-4">
                             <h4 class="font-mono text-white uppercase font-bold text-sm mb-1">Level 1: Static Heuristic</h4>
-                            <p class="text-sm text-gray-500 mb-1">Formula additiva manuale (magic numbers). Prestazioni deboli su binari complessi.</p>
+                            <p class="text-sm text-gray-500 mb-1">Manual additive formula (magic numbers). Weak performance on complex binaries.</p>
                             <p class="text-xs font-mono text-gray-600">NDCG@1: 11.0%</p>
                         </div>
                         
                         <div class="border-l-2 border-primary/50 pl-4">
                             <h4 class="font-mono text-white uppercase font-bold text-sm mb-1">Level 2: Optuna Calibrated</h4>
-                            <p class="text-sm text-gray-500 mb-1">Coefficienti della formula core ottimizzati via 200 trial bayesiani (Optuna).</p>
-                            <p class="text-xs font-mono text-gray-600">NDCG@5: 98.9% <span class="text-gray-500">-> Altissima precisione a costo runtime zero.</span></p>
+                            <p class="text-sm text-gray-500 mb-1">Core formula coefficients optimized via 200 Bayesian trials (Optuna).</p>
+                            <p class="text-xs font-mono text-gray-600">NDCG@5: 98.9% <span class="text-gray-500">-> Extremely high precision at zero runtime cost.</span></p>
                         </div>
                         
                         <div class="border-l-2 border-primary pl-4 relative">
                             <h4 class="font-mono text-primary uppercase font-bold text-sm mb-1">Level 3: Deep ML Inference</h4>
-                            <p class="text-sm text-gray-500 mb-1">Modello Ibrido (LightGBM) con feature semantiche (<i>angr</i>). Filtra il rumore sintattico.</p>
-                            <p class="text-xs font-mono text-primary">NDCG@20: 100.0% <span class="text-gray-500">-> Classifica infallibile per catene ROP complesse.</span></p>
+                            <p class="text-sm text-gray-500 mb-1">Hybrid Model (LightGBM) with semantic features (<i>angr</i>). Filters out syntactic noise.</p>
+                            <p class="text-xs font-mono text-primary">NDCG@20: 100.0% <span class="text-gray-500">-> Flawless ranking for complex ROP chains.</span></p>
                         </div>
                     </div>
                 </div>
@@ -638,11 +638,7 @@ images: images/LCSAJfull.png
                                         <td class="px-4 py-3 text-gray-500 text-xs">FLAG</td>
                                         <td class="px-4 py-3 text-gray-400">Use strictly the algorithmic ranking (bypass ML).</td>
                                     </tr>
-                                    <tr class="bg-black/20 hover:bg-black/40 transition-colors">
-                                        <td class="px-4 py-3 font-mono text-gray-500 whitespace-nowrap">--viz</td>
-                                        <td class="px-4 py-3 text-gray-500 text-xs">FLAG</td>
-                                        <td class="px-4 py-3 text-gray-400">Export full graph as JSON for 3D visualization.</td>
-                                    </tr>
+                                    
                                     <tr class="bg-black/10 hover:bg-black/40 transition-colors">
                                         <td class="px-4 py-3 font-mono text-gray-500 whitespace-nowrap">--version</td>
                                         <td class="px-4 py-3 text-gray-500 text-xs">FLAG</td>
