@@ -321,7 +321,7 @@ images: images/LCSAJfull.png
                         
                         <div class="border-l-2 border-primary pl-4 relative">
                             <h4 class="font-mono text-primary uppercase font-bold text-sm mb-1">Level 3: Deep ML Inference</h4>
-                            <p class="text-sm text-gray-500 mb-1">Hybrid Model (LightGBM) with semantic features (<i>angr</i>). Filters out syntactic noise.</p>
+                            <p class="text-sm text-gray-500 mb-1">Hybrid Model (LightGBM) pre-trained with semantic constraints (<i>angr/angrop</i>). Filters out syntactic noise with zero runtime overhead.</p>
                             <p class="text-xs font-mono text-primary">NDCG@20: 100.0% <span class="text-gray-500">-> Flawless ranking for complex ROP chains.</span></p>
                         </div>
                     </div>
@@ -330,16 +330,16 @@ images: images/LCSAJfull.png
                 <div class="bg-black border border-white/10 sharp p-6 relative group h-full shadow-2xl">
                 <div class="scanlines absolute inset-0 opacity-50 pointer-events-none"></div>
                 <div class="relative z-10 font-mono text-xs leading-relaxed text-gray-300">
-                    <p class="text-gray-500 mb-4">$ cat inference_evaluation_v14.log</p>
+                    <p class="text-gray-500 mb-4">$ cat evaluate_hybrid_v3.log</p>
                     
-                    <p class="text-primary font-bold"># Dataset Specs (Hybrid v14)</p>
+                    <p class="text-primary font-bold"># Model Specs (Hybrid v3)</p>
                     <p>> Binaries: <span class="text-white">Real-world exploits & CTF Challenges</span></p>
-                    <p>> Features: <span class="text-white">31 (26 Structural + 5 Semantic via angr)</span></p>
+                    <p>> Features: <span class="text-white">31 (26 Structural + 5 Semantic via angr/angrop)</span></p>
                     <p>> Training: <span class="text-white">Hard Negative Mining applied</span></p>
                     <br>
                     
                     <p class="text-primary font-bold"># Benchmark Results (vs libc.so.6)</p>
-                    <p>> Model   : Hybrid LightGBM (Optuna optimized)</p>
+                    <p>> Model   : <span class="text-white">lcsajlearn_chainfinder_hybrid_v3.pkl</span></p>
                     <p>> NDCG@5  : <span class="text-white">0.821</span> <span class="text-gray-500">(Perfect static filtering)</span></p>
                     <p>> NDCG@20 : <span class="text-white">1.000</span> <span class="text-gray-500">(Mathematically perfect deep ranking)</span></p>
                     <br>
