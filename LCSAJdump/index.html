@@ -59,6 +59,7 @@ images: images/LCSAJfull.png
                         <a href="#features"      class="hover:text-primary transition-colors px-3 py-2 sharp text-sm font-medium">Features</a>
                         <a href="#architectures" class="hover:text-primary transition-colors px-3 py-2 sharp text-sm font-medium">Architectures</a>
                         <a href="#plugins"       class="hover:text-primary transition-colors px-3 py-2 sharp text-sm font-medium">Plugins</a>
+                        <a href="#ml-engine"       class="hover:text-primary transition-colors px-3 py-2 sharp text-sm font-medium">ML-Engine</a>
                         <a href="#usage"         class="hover:text-primary transition-colors px-3 py-2 sharp text-sm font-medium">Usage</a>
                     </div>
                 </div>
@@ -73,7 +74,6 @@ images: images/LCSAJfull.png
         </div>
     </nav>
 
-    <!-- ── Download stats bar (compact, under navbar) ──────── -->
     <div class="w-full bg-darker/95 border-b border-white/6">
         <div class="max-w-7xl mx-auto px-4 flex items-center justify-center gap-6 sm:gap-10 h-8 text-[11px] font-mono">
             <span class="w-1 h-1 rounded-full bg-primary animate-pulse"></span>
@@ -106,7 +106,7 @@ images: images/LCSAJfull.png
                     </div>
 
                     <div class="flex justify-center lg:justify-start mb-8">
-                        <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Buy me a coffee', '#F07C06', 'H2H21UHZP2');kofiwidget2.draw();</script> 
+                        <iframe src="https://github.com/sponsors/Chris1sFlaggin/button" title="Sponsor Chris1sFlaggin" height="32" width="114" style="border: 0; border-radius: 6px;"></iframe> 
                     </div>
 
                     <h1 class="font-display glitch-title text-6xl sm:text-7xl xl:text-8xl text-white mb-6 leading-none tracking-tight uppercase">
@@ -193,7 +193,6 @@ images: images/LCSAJfull.png
                     Your browser does not support the video tag.
                 </video>
             </div>
-            
         </div>
     </section>
 
@@ -262,33 +261,101 @@ images: images/LCSAJfull.png
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-white/5">
-                <div class="feature-card bg-card p-8 hover:bg-[#111] transition-colors group cursor-default relative overflow-hidden">
+                <div class="feature-card bg-card p-8 hover:bg-[#111] transition-colors group cursor-default relative overflow-hidden flex flex-col h-full">
                     <div class="feature-num absolute bottom-4 right-4">01</div>
-                    <div class="w-2 h-8 bg-primary mb-6"></div>
+                    <div class="w-2 h-8 bg-primary mb-6 shrink-0"></div>
                     <h3 class="font-display text-2xl text-white mb-3 uppercase">Graph<br>Reconstruction</h3>
-                    <p class="text-sm text-gray-500 leading-relaxed">Models the binary as a directed graph of Basic Blocks. Every control-flow edge is explicit.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed flex-1">Models the binary as a directed graph of Basic Blocks. Every control-flow edge is explicit.</p>
                 </div>
 
-                <div class="feature-card bg-card p-8 hover:bg-[#111] transition-colors group cursor-default relative overflow-hidden">
+                <div class="feature-card bg-card p-8 hover:bg-[#111] transition-colors group cursor-default relative overflow-hidden flex flex-col h-full">
                     <div class="feature-num absolute bottom-4 right-4">02</div>
-                    <div class="w-2 h-8 bg-secondary mb-6"></div>
+                    <div class="w-2 h-8 bg-secondary mb-6 shrink-0"></div>
                     <h3 class="font-display text-2xl text-white mb-3 uppercase">Rainbow<br>BFS</h3>
-                    <p class="text-sm text-gray-500 leading-relaxed">Backward traversal with O(1) Early-Drop filter and Hard-Cap limits. Fast and exhaustive.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed flex-1">Backward traversal with O(1) Early-Drop filter and Hard-Cap limits. Fast and exhaustive.</p>
                 </div>
 
-                <div class="feature-card bg-card p-8 hover:bg-[#111] transition-colors group cursor-default relative overflow-hidden">
+                <div class="feature-card bg-card p-8 hover:bg-[#111] transition-colors group cursor-default relative overflow-hidden flex flex-col h-full">
                     <div class="feature-num absolute bottom-4 right-4">03</div>
-                    <div class="w-2 h-8 bg-primary mb-6"></div>
+                    <div class="w-2 h-8 bg-primary mb-6 shrink-0"></div>
                     <h3 class="font-display text-2xl text-white mb-3 uppercase">Shadow<br>Gadgets</h3>
-                    <p class="text-sm text-gray-500 leading-relaxed">Trampoline and conditional chains that bypass bad bytes. Invisible to linear scanners.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed flex-1">Trampoline and conditional chains that bypass bad bytes. Invisible to linear scanners.</p>
                 </div>
 
-                <div class="feature-card bg-card p-8 hover:bg-[#111] transition-colors group cursor-default relative overflow-hidden">
+                <div class="feature-card bg-card p-8 hover:bg-[#111] transition-colors group cursor-default relative overflow-hidden flex flex-col h-full">
                     <div class="feature-num absolute bottom-4 right-4">04</div>
-                    <div class="w-2 h-8 bg-secondary mb-6"></div>
+                    <div class="w-2 h-8 bg-secondary mb-6 shrink-0"></div>
                     <h3 class="font-display text-2xl text-white mb-3 uppercase">Dynamic<br>Scoring</h3>
-                    <p class="text-sm text-gray-500 leading-relaxed">Architecture-aware heuristics rank gadgets by register criticality and chain potential.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed flex-1">Architecture-aware heuristics rank gadgets by register criticality and chain potential.</p>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="ml-engine" class="py-20 bg-darker border-y border-white/5 accent-thread">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="section-label mb-4" style="color: #9BDB08;">Core Evolution</p>
+            <h2 class="font-display glitch-title text-6xl sm:text-7xl text-white uppercase mb-12 leading-none">
+                ML <span class="text-primary">Scoring</span> Engine
+            </h2>
+    
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                <div class="space-y-8">
+                    <p class="text-gray-400 text-lg font-mono leading-relaxed border-l-2 border-white/10 pl-4">
+                        <span class="text-primary">></span> Il framework evolve da pesi empirici a un motore di ranking guidato dai dati.<br>
+                        <span class="text-primary">></span> Sfruttando <span class="text-white">LightGBM LambdaRank</span> e 23 feature strutturali, LCSAJdump trasforma la discovery dei gadget in un problema di Learning-to-Rank.
+                    </p>
+    
+                    <div class="space-y-6 pt-4">
+                        <div class="border-l-2 border-primary/50 pl-4">
+                            <h4 class="font-mono text-white uppercase font-bold text-sm mb-1">Level 1: Static Heuristic</h4>
+                            <p class="text-sm text-gray-500 mb-1">Formula additiva manuale (magic numbers). Prestazioni deboli su binari complessi.</p>
+                            <p class="text-xs font-mono text-gray-600">NDCG@1: 11.0%</p>
+                        </div>
+                        
+                        <div class="border-l-2 border-primary/50 pl-4">
+                            <h4 class="font-mono text-white uppercase font-bold text-sm mb-1">Level 2: Optuna Calibrated</h4>
+                            <p class="text-sm text-gray-500 mb-1">Coefficienti della formula core ottimizzati via 200 trial bayesiani (Optuna).</p>
+                            <p class="text-xs font-mono text-gray-600">NDCG@5: 98.9% <span class="text-gray-500">-> Altissima precisione a costo runtime zero.</span></p>
+                        </div>
+                        
+                        <div class="border-l-2 border-primary pl-4 relative">
+                            <h4 class="font-mono text-primary uppercase font-bold text-sm mb-1">Level 3: Deep ML Inference</h4>
+                            <p class="text-sm text-gray-500 mb-1">Modello Ibrido (LightGBM) con feature semantiche (<i>angr</i>). Filtra il rumore sintattico.</p>
+                            <p class="text-xs font-mono text-primary">NDCG@20: 100.0% <span class="text-gray-500">-> Classifica infallibile per catene ROP complesse.</span></p>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="bg-black border border-white/10 sharp p-6 relative group h-full shadow-2xl">
+                <div class="scanlines absolute inset-0 opacity-50 pointer-events-none"></div>
+                <div class="relative z-10 font-mono text-xs leading-relaxed text-gray-300">
+                    <p class="text-gray-500 mb-4">$ cat inference_evaluation_v14.log</p>
+                    
+                    <p class="text-primary font-bold"># Dataset Specs (Hybrid v14)</p>
+                    <p>> Binaries: <span class="text-white">Real-world exploits & CTF Challenges</span></p>
+                    <p>> Features: <span class="text-white">31 (26 Structural + 5 Semantic via angr)</span></p>
+                    <p>> Training: <span class="text-white">Hard Negative Mining applied</span></p>
+                    <br>
+                    
+                    <p class="text-primary font-bold"># Benchmark Results (vs libc.so.6)</p>
+                    <p>> Model   : Hybrid LightGBM (Optuna optimized)</p>
+                    <p>> NDCG@5  : <span class="text-white">0.821</span> <span class="text-gray-500">(Perfect static filtering)</span></p>
+                    <p>> NDCG@20 : <span class="text-white">1.000</span> <span class="text-gray-500">(Mathematically perfect deep ranking)</span></p>
+                    <br>
+                    
+                    <p class="text-primary font-bold"># Semantic Evolution (Feature Gain)</p>
+                    <p>> [1] has_direct_call         : <span class="text-white">Dominant</span> <span class="text-gray-500">(Structural)</span></p>
+                    <p>> [5] sm_dereferences_memory  : <span class="text-white">577.0 Gain</span> <span class="text-primary font-bold"><-- NEW</span></p>
+                    <p>> [15] sm_controls_arg_reg    : <span class="text-white">4.5 Gain</span></p>
+                    <p class="text-gray-500 mt-2 ml-4">Note: By injecting symbolic execution constraints (angr),</p>
+                    <p class="text-gray-500 ml-4">the Hybrid model successfully isolates clean stack-popping</p>
+                    <p class="text-gray-500 ml-4">and robust ret2csu-like calls, zeroing out the noise.</p>
+                    <br>
+                    
+                    <p class="text-primary animate-pulse">_</p>
+                </div>
+            </div>
             </div>
         </div>
     </section>
@@ -301,9 +368,9 @@ images: images/LCSAJfull.png
                 <p class="mt-4 text-gray-400">LCSAJdump is modular — extend support by adding new profiles in <code class="text-primary">config.py</code>.</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                <div class="bg-card border border-white/10 p-6 sharp hover:border-secondary/50 transition-all group">
+                <div class="bg-card border border-white/10 p-6 sharp hover:border-secondary/50 transition-all group flex flex-col h-full">
                     <div class="flex items-center gap-4 mb-4">
-                        <div class="w-16 h-16 sharp bg-secondary/10 flex items-center justify-center p-2">
+                        <div class="w-16 h-16 sharp bg-secondary/10 flex items-center justify-center p-2 shrink-0">
                             <img src="../images/riscv.png" onerror="this.onerror=null; this.src='images/riscv.png';" alt="RISC-V Logo" class="w-full h-full object-contain" style="filter: brightness(0) saturate(100%) invert(49%) sepia(64%) saturate(2017%) hue-rotate(1deg) brightness(101%) contrast(101%);">
                         </div>
                         <div>
@@ -311,11 +378,11 @@ images: images/LCSAJfull.png
                             <span class="text-[10px] px-1.5 py-0.5 bg-secondary/10 text-secondary uppercase tracking-widest font-bold">Native</span>
                         </div>
                     </div>
-                    <p class="text-sm text-gray-400">Native implementation with full support for compressed instructions (RVC). Default architecture.</p>
+                    <p class="text-sm text-gray-400 flex-1">Native implementation with full support for compressed instructions (RVC). Default architecture.</p>
                 </div>
-                <div class="bg-card border border-white/10 p-6 sharp hover:border-blue-400/50 transition-all group">
+                <div class="bg-card border border-white/10 p-6 sharp hover:border-blue-400/50 transition-all group flex flex-col h-full">
                     <div class="flex items-center gap-4 mb-4">
-                        <div class="w-16 h-16 sharp bg-blue-400/10 flex items-center justify-center p-0">
+                        <div class="w-16 h-16 sharp bg-blue-400/10 flex items-center justify-center p-0 shrink-0">
                             <img src="../images/amd64.png" onerror="this.onerror=null; this.src='images/amd64.png';" alt="x86_64 Logo" class="w-full h-full object-contain" style="filter: brightness(0) saturate(100%) invert(60%) sepia(60%) saturate(500%) hue-rotate(180deg) brightness(110%) contrast(100%);">
                         </div>
                         <div>
@@ -323,11 +390,11 @@ images: images/LCSAJfull.png
                             <span class="text-[10px] px-1.5 py-0.5 bg-blue-400/10 text-blue-400 uppercase tracking-widest font-bold">Fully Supported</span>
                         </div>
                     </div>
-                    <p class="text-sm text-gray-400">Latest update with x86_64 support. Handles variable-length overlapping instructions and misaligned gadgets.</p>
+                    <p class="text-sm text-gray-400 flex-1">Latest update with x86_64 support. Handles variable-length overlapping instructions and misaligned gadgets.</p>
                 </div>
-                <div class="bg-card border border-white/10 p-6 sharp hover:border-primary/50 transition-all group">
+                <div class="bg-card border border-white/10 p-6 sharp hover:border-primary/50 transition-all group flex flex-col h-full">
                     <div class="flex items-center gap-4 mb-4">
-                        <div class="w-16 h-16 sharp bg-primary/10 flex items-center justify-center p-0">
+                        <div class="w-16 h-16 sharp bg-primary/10 flex items-center justify-center p-0 shrink-0">
                             <img src="../images/arm.png" onerror="this.onerror=null; this.src='images/arm.png';" alt="arm Logo" class="w-full h-full object-contain" style="filter: brightness(0) saturate(100%) invert(62%) sepia(95%) saturate(600%) hue-rotate(35deg) brightness(105%) contrast(101%);">
                         </div>
                         <div>
@@ -335,7 +402,7 @@ images: images/LCSAJfull.png
                             <span class="text-[10px] px-1.5 py-0.5 bg-primary/10 text-primary uppercase tracking-widest font-bold">Fully Supported</span>
                         </div>
                     </div>
-                    <p class="text-sm text-gray-400">Latest update with ARM support. Handles variable-length instructions and Thumb/Thumb-2 mixed-mode gadgets.</p>
+                    <p class="text-sm text-gray-400 flex-1">Latest update with ARM support. Handles variable-length instructions and Thumb/Thumb-2 mixed-mode gadgets.</p>
                 </div>
             </div>
         </div>
@@ -349,20 +416,23 @@ images: images/LCSAJfull.png
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                <!-- pwntools card -->
-                <div class="group bg-card border border-white/8 hover:border-primary/40 transition-all duration-300 p-6 relative overflow-hidden">
+                <a href="pwntools/" class="group bg-card border border-white/8 hover:border-primary/40 transition-all duration-300 p-6 relative overflow-hidden flex flex-col h-full">
                     <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 bg-primary/10 border border-primary/20 flex items-center justify-center">
-                                <span class="font-mono text-primary font-bold text-xs">py</span>
+                    
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                                    <span class="font-mono text-primary font-bold text-xs">py</span>
+                                </div>
+                                <span class="font-display text-xl text-white uppercase">pwntools</span>
                             </div>
-                            <span class="font-display text-xl text-white uppercase">pwntools</span>
+                            <span class="font-mono text-[10px] font-bold text-primary bg-primary/10 border border-primary/20 px-2 py-1 uppercase tracking-wider">Available</span>
                         </div>
-                        <span class="font-mono text-[10px] font-bold text-primary bg-primary/10 border border-primary/20 px-2 py-1 uppercase tracking-wider">Available</span>
+                        <p class="text-xs text-gray-500 mb-3 leading-relaxed">Zero-import integration — <code class="text-primary">LCSAJGadgets</code> is injected into pwntools' namespace automatically.</p>
                     </div>
-                    <p class="text-xs text-gray-500 mb-3 leading-relaxed">Zero-import integration — <code class="text-primary">LCSAJGadgets</code> is injected into pwntools' namespace automatically.</p>
-                    <div class="integration-code">
+
+                    <div class="integration-code mt-auto">
                         <span class="text-gray-600"># no extra imports needed</span><br>
                         <span class="text-blue-400">from</span> <span class="text-white">pwn</span> <span class="text-blue-400">import</span> <span class="text-white">*</span><br>
                         <br>
@@ -370,51 +440,57 @@ images: images/LCSAJfull.png
                         <span class="text-gray-400">pop_rdi</span> <span class="text-white">=</span> <span class="text-gray-400">gadgets</span><span class="text-white">.</span><span class="text-yellow-400">find</span><span class="text-white">(</span><span class="text-green-400">'pop rdi'</span><span class="text-white">)[</span><span class="text-orange-400">0</span><span class="text-white">]</span><br>
                         <span class="text-gray-400">fat</span> <span class="text-white">=</span> <span class="text-gray-400">gadgets</span><span class="text-white">.</span><span class="text-yellow-400">trampolines</span><span class="text-white">(</span><span class="text-green-400">'call'</span><span class="text-white">)[</span><span class="text-orange-400">0</span><span class="text-white">]</span>
                     </div>
-                </div>
+                </a>
 
-                <!-- GDB card -->
-                <div class="group bg-card border border-white/8 hover:border-blue-500/40 transition-all duration-300 p-6 relative overflow-hidden">
+                <a href="gdb/" class="group bg-card border border-white/8 hover:border-blue-500/40 transition-all duration-300 p-6 relative overflow-hidden flex flex-col h-full">
                     <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                                <span class="font-mono text-blue-400 font-bold text-[10px] leading-none">gdb</span>
+                    
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
+                                    <span class="font-mono text-blue-400 font-bold text-[10px] leading-none">gdb</span>
+                                </div>
+                                <span class="font-display text-xl text-white uppercase">GDB / pwndbg</span>
                             </div>
-                            <span class="font-display text-xl text-white uppercase">GDB / pwndbg / GEF</span>
+                            <span class="font-mono text-[10px] font-bold text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-1 uppercase tracking-wider">Available</span>
                         </div>
-                        <span class="font-mono text-[10px] font-bold text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-1 uppercase tracking-wider">Available</span>
+                        <p class="text-xs text-gray-500 mb-3 leading-relaxed">Source once in <code class="text-blue-400">~/.gdbinit</code> — the <code class="text-blue-400">lcsaj</code> command is available in every session, on any compatible debugger.</p>
                     </div>
-                    <p class="text-xs text-gray-500 mb-3 leading-relaxed">Source once in <code class="text-blue-400">~/.gdbinit</code> — the <code class="text-blue-400">lcsaj</code> command is available in every session, on any compatible debugger.</p>
-                    <div class="integration-code">
+
+                    <div class="integration-code mt-auto">
                         <span class="text-gray-600"># run gadget search inside the debugger</span><br>
                         <span class="text-blue-400">pwndbg&gt;</span> <span class="text-primary">lcsaj</span> <span class="text-white">./chal</span> <span class="text-secondary">--find</span> <span class="text-green-400">"pop rdi"</span><br>
                         <br>
                         <span class="text-gray-600"># auto-detects the running inferior</span><br>
                         <span class="text-blue-400">pwndbg&gt;</span> <span class="text-primary">lcsaj</span> <span class="text-secondary">-l</span> <span class="text-orange-400">20</span> <span class="text-secondary">--all-exec</span>
                     </div>
-                </div>
+                </a>
 
-                <!-- IDA Pro card -->
-                <div class="group bg-card border border-white/8 hover:border-purple-500/40 transition-all duration-300 p-6 relative overflow-hidden">
+                <a href="ida/" class="group bg-card border border-white/8 hover:border-purple-500/40 transition-all duration-300 p-6 relative overflow-hidden flex flex-col h-full">
                     <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
-                                <span class="font-mono text-purple-400 font-bold text-[10px] leading-none">IDA</span>
+                    
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shrink-0">
+                                    <span class="font-mono text-purple-400 font-bold text-[10px] leading-none">IDA</span>
+                                </div>
+                                <span class="font-display text-xl text-white uppercase">IDA Pro</span>
                             </div>
-                            <span class="font-display text-xl text-white uppercase">IDA Pro</span>
+                            <span class="font-mono text-[10px] font-bold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2 py-1 uppercase tracking-wider">Available</span>
                         </div>
-                        <span class="font-mono text-[10px] font-bold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2 py-1 uppercase tracking-wider">Available</span>
+                        <p class="text-xs text-gray-500 mb-3 leading-relaxed">Drop <code class="text-purple-400">ida_lcsajdump.py</code> into <code class="text-purple-400">~/.idapro/plugins/</code> — gadgets appear in a dockable panel with live register filtering.</p>
                     </div>
-                    <p class="text-xs text-gray-500 mb-3 leading-relaxed">Drop <code class="text-purple-400">ida_lcsajdump.py</code> into <code class="text-purple-400">~/.idapro/plugins/</code> — gadgets appear in a dockable panel with live register filtering.</p>
-                    <div class="integration-code">
+
+                    <div class="integration-code mt-auto">
                         <span class="text-gray-600"># open any binary in IDA Pro, then</span><br>
                         <span class="text-purple-400">Ctrl</span><span class="text-white">+</span><span class="text-purple-400">Shift</span><span class="text-white">+</span><span class="text-purple-400">L</span><span class="text-gray-600">  — launch analysis</span><br>
                         <br>
                         <span class="text-gray-600"># results panel: check registers</span><br>
                         <span class="text-gray-600"># to filter gadgets in real time</span>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
 
@@ -557,7 +633,17 @@ images: images/LCSAJfull.png
                                         <td class="px-4 py-3 text-gray-500 text-xs">FLAG</td>
                                         <td class="px-4 py-3 text-gray-400">Analyze all executable sections, not just <code class="text-xs bg-white/10 px-1 rounded">.text</code>.</td>
                                     </tr>
+                                    <tr class="bg-black/10 hover:bg-black/40 transition-colors">
+                                        <td class="px-4 py-3 font-mono text-gray-500 whitespace-nowrap">-al, --algo</td>
+                                        <td class="px-4 py-3 text-gray-500 text-xs">FLAG</td>
+                                        <td class="px-4 py-3 text-gray-400">Use strictly the algorithmic ranking (bypass ML).</td>
+                                    </tr>
                                     <tr class="bg-black/20 hover:bg-black/40 transition-colors">
+                                        <td class="px-4 py-3 font-mono text-gray-500 whitespace-nowrap">--viz</td>
+                                        <td class="px-4 py-3 text-gray-500 text-xs">FLAG</td>
+                                        <td class="px-4 py-3 text-gray-400">Export full graph as JSON for 3D visualization.</td>
+                                    </tr>
+                                    <tr class="bg-black/10 hover:bg-black/40 transition-colors">
                                         <td class="px-4 py-3 font-mono text-gray-500 whitespace-nowrap">--version</td>
                                         <td class="px-4 py-3 text-gray-500 text-xs">FLAG</td>
                                         <td class="px-4 py-3 text-gray-400">Show the installed version and exit.</td>
@@ -599,10 +685,12 @@ images: images/LCSAJfull.png
                 <div>
                     <h4 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Project</h4>
                     <ul class="space-y-3">
-                        <li><a href="#features" class="text-sm text-gray-500 hover:text-primary transition-colors">Features</a></li>
-                        <li><a href="#benchmarks" class="text-sm text-gray-500 hover:text-primary transition-colors">Benchmarks</a></li>
-                        <li><a href="#architectures" class="text-sm text-gray-500 hover:text-primary transition-colors">Architectures</a></li>
-                        <li><a href="#plugins" class="text-sm text-gray-500 hover:text-primary transition-colors">Plugins</a></li>
+                        <li><a href="#problem"       class="hover:text-primary transition-colors px-3 py-2 sharp text-sm font-medium">The Problem</a></li>
+                        <li><a href="#features"      class="hover:text-primary transition-colors px-3 py-2 sharp text-sm font-medium">Features</a></li>
+                        <li><a href="#architectures" class="hover:text-primary transition-colors px-3 py-2 sharp text-sm font-medium">Architectures</a></li>
+                        <li><a href="#plugins"       class="hover:text-primary transition-colors px-3 py-2 sharp text-sm font-medium">Plugins</a></li>
+                        <li><a href="#ml-engine"       class="hover:text-primary transition-colors px-3 py-2 sharp text-sm font-medium">ML-Engine</a></li>
+                        <li><a href="#usage"         class="hover:text-primary transition-colors px-3 py-2 sharp text-sm font-medium">Usage</a></li>
                     </ul>
                 </div>
 
