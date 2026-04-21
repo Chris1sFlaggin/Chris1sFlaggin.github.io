@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>lcsaj — GDB / pwndbg / GEF Plugin | LCSAJdump</title>
+    <meta name="description" content="lcsaj: GDB plugin that adds graph-based gadget discovery inside any GDB-compatible debugger.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#9BDB08',
+                        secondary: '#F07C06',
+                        accent: '#3b82f6', /* Blu GDB */
+                        accentHover: '#60a5fa',
+                        dark: '#0a0a0a',
+                        darker: '#050505',
+                        card: '#141414',
+                        cardHover: '#1a1a1a'
+                    },
+                    fontFamily: {
+                        sans: ['"DM Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                        display: ['"Barlow Condensed"', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* ── Accent thread (linea verticale) ────────────────────────── */
+        .accent-thread { position: relative; }
+        .accent-thread::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: #3b82f6; /* Blu per GDB */
+            opacity: 0.45;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .section-connector {
+            position: relative;
+            height: 0;
+            overflow: visible;
+            z-index: 20;
+        }
+        .section-connector::before {
+            content: '';
+            position: absolute;
+            left: 3px; top: -5px;
+            width: 60px; height: 1px;
+            background: linear-gradient(to right, rgba(59,130,246,0.5), transparent);
+        }
+        .section-connector::after {
+            content: '';
+            position: absolute;
+            left: -2px; top: -7px;
+            width: 7px; height: 7px;
+            background: #3b82f6;
+            opacity: 0.7;
+            transform: rotate(45deg);
+            z-index: 21;
+        }
+    </style>
+</head>
+<body class="bg-darker text-gray-300 font-sans antialiased selection:bg-accent/40 selection:text-white bg-grid">
+
+    <nav class="fixed w-full z-50 top-0 backdrop-blur-md bg-darker/90 border-b border-white/8" style="border-top: 2px solid #3b82f6;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="../" class="flex items-center gap-2 text-gray-400 hover:text-accent transition-colors text-sm font-mono">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    LCSAJdump
+                </a>
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 sharp bg-accent animate-pulse"></div>
+                    <span class="font-display text-lg text-white uppercase tracking-wide">GDB / pwndbg / GEF Plugin</span>
+                </div>
+                <a href="https://github.com/chris1sflaggin/lcsajdump" target="_blank"
+                   class="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-4 py-2 sharp text-sm font-medium transition-all">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
+                    GitHub
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-32 pb-16 overflow-hidden bg-darker accent-thread">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="absolute top-0 left-1/4 w-96 h-96 bg-accent/15 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-pulse-slow"></div>
+
+            <div class="relative z-10 lg:grid lg:grid-cols-12 lg:gap-16 items-center">
+                <div class="lg:col-span-6">
+                    <p class="section-label mb-4" style="color:#3b82f6;">Plugin / GDB</p>
+                    <h1 class="font-display glitch-title text-6xl sm:text-7xl xl:text-8xl text-white mb-6 leading-none uppercase">
+                        lcsaj<br><span style="background:linear-gradient(90deg,#3b82f6,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">command</span>
+                    </h1>
+                    <p class="text-gray-400 text-xl mb-8">
+                        Source once in <code class="text-accent font-mono bg-white/5 px-1.5 py-0.5 sharp">~/.gdbinit</code> and the <code class="text-accent font-mono bg-white/5 px-1.5 py-0.5 sharp">lcsaj</code> command is available in every GDB, pwndbg, and GEF session.
+                        Binary auto-detection means you can run gadget discovery without ever leaving the debugger.
+                    </p>
+                    <div class="flex flex-wrap gap-3">
+                        <span class="inline-flex items-center gap-2 px-3 py-1 bg-accent/10 border border-accent/30 text-sm text-accentHover font-mono font-bold sharp">
+                            <span class="flex h-2 w-2 bg-accent animate-pulse sharp"></span>
+                            Available
+                        </span>
+                        <span class="px-3 py-1 bg-white/5 border border-white/10 text-sm text-gray-400 font-mono sharp">GDB · pwndbg · GEF</span>
+                        <span class="px-3 py-1 bg-white/5 border border-white/10 text-sm text-gray-400 font-mono sharp">x86_64 · ARM64 · RISC-V64</span>
+                    </div>
+                </div>
+
+                <div class="hidden lg:flex lg:col-span-6 mt-10 lg:mt-0">
+                    <div class="w-full border border-white/10 sharp bg-card overflow-hidden flex flex-col h-full shadow-2xl">
+                        <div class="flex items-center px-4 py-3 bg-darker/60 border-b border-white/10">
+                            <div class="flex space-x-2">
+                                <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+                            </div>
+                            <div class="mx-auto text-xs text-gray-500 font-mono">pwndbg — lcsaj demo</div>
+                        </div>
+                        <div class="scanlines p-5 text-[11px] font-mono text-gray-300 bg-black/90 space-y-1 flex-1">
+                            <p><span class="text-accentHover">pwndbg&gt;</span> <span class="text-primary">lcsaj</span> <span class="text-secondary">--find</span> <span class="text-green-400">"pop rdi"</span> <span class="text-secondary">-l</span> <span class="text-orange-400">5</span></p>
+                            <p class="text-gray-600 text-[10px]">[lcsaj] Auto-detected binary: /home/user/ctf/chal</p>
+                            <p class="text-gray-600 text-[10px]">[lcsaj] Analysing /home/user/ctf/chal ...</p>
+                            <p class="mt-2 text-white font-bold">  LCSAJ Gadgets — chal</p>
+                            <p class="text-gray-600">  Filter: "pop rdi"</p>
+                            <p class="mt-1 text-white">  Sequential gadgets (3 found, showing 3):</p>
+                            <p class="text-gray-600">  ────────────────────────────────────────────────────────────</p>
+                            <p>  [1] <span class="text-yellow-400">0x401156</span>  <span class="text-gray-300">pop rdi; ret</span>  <span class="text-gray-600">[ROP] score=230</span></p>
+                            <p>  [2] <span class="text-yellow-400">0x40117a</span>  <span class="text-gray-300">pop rdi; pop rsi; ret</span>  <span class="text-gray-600">[ROP] score=210</span></p>
+                            <p>  [3] <span class="text-yellow-400">0x401190</span>  <span class="text-gray-300">xor rdi, rdi; pop rdi; ret</span>  <span class="text-gray-600">[ROP] score=180</span></p>
+                            <p class="mt-1 text-white">  Jump-based gadgets (0 found, showing 0):</p>
+                            <p class="text-gray-600">  (none)</p>
+                            <p class="mt-2 text-gray-600 text-[10px]">  Showing 3 of 3 gadgets.</p>
+                            <p class="text-gray-600 text-[10px]">  Tip: use -l N to show more, --find PATTERN to filter.</p>
+                            <p class="mt-2 text-accentHover animate-pulse">pwndbg&gt; _</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="section-connector"></div>
+
+    <section class="py-16 bg-card/50 border-y border-white/5 accent-thread">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="section-label mb-4" style="color:#3b82f6;">Installation</p>
+            <h2 class="font-display text-4xl text-white uppercase mb-8">One-Time Setup</h2>
+
+            <div class="space-y-4">
+                <div class="bg-darker border border-white/10 sharp p-6">
+                    <p class="text-xs text-gray-500 font-mono uppercase tracking-wider mb-3">Installazione Automatica</p>
+                    <div class="scanlines bg-black/80 border border-white/8 sharp p-4 font-mono text-sm">
+                        <span class="text-primary">❯</span> <span class="text-white">./install_integrations.sh --gdb</span>
+                    </div>
+                    <p class="mt-3 text-xs text-gray-600">Lo script configurerà automaticamente il tuo <code class="text-white">~/.gdbinit</code> e aggiungerà il comando <code class="text-primary font-mono bg-black px-1 sharp border border-white/5">lcsaj</code> a GDB, pwndbg e GEF.</p>
+                </div>
+
+                <div class="bg-darker border border-white/10 sharp p-6">
+                    <p class="text-xs text-gray-500 font-mono uppercase tracking-wider mb-3">Step 2 — use it</p>
+                    <div class="scanlines bg-black/80 border border-white/8 sharp p-4 font-mono text-sm space-y-1">
+                        <p><span class="text-accentHover">pwndbg&gt;</span> <span class="text-primary">lcsaj</span> <span class="text-white">--help</span></p>
+                    </div>
+                </div>
+            </div>
+                </div>
+
+                <div class="bg-darker border border-white/10 sharp p-6">
+                    <p class="text-xs text-gray-500 font-mono uppercase tracking-wider mb-3">Step 2 — add to ~/.gdbinit</p>
+                    <div class="scanlines bg-black/80 border border-white/8 sharp p-4 font-mono text-sm space-y-1">
+                        <p class="text-gray-500"># add these two lines to ~/.gdbinit</p>
+                        <p><span class="text-accentHover">python</span> <span class="text-white">import sys; sys.path.insert(0, </span><span class="text-green-400">'/path/to/lcsajdump-debug'</span><span class="text-white">)</span></p>
+                        <p><span class="text-accentHover">source</span> <span class="text-green-400">/path/to/lcsajdump_dbg/integrations/gdb_plugin.py</span></p>
+                    </div>
+                    <p class="mt-3 text-xs text-gray-600">Replace <code class="text-accent font-mono bg-black px-1 sharp border border-white/5">/path/to/lcsajdump-debug</code> with the actual path to the package root. With a pip install, the plugin file is at the path returned by <code class="text-accent font-mono bg-black px-1 sharp border border-white/5">python -c "import lcsajdump_dbg; print(lcsajdump_dbg.__file__)"</code>.</p>
+                </div>
+
+                <div class="bg-darker border border-white/10 sharp p-6">
+                    <p class="text-xs text-gray-500 font-mono uppercase tracking-wider mb-3">Step 3 — use it</p>
+                    <div class="scanlines bg-black/80 border border-white/8 sharp p-4 font-mono text-sm space-y-1">
+                        <p><span class="text-accentHover">pwndbg&gt;</span> <span class="text-primary">lcsaj</span> <span class="text-secondary">--help</span></p>
+                        <p class="text-gray-500 text-[11px] mt-1"># or auto-detect and run immediately</p>
+                        <p><span class="text-accentHover">pwndbg&gt;</span> <span class="text-primary">lcsaj</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-connector"></div>
+
+    <section class="py-16 bg-darker border-b border-white/5 accent-thread">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="section-label mb-4" style="color:#3b82f6;">Reference</p>
+            <h2 class="font-display text-4xl text-white uppercase mb-8">Command Flags</h2>
+
+            <div class="sharp border border-white/10 overflow-hidden text-sm bg-black/40 mb-10 scanlines">
+                <table class="w-full text-left relative z-10">
+                    <thead>
+                        <tr class="bg-black border-b border-white/10">
+                            <th class="px-4 py-3 text-gray-500 font-mono text-xs uppercase tracking-wider">Opzione</th>
+                            <th class="px-4 py-3 text-gray-500 font-mono text-xs uppercase tracking-wider">Argomento</th>
+                            <th class="px-4 py-3 text-gray-500 font-mono text-xs uppercase tracking-wider">Descrizione</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        <tr class="hover:bg-accent/10 transition-colors">
+                            <td class="px-4 py-3 font-mono text-secondary whitespace-nowrap">-l, --limit</td>
+                            <td class="px-4 py-3 text-orange-400 font-mono text-xs">N</td>
+                            <td class="px-4 py-3 text-gray-400 text-sm">Number of gadgets to display per section (default: 10)</td>
+                        </tr>
+                        <tr class="hover:bg-accent/10 transition-colors">
+                            <td class="px-4 py-3 font-mono text-secondary whitespace-nowrap">-b, --bad-chars</td>
+                            <td class="px-4 py-3 text-green-400 font-mono text-xs">HEX</td>
+                            <td class="px-4 py-3 text-gray-400 text-sm">Hex bytes to exclude from addresses (e.g. 000a0d)</td>
+                        </tr>
+                        <tr class="hover:bg-accent/10 transition-colors">
+                            <td class="px-4 py-3 font-mono text-secondary whitespace-nowrap">-d, --depth</td>
+                            <td class="px-4 py-3 text-orange-400 font-mono text-xs">N</td>
+                            <td class="px-4 py-3 text-gray-400 text-sm">Max LCSAJ blocks per path (default: 20)</td>
+                        </tr>
+                        <tr class="hover:bg-accent/10 transition-colors">
+                            <td class="px-4 py-3 font-mono text-secondary whitespace-nowrap">-k, --darkness</td>
+                            <td class="px-4 py-3 text-orange-400 font-mono text-xs">N</td>
+                            <td class="px-4 py-3 text-gray-400 text-sm">Per-node visit ceiling / pruning threshold (default: 5)</td>
+                        </tr>
+                        <tr class="hover:bg-accent/10 transition-colors">
+                            <td class="px-4 py-3 font-mono text-secondary whitespace-nowrap">-i, --instructions</td>
+                            <td class="px-4 py-3 text-orange-400 font-mono text-xs">N</td>
+                            <td class="px-4 py-3 text-gray-400 text-sm">Max instructions per gadget node (default: 15)</td>
+                        </tr>
+                        <tr class="hover:bg-accent/10 transition-colors">
+                            <td class="px-4 py-3 font-mono text-secondary whitespace-nowrap">--all-exec</td>
+                            <td class="px-4 py-3 text-gray-500 font-mono text-xs">-</td>
+                            <td class="px-4 py-3 text-gray-400 text-sm">Analyse all executable sections (includes .coldpath)</td>
+                        </tr>
+                        <tr class="hover:bg-accent/10 transition-colors">
+                            <td class="px-4 py-3 font-mono text-secondary whitespace-nowrap">--find</td>
+                            <td class="px-4 py-3 text-green-400 font-mono text-xs">PATTERN</td>
+                            <td class="px-4 py-3 text-gray-400 text-sm">Filter gadgets whose instruction text contains PATTERN</td>
+                        </tr>
+                        <tr class="hover:bg-accent/10 transition-colors">
+                            <td class="px-4 py-3 font-mono text-secondary whitespace-nowrap">--arch</td>
+                            <td class="px-4 py-3 text-green-400 font-mono text-xs">ARCH</td>
+                            <td class="px-4 py-3 text-gray-400 text-sm">Override architecture: auto · x86_64 · arm64 · riscv64</td>
+                        </tr>
+                        <tr class="hover:bg-accent/10 transition-colors">
+                            <td class="px-4 py-3 font-mono text-secondary whitespace-nowrap">-al, --algo</td>
+                            <td class="px-4 py-3 text-gray-500 font-mono text-xs">-</td>
+                            <td class="px-4 py-3 text-gray-400 text-sm">Use strictly the algorithmic ranking (bypass ML)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="px-4 py-3 bg-black border-t border-white/10 text-xs text-gray-500 relative z-10">
+                    If [binary] is omitted, the plugin auto-detects the inferior from /proc/&lt;pid&gt;/exe or GDB's 'info files' output.
+                </div>
+            </div>
+
+            <h3 class="font-display text-2xl text-accentHover uppercase mb-6 border-b border-accent/20 pb-2">Examples</h3>
+            <div class="space-y-4">
+
+                <div class="bg-card border border-white/8 sharp p-5 hover:border-accent/50 transition-colors">
+                    <p class="text-xs text-gray-500 mb-3">Run on the auto-detected inferior (most common during a debug session)</p>
+                    <div class="scanlines bg-black/80 border border-white/8 sharp p-3 font-mono text-xs">
+                        <span class="text-accentHover">pwndbg&gt;</span> <span class="text-primary">lcsaj</span> <span class="text-secondary">-l</span> <span class="text-orange-400">20</span>
+                    </div>
+                </div>
+
+                <div class="bg-card border border-white/8 sharp p-5 hover:border-accent/50 transition-colors">
+                    <p class="text-xs text-gray-500 mb-3">Search for a specific gadget pattern</p>
+                    <div class="scanlines bg-black/80 border border-white/8 sharp p-3 font-mono text-xs">
+                        <span class="text-accentHover">pwndbg&gt;</span> <span class="text-primary">lcsaj</span> <span class="text-secondary">--find</span> <span class="text-green-400">"pop rdi"</span>
+                    </div>
+                </div>
+
+                <div class="bg-card border border-white/8 sharp p-5 hover:border-accent/50 transition-colors">
+                    <p class="text-xs text-gray-500 mb-3">Analyse all executable sections (finds gadgets in .coldpath, .init, etc.)</p>
+                    <div class="scanlines bg-black/80 border border-white/8 sharp p-3 font-mono text-xs">
+                        <span class="text-accentHover">pwndbg&gt;</span> <span class="text-primary">lcsaj</span> <span class="text-secondary">--all-exec</span> <span class="text-secondary">-l</span> <span class="text-orange-400">30</span>
+                    </div>
+                </div>
+
+                <div class="bg-card border border-white/8 sharp p-5 hover:border-accent/50 transition-colors">
+                    <p class="text-xs text-gray-500 mb-3">Explicit binary, filter bad bytes, find JOP trampoline</p>
+                    <div class="scanlines bg-black/80 border border-white/8 sharp p-3 font-mono text-xs">
+                        <span class="text-accentHover">pwndbg&gt;</span> <span class="text-primary">lcsaj</span> <span class="text-white">./chal</span> <span class="text-secondary">-b</span> <span class="text-green-400">"000a0d"</span> <span class="text-secondary">--find</span> <span class="text-green-400">"add rsp"</span>
+                    </div>
+                </div>
+
+                <div class="bg-card border border-white/8 sharp p-5 hover:border-accent/50 transition-colors">
+                    <p class="text-xs text-gray-500 mb-3">Cross-arch: analyse an ARM64 binary inside GDB (e.g. with qemu-user multiarch)</p>
+                    <div class="scanlines bg-black/80 border border-white/8 sharp p-3 font-mono text-xs">
+                        <span class="text-accentHover">pwndbg&gt;</span> <span class="text-primary">lcsaj</span> <span class="text-white">./chal_arm</span> <span class="text-secondary">--arch</span> <span class="text-green-400">arm64</span> <span class="text-secondary">--all-exec</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-connector"></div>
+
+    <section class="py-16 bg-card/30 border-b border-white/5 accent-thread">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="section-label mb-4" style="color:#3b82f6;">Output</p>
+            <h2 class="font-display text-4xl text-white uppercase mb-8">Output Format</h2>
+            <p class="text-gray-400 mb-6">Results are split into two sections — sequential (ret-terminated) and jump-based (JOP/call-terminated) — each listing up to <code class="text-accentHover font-mono bg-black px-1 border border-white/5 sharp">-l</code> gadgets with address, instruction text, tag, and heuristic score.</p>
+
+            <div class="scanlines bg-black border border-white/8 sharp p-6 font-mono text-[11px] leading-relaxed shadow-lg">
+                <p class="text-white font-bold">  LCSAJ Gadgets — chal</p>
+                <p class="text-gray-500">  Filter: "pop rdi"</p>
+                <p class="mt-4 text-white">  Sequential gadgets (3 found, showing 3):</p>
+                <p class="text-gray-600">  ────────────────────────────────────────────────────────────</p>
+                <p>  [1] <span class="text-yellow-400">0x401156</span>  <span class="text-white">pop rdi; ret</span>  <span class="text-gray-600">[ROP] score=230</span></p>
+                <p class="text-gray-600 text-[10px]">       also at: 0x401184</p>
+                <p>  [2] <span class="text-yellow-400">0x401178</span>  <span class="text-white">pop rdi; pop rsi; ret</span>  <span class="text-gray-600">[ROP] score=210</span></p>
+                <p class="mt-4 text-white">  Jump-based gadgets (0 found, showing 0):</p>
+                <p class="text-gray-600">  (none)</p>
+                <p class="mt-4 text-gray-600">  Showing 2 of 2 gadgets.</p>
+                <p class="text-gray-600">  Tip: use -l N to show more, --find PATTERN to filter.</p>
+            </div>
+
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-black border-t-2 border-accent border-x border-b border-white/10 sharp p-5 flex flex-col h-full hover:border-accent/50 transition-colors">
+                    <p class="text-xs text-gray-500 uppercase font-mono tracking-wider mb-1">Address</p>
+                    <p class="text-sm text-yellow-400 font-mono">0x401156</p>
+                    <p class="text-xs text-gray-500 mt-2">Primary entry point. <em class="text-gray-400">also at</em> lists duplicate addresses that reach the same gadget mid-sequence.</p>
+                </div>
+                <div class="bg-black border-t-2 border-accent border-x border-b border-white/10 sharp p-5 flex flex-col h-full hover:border-accent/50 transition-colors">
+                    <p class="text-xs text-gray-500 uppercase font-mono tracking-wider mb-1">Tag</p>
+                    <p class="text-sm text-gray-400 font-mono">[ROP] · [JOP] · [lcsaj]</p>
+                    <p class="text-xs text-gray-500 mt-2"><code class="text-gray-400 font-mono">lcsaj</code> marks gadgets exclusive to lcsajdump — not findable by ropper or ROPgadget.</p>
+                </div>
+                <div class="bg-black border-t-2 border-accent border-x border-b border-white/10 sharp p-5 flex flex-col h-full hover:border-accent/50 transition-colors">
+                    <p class="text-xs text-gray-500 uppercase font-mono tracking-wider mb-1">Score</p>
+                    <p class="text-sm text-gray-400 font-mono">score=230</p>
+                    <p class="text-xs text-gray-500 mt-2">Optuna-calibrated heuristic score. Higher = more useful for exploit chains on the current architecture.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-12 bg-darker border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <a href="../" class="font-display text-xl text-white uppercase hover:text-accentHover transition-colors">← LCSAJdump</a>
+                <div class="flex gap-6 text-sm text-gray-500">
+                    <a href="../pwntools/" class="hover:text-primary transition-colors">pwntools Plugin</a>
+                    <a href="../ida/" class="hover:text-red-500 transition-colors">IDA Pro Plugin</a>
+                    <a href="https://github.com/chris1sflaggin/lcsajdump" target="_blank" class="hover:text-white transition-colors">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
