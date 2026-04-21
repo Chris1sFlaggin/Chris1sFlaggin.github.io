@@ -259,13 +259,18 @@
                             <td class="px-4 py-3 text-green-400 font-mono text-xs">ARCH</td>
                             <td class="px-4 py-3 text-gray-400 text-sm">Override architecture: auto · x86_64 · arm64 · riscv64</td>
                         </tr>
-                        <tr class="hover:bg-accent/10 transition-colors">
-                            <td class="px-4 py-3 font-mono text-secondary whitespace-nowrap">-al, --algo</td>
-                            <td class="px-4 py-3 text-gray-500 font-mono text-xs">-</td>
-                            <td class="px-4 py-3 text-gray-400 text-sm">Use strictly the algorithmic ranking (bypass ML)</td>
-                        </tr>
-                    </tbody>
-                </table>
+              <tr class="hover:bg-accent/10 transition-colors">
+                <td class="px-4 py-3 font-mono text-secondary whitespace-nowrap">-al, --algo</td>
+                <td class="px-4 py-3 text-gray-500 font-mono text-xs">-</td>
+                <td class="px-4 py-3 text-gray-400 text-sm">Use strictly the algorithmic ranking (bypass ML)</td>
+              </tr>
+              <tr class="hover:bg-accent/10 transition-colors border-t border-accent/30">
+                <td class="px-4 py-3 font-mono text-accent whitespace-nowrap">--from-json</td>
+                <td class="px-4 py-3 text-green-400 font-mono text-xs">PATH</td>
+                <td class="px-4 py-3 text-gray-400 text-sm">Load gadgets from pre-generated JSON (skips re-analysis)</td>
+              </tr>
+            </tbody>
+          </table>
                 <div class="px-4 py-3 bg-black border-t border-white/10 text-xs text-gray-500 relative z-10">
                     If [binary] is omitted, the plugin auto-detects the inferior from /proc/&lt;pid&gt;/exe or GDB's 'info files' output.
                 </div>
@@ -302,15 +307,29 @@
                     </div>
                 </div>
 
-                <div class="bg-card border border-white/8 sharp p-5 hover:border-accent/50 transition-colors">
-                    <p class="text-xs text-gray-500 mb-3">Cross-arch: analyse an ARM64 binary inside GDB (e.g. with qemu-user multiarch)</p>
-                    <div class="scanlines bg-black/80 border border-white/8 sharp p-3 font-mono text-xs">
-                        <span class="text-accentHover">pwndbg&gt;</span> <span class="text-primary">lcsaj</span> <span class="text-white">./chal_arm</span> <span class="text-secondary">--arch</span> <span class="text-green-400">arm64</span> <span class="text-secondary">--all-exec</span>
-                    </div>
-                </div>
+            <div class="bg-card border border-white/8 sharp p-5 hover:border-accent/50 transition-colors">
+              <p class="text-xs text-gray-500 mb-3">Cross-arch: analyse an ARM64 binary inside GDB (e.g. with qemu-user multiarch)</p>
+              <div class="scanlines bg-black/80 border border-white/8 sharp p-3 font-mono text-xs">
+                <span class="text-accentHover">pwndbg&gt;</span> <span class="text-primary">lcsaj</span> <span class="text-white">./chal_arm</span> <span class="text-secondary">--arch</span> <span class="text-green-400">arm64</span> <span class="text-secondary">--all-exec</span>
+              </div>
             </div>
+
+            <div class="bg-card border border-white/8 sharp p-5 hover:border-accent/50 transition-colors">
+              <p class="text-xs text-gray-500 mb-3">Bypass ML ranking — use pure Optuna-calibrated heuristic (faster, deterministic)</p>
+              <div class="scanlines bg-black/80 border border-white/8 sharp p-3 font-mono text-xs">
+                <span class="text-accentHover">pwndbg&gt;</span> <span class="text-primary">lcsaj</span> <span class="text-secondary">--algo</span> <span class="text-secondary">-l</span> <span class="text-orange-400">50</span>
+              </div>
+            </div>
+
+            <div class="bg-card border border-accent/30 sharp p-5 hover:border-accent/50 transition-colors">
+              <p class="text-xs text-gray-500 mb-3">Load from pre-generated JSON (instant, no re-analysis) — generate with <code class="text-accent">lcsajdump --json -o gadgets.json</code></p>
+              <div class="scanlines bg-black/80 border border-white/8 sharp p-3 font-mono text-xs">
+                <span class="text-accentHover">pwndbg&gt;</span> <span class="text-primary">lcsaj</span> <span class="text-accent">--from-json</span> <span class="text-green-400">./gadgets.json</span> <span class="text-secondary">--find</span> <span class="text-green-400">"pop rdi"</span>
+              </div>
+            </div>
+          </div>
         </div>
-    </section>
+      </section>
 
     <div class="section-connector"></div>
 

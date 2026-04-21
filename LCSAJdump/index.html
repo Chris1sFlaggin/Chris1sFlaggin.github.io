@@ -306,55 +306,60 @@ images: images/LCSAJfull.png
                         <span class="text-primary">></span> Leveraging <span class="text-white">LightGBM LambdaRank</span> and structural/semantic features, LCSAJdump turns gadget discovery into a Learning-to-Rank problem.
                     </p>
     
-                    <div class="space-y-6 pt-4">
-                        <div class="border-l-2 border-primary/50 pl-4">
-                            <h4 class="font-mono text-white uppercase font-bold text-sm mb-1">Level 1: Static Heuristic</h4>
-                            <p class="text-sm text-gray-500 mb-1">Manual additive formula (magic numbers). Weak performance on complex binaries.</p>
-                            <p class="text-xs font-mono text-gray-600">NDCG@1: 11.0%</p>
-                        </div>
-                        
-                        <div class="border-l-2 border-primary/50 pl-4">
-                            <h4 class="font-mono text-white uppercase font-bold text-sm mb-1">Level 2: Optuna Calibrated</h4>
-                            <p class="text-sm text-gray-500 mb-1">Core formula coefficients optimized via 200 Bayesian trials (Optuna).</p>
-                            <p class="text-xs font-mono text-gray-600">NDCG@5: 98.9% <span class="text-gray-500">-> Extremely high precision at zero runtime cost.</span></p>
-                        </div>
-                        
-                        <div class="border-l-2 border-primary pl-4 relative">
-                            <h4 class="font-mono text-primary uppercase font-bold text-sm mb-1">Level 3: Deep ML Inference</h4>
-                            <p class="text-sm text-gray-500 mb-1">Hybrid Model (LightGBM) pre-trained with semantic constraints (<i>angr/angrop</i>). Filters out syntactic noise with zero runtime overhead.</p>
-                            <p class="text-xs font-mono text-primary"><a href="https://huggingface.co/chris1sflaggin/chainfinder_v4_hybrid" target="_blank" class="hover:underline text-blue-400">NDCG@1: 98.3%</a> <span class="text-gray-500">-> Flawless ranking for complex ROP chains.</span></p>
-                        </div>
-                    </div>
+            <div class="space-y-6 pt-4">
+              <div class="border-l-2 border-gray-600 pl-4">
+                <h4 class="font-mono text-gray-400 uppercase font-bold text-sm mb-1">Level 1: Static Heuristic</h4>
+                <p class="text-sm text-gray-500 mb-1">Manual additive formula with fixed magic numbers. Struggles on complex binaries and modern obfuscation.</p>
+                <p class="text-xs font-mono text-gray-600">NDCG@10: ~0.72 <span class="text-gray-500">(Baseline heuristics)</span></p>
+              </div>
+
+              <div class="border-l-2 border-primary/50 pl-4">
+                <h4 class="font-mono text-white uppercase font-bold text-sm mb-1">Level 2: Optuna Calibrated</h4>
+                <p class="text-sm text-gray-500 mb-1">Core formula coefficients optimized via 200+ Bayesian trials. Significant improvement without ML overhead.</p>
+                <p class="text-xs font-mono text-gray-600">NDCG@10: ~0.89 <span class="text-gray-500">(Zero-cost optimization)</span></p>
+              </div>
+
+              <div class="border-l-2 border-primary pl-4 relative">
+                <h4 class="font-mono text-primary uppercase font-bold text-sm mb-1">Level 3: Hybrid ML (LGBM + angr)</h4>
+                <p class="text-sm text-gray-500 mb-1">LightGBM LambdaRank with 38 features (28 structural + 10 semantic via angr symbolic execution). Zero runtime overhead via pre-computed inference.</p>
+                <p class="text-xs font-mono text-primary"><a href="https://huggingface.co/chris1sflaggin/chainfinder_v4_hybrid" target="_blank" class="hover:underline text-blue-400">NDCG@1: 98.3% · NDCG@10: 96.6%</a> <span class="text-gray-500">(Production-ready ranking)</span></p>
+              </div>
+            </div>
                 </div>
     
-                <div class="bg-black border border-white/10 sharp p-6 relative group h-full shadow-2xl">
-                <div class="scanlines absolute inset-0 opacity-50 pointer-events-none"></div>
-                <div class="relative z-10 font-mono text-xs leading-relaxed text-gray-300">
-                    <p class="text-gray-500 mb-4">$ cat evaluate_hybrid_v3.log</p>
-                    
-                    <p class="text-primary font-bold"># Model Specs (Hybrid v3)</p>
-                    <p>> Binaries: <span class="text-white">Real-world exploits & CTF Challenges</span></p>
-                    <p>> Features: <span class="text-white">31 (26 Structural + 5 Semantic via angr/angrop)</span></p>
-                    <p>> Training: <span class="text-white">Hard Negative Mining applied</span></p>
-                    <br>
-                    
-                    <p class="text-primary font-bold"># Benchmark Results (vs libc.so.6)</p>
-                    <p>> Model   : <span class="text-white">lcsajlearn_chainfinder_hybrid_v3.pkl</span></p>
-                    <p>> NDCG@5  : <span class="text-white">0.821</span> <span class="text-gray-500">(Perfect static filtering)</span></p>
-                    <p>> NDCG@20 : <span class="text-white">1.000</span> <span class="text-gray-500">(Mathematically perfect deep ranking)</span></p>
-                    <br>
-                    
-                    <p class="text-primary font-bold"># Semantic Evolution (Feature Gain)</p>
-                    <p>> [1] has_direct_call         : <span class="text-white">Dominant</span> <span class="text-gray-500">(Structural)</span></p>
-                    <p>> [5] sm_dereferences_memory  : <span class="text-white">577.0 Gain</span> <span class="text-primary font-bold"><-- NEW</span></p>
-                    <p>> [15] sm_controls_arg_reg    : <span class="text-white">4.5 Gain</span></p>
-                    <p class="text-gray-500 mt-2 ml-4">Note: By injecting symbolic execution constraints (angr),</p>
-                    <p class="text-gray-500 ml-4">the Hybrid model successfully isolates clean stack-popping</p>
-                    <p class="text-gray-500 ml-4">and robust ret2csu-like calls, zeroing out the noise.</p>
-                    <br>
-                    
-                    <p class="text-primary animate-pulse">_</p>
-                </div>
+        <div class="bg-black border border-white/10 sharp p-6 relative group h-full shadow-2xl">
+          <div class="scanlines absolute inset-0 opacity-50 pointer-events-none"></div>
+          <div class="relative z-10 font-mono text-xs leading-relaxed text-gray-300">
+            <p class="text-gray-500 mb-4">$ cat evaluate_hybrid_v4.log</p>
+
+            <p class="text-primary font-bold"># Model Specs (Hybrid ML v4)</p>
+            <p>> Architecture: <span class="text-white">LightGBM LambdaRank</span></p>
+            <p>> Features: <span class="text-white">38 (28 Structural + 10 Semantic via angr)</span></p>
+            <p>> Training: <span class="text-white">~1,700 gadgets from real CTF exploits</span></p>
+            <p>> Validation: <span class="text-white">K-Fold Cross Validation (k=5)</span></p>
+            <br>
+
+            <p class="text-primary font-bold"># NDCG Performance (Validation Set)</p>
+            <p>> NDCG@1  : <span class="text-white">0.9833</span> <span class="text-gray-500">(#1 ranked gadget is optimal 98% of the time)</span></p>
+            <p>> NDCG@3  : <span class="text-white">0.9833</span> <span class="text-gray-500">(Top-3 precision)</span></p>
+            <p>> NDCG@5  : <span class="text-white">0.9749</span> <span class="text-gray-500">(Top-5 recall)</span></p>
+            <p>> NDCG@10 : <span class="text-white">0.9656</span> <span class="text-gray-500">(Top-10 ranking quality)</span></p>
+            <br>
+
+            <p class="text-primary font-bold"># Top Feature Importances (SHAP)</p>
+            <p>> [1] is_ret_terminated : <span class="text-white">0.142</span> <span class="text-gray-500">(Structural - clean execution flow)</span></p>
+            <p>> [2] heuristic_score : <span class="text-white">0.098</span> <span class="text-gray-500">(Base syntactic score)</span></p>
+            <p>> [3] sm_stack_pivot_size : <span class="text-white">0.087</span> <span class="text-primary font-bold"><-- Semantic (angr)</span></p>
+            <p>> [4] frame_size_bytes : <span class="text-white">0.065</span> <span class="text-gray-500">(Stack damage minimization)</span></p>
+            <p>> [5] stack_slots : <span class="text-white">0.054</span> <span class="text-gray-500">(Stack depth)</span></p>
+            <br>
+
+            <p class="text-gray-500">Note: Semantic features (extracted via angr symbolic execution)</p>
+            <p class="text-gray-500">enable cross-architecture transfer learning and filter syntactic noise.</p>
+
+            <p class="text-primary animate-pulse mt-4">_</p>
+          </div>
+        </div>
             </div>
             </div>
         </div>
@@ -499,39 +504,11 @@ images: images/LCSAJfull.png
                         <span class="text-gray-600"># to filter gadgets in real time</span>
                     </div>
                 </a>
-            </div>
-        </div>
+</div>
+</div>
+</section>
 
-        <div id="form" class="mt-16 max-w-2xl mx-auto bg-card border border-white/10 sharp p-8 relative overflow-hidden shadow-2xl">
-            <div class="absolute -top-24 -right-24 w-48 h-48 bg-primary/20 rounded-full mix-blend-screen filter blur-3xl opacity-50 pointer-events-none"></div>
-            
-            <div class="relative z-10 text-center">
-                <h3 class="text-2xl font-bold text-white mb-2">Do you want early access?</h3>
-                <p class="text-gray-400 text-sm mb-6">
-                    Stay updated on new integrations, architecture support, and releases.
-                </p>
-                
-                <form action="https://formspree.io/f/mdawzzen" method="POST" class="flex flex-col sm:flex-row gap-3">
-                    <input 
-                        type="email" 
-                        name="email" 
-                        placeholder="Insert your email..." 
-                        required 
-                        class="flex-1 bg-darker border border-white/10 sharp px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm"
-                    >
-                    <button 
-                        type="submit" 
-                        class="px-6 py-3 border border-transparent text-sm font-medium sharp text-darker bg-primary hover:bg-primary/90 glow-primary transition-all whitespace-nowrap"
-                    >
-                        Notify me
-                    </button>
-                </form>
-                <p class="mt-3 text-[10px] text-gray-600 uppercase tracking-wider">No spam.</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="usage" class="py-16 bg-card/50 border-b border-white/5">
+<section id="usage" class="py-16 bg-card/50 border-b border-white/5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
                 <p class="section-label justify-center mb-3">Get Started</p>
@@ -621,21 +598,21 @@ images: images/LCSAJfull.png
                                         <td class="px-4 py-3 text-gray-500 text-xs">FLAG</td>
                                         <td class="px-4 py-3 text-gray-400">Enable verbose output for detailed per-gadget results.</td>
                                     </tr>
-                                    <tr class="bg-black/10 hover:bg-black/40 transition-colors">
-                                        <td class="px-4 py-3 font-mono text-green-400 whitespace-nowrap">-o, --output</td>
-                                        <td class="px-4 py-3 text-gray-500 text-xs">PATH</td>
-                                        <td class="px-4 py-3 text-gray-400">Write gadgets to the specified file path.</td>
-                                    </tr>
-                                    <tr class="bg-black/20 hover:bg-black/40 transition-colors">
-                                        <td class="px-4 py-3 font-mono text-green-400 whitespace-nowrap">-b, --bad-chars</td>
-                                        <td class="px-4 py-3 text-gray-500 text-xs">TEXT</td>
-                                        <td class="px-4 py-3 text-gray-400">Hex bytes to filter from gadget addresses (e.g. <code class="text-xs bg-white/10 px-1 rounded">"000a0d"</code>).</td>
-                                    </tr>
-                                    <tr class="bg-black/10 hover:bg-black/40 transition-colors">
-                                        <td class="px-4 py-3 font-mono text-green-400 whitespace-nowrap">--json</td>
-                                        <td class="px-4 py-3 text-gray-500 text-xs">FLAG</td>
-                                        <td class="px-4 py-3 text-gray-400">Output gadgets as structured JSON instead of plain text.</td>
-                                    </tr>
+              <tr class="bg-black/10 hover:bg-black/40 transition-colors">
+                <td class="px-4 py-3 font-mono text-green-400 whitespace-nowrap">-o, --output</td>
+                <td class="px-4 py-3 text-gray-500 text-xs">PATH</td>
+                <td class="px-4 py-3 text-gray-400">Write output to file. Plain text by default, or JSON when combined with <code class="text-xs bg-white/10 px-1">--json</code>.</td>
+              </tr>
+              <tr class="bg-black/20 hover:bg-black/40 transition-colors">
+                <td class="px-4 py-3 font-mono text-green-400 whitespace-nowrap">-b, --bad-chars</td>
+                <td class="px-4 py-3 text-gray-500 text-xs">TEXT</td>
+                <td class="px-4 py-3 text-gray-400">Hex bytes to filter from gadget addresses (e.g. <code class="text-xs bg-white/10 px-1 rounded">"000a0d"</code>).</td>
+              </tr>
+              <tr class="bg-black/10 hover:bg-black/40 transition-colors">
+                <td class="px-4 py-3 font-mono text-green-400 whitespace-nowrap">--json</td>
+                <td class="px-4 py-3 text-gray-500 text-xs">FLAG</td>
+                <td class="px-4 py-3 text-gray-400">Output gadgets as structured JSON. Use with <code class="text-xs bg-white/10 px-1">-o</code> to save to file.</td>
+              </tr>
                                     <tr class="bg-black/20 hover:bg-black/40 transition-colors">
                                         <td class="px-4 py-3 font-mono text-green-400 whitespace-nowrap">--all-exec</td>
                                         <td class="px-4 py-3 text-gray-500 text-xs">FLAG</td>
