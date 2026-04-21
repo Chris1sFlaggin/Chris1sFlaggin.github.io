@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LCSAJGadgets — pwntools Integration | LCSAJdump</title>
+    <meta name="description" content="LCSAJGadgets: zero-import pwntools integration for graph-based ROP/JOP gadget discovery.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../style.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#9BDB08',
+                        secondary: '#F07C06',
+                        dark: '#0a0a0a',
+                        darker: '#050505',
+                        card: '#141414',
+                        cardHover: '#1a1a1a'
+                    },
+                    fontFamily: {
+                        sans: ['"DM Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                        display: ['"Barlow Condensed"', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* ── Accent thread (linea verticale) ────────────────────────── */
+        .accent-thread { position: relative; }
+        .accent-thread::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: #9BDB08;
+            opacity: 0.45;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .section-connector {
+            position: relative;
+            height: 0;
+            overflow: visible;
+            z-index: 20;
+        }
+        .section-connector::before {
+            content: '';
+            position: absolute;
+            left: 3px; top: -5px;
+            width: 60px; height: 1px;
+            background: linear-gradient(to right, rgba(155,219,8,0.5), transparent);
+        }
+        .section-connector::after {
+            content: '';
+            position: absolute;
+            left: -2px; top: -7px;
+            width: 7px; height: 7px;
+            background: #9BDB08;
+            opacity: 0.7;
+            transform: rotate(45deg);
+            z-index: 21;
+        }
+
+        /* ── Exploit carousel ───────────────────────────────────────── */
+        .exploit-carousel {
+            position: relative;
+            width: 100%;
+            min-height: 380px;
+            perspective: 900px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 28px;
+        }
+        .exploit-card {
+            position: absolute;
+            width: 360px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: #050505;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            user-select: none;
+        }
+        .exploit-card[data-pos="center"] {
+            transform: translateZ(0) rotateY(0deg) scale(1);
+            opacity: 1;
+            z-index: 3;
+            cursor: default;
+            box-shadow: 0 0 30px rgba(155,219,8,0.1);
+        }
+        .exploit-card[data-pos="left"] {
+            transform: translateX(-270px) translateY(14px) translateZ(-110px) rotateY(14deg) scale(0.82);
+            opacity: 0.42;
+            z-index: 1;
+        }
+        .exploit-card[data-pos="right"] {
+            transform: translateX(270px) translateY(14px) translateZ(-110px) rotateY(-14deg) scale(0.82);
+            opacity: 0.42;
+            z-index: 1;
+        }
+        .exploit-card[data-pos="left"]:hover,
+        .exploit-card[data-pos="right"]:hover { opacity: 0.65; }
+
+        .exploit-card-accent { height: 2px; width: 100%; margin-bottom: 20px; }
+        .exploit-card-arch {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.15em;
+            margin-bottom: 6px;
+        }
+        .exploit-card-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.6rem; font-weight: 700;
+            text-transform: uppercase; color: #ffffff;
+            line-height: 1.1; margin-bottom: 4px;
+        }
+        .exploit-card-ctf {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.62rem; color: #6b7280;
+            margin-bottom: 12px;
+        }
+        .exploit-card-desc {
+            font-size: 0.78rem; color: #9ca3af;
+            line-height: 1.55; margin-bottom: 14px;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .exploit-card-code {
+            background: rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 10px 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem; color: #d1d5db;
+            line-height: 1.8; position: relative; overflow: hidden;
+        }
+        .exploit-card-code::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: repeating-linear-gradient(
+                to bottom, transparent, transparent 2px,
+                rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px
+            );
+            pointer-events: none;
+        }
+        .carousel-nav {
+            display: flex; align-items: center;
+            justify-content: center; gap: 20px; margin-top: 4px;
+        }
+        .carousel-arrow {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #d1d5db; cursor: pointer; font-size: 0.85rem;
+            transition: background 0.2s, border-color 0.2s; user-select: none;
+        }
+        .carousel-arrow:hover {
+            background: rgba(155,219,8,0.1);
+            border-color: rgba(155,219,8,0.3); color: #9BDB08;
+        }
+        .carousel-dots { display: flex; gap: 8px; align-items: center; }
+        .carousel-dot {
+            width: 7px; height: 7px;
+            background: rgba(255,255,255,0.15);
+            transform: rotate(45deg); cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .carousel-dot.active {
+            background: #9BDB08;
+            transform: rotate(45deg) scale(1.3);
+            box-shadow: 0 0 10px rgba(155,219,8,0.5);
+        }
+    </style>
+</head>
+<body class="bg-darker text-gray-300 font-sans antialiased selection:bg-primary selection:text-darker bg-grid">
+
+    <nav class="nav-accent fixed w-full z-50 top-0 backdrop-blur-md bg-darker/90 border-b border-white/8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="../" class="flex items-center gap-2 text-gray-400 hover:text-primary transition-colors text-sm font-mono">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    LCSAJdump
+                </a>
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 sharp bg-primary animate-pulse"></div>
+                    <span class="font-display text-lg text-white uppercase tracking-wide">pwntools Integration</span>
+                </div>
+                <a href="https://github.com/chris1sflaggin/lcsajdump" target="_blank"
+                   class="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-4 py-2 sharp text-sm font-medium transition-all">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/></svg>
+                    GitHub
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-32 pb-16 overflow-hidden bg-darker accent-thread">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="absolute top-0 left-1/4 w-96 h-96 bg-primary/15 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-pulse-slow"></div>
+
+            <div class="relative z-10 max-w-3xl">
+                <p class="section-label mb-4">Plugin / pwntools</p>
+                <h1 class="font-display glitch-title text-6xl sm:text-7xl xl:text-8xl text-white mb-6 leading-none uppercase">
+                    LCSAJ<span class="text-gradient">Gadgets</span>
+                </h1>
+                <p class="text-gray-400 text-xl mb-8 max-w-2xl">
+                    Zero-import integration that injects <code class="text-primary font-mono bg-white/5 px-1.5 py-0.5">LCSAJGadgets</code> into pwntools' top-level namespace.
+                    Graph-based gadget discovery available the moment you write <code class="text-primary font-mono bg-white/5 px-1.5 py-0.5">from pwn import *</code>.
+                </p>
+                <div class="flex flex-wrap gap-3">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/30 text-sm text-primary font-mono font-bold sharp">
+                        <span class="flex h-2 w-2 bg-primary animate-pulse sharp"></span>
+                        Available
+                    </span>
+                    <span class="px-3 py-1 bg-white/5 border border-white/10 text-sm text-gray-400 font-mono sharp">x86_64 · ARM64 · RISC-V64</span>
+                    <span class="px-3 py-1 bg-white/5 border border-white/10 text-sm text-gray-400 font-mono sharp">22 public methods</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="section-connector"></div>
+
+    <section id="exploits" class="py-16 bg-card/50 border-y border-white/5 accent-thread">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="section-label mb-4">Exploits</p>
+            <h2 class="font-display text-4xl sm:text-5xl text-white uppercase mb-4">Real-world chains</h2>
+            <p class="text-gray-500 text-base mb-12 max-w-3xl">Three CTF exploits built entirely with the semantic API. Each exposes a structural gap invisible to ropper and ROPgadget.</p>
+
+            <div class="exploit-carousel" id="exploit-carousel">
+
+                <div class="exploit-card sharp" data-idx="0" data-pos="center" onclick="carouselClick(this)">
+                    <div class="exploit-card-accent" style="background:linear-gradient(to right,#9BDB08,transparent);"></div>
+                    <div class="exploit-card-arch" style="color:#9BDB08;">x86-64</div>
+                    <div class="exploit-card-title">JOP Trampoline Chain</div>
+                    <div class="exploit-card-ctf">CTFSG 2021 · jop · stack pivot + JOP trampoline</div>
+                    <div class="exploit-card-desc">
+                        Stack pivot redirects <code style="color:#9BDB08;font-family:monospace;font-size:0.62rem">rsp</code> into the JOP chain. A trampoline (<code style="color:#9BDB08;font-family:monospace;font-size:0.62rem">add rsp,8; jmp [rsp-8]</code>) acts as a <code style="color:#9BDB08;font-family:monospace;font-size:0.62rem">ret</code> substitute — no hardcoded offsets needed.
+                    </div>
+                    <div class="exploit-card-code sharp">
+                        <span style="color:#6b7280">gadgets</span> <span style="color:#fff">=</span> <span style="color:#9BDB08">LCSAJGadgets</span><span style="color:#fff">('./jop')</span><br>
+                        <span style="color:#6b7280">pivot</span>      <span style="color:#fff">=</span> <span style="color:#6b7280">gadgets</span><span style="color:#fff">.</span><span style="color:#fbbf24">pivot_gadgets</span><span style="color:#fff">()[</span><span style="color:#fb923c">0</span><span style="color:#fff">]</span><br>
+                        <span style="color:#6b7280">trampoline</span> <span style="color:#fff">=</span> <span style="color:#6b7280">gadgets</span><span style="color:#fff">.</span><span style="color:#fbbf24">trampolines</span><span style="color:#fff">(mnem=</span><span style="color:#86efac">'add rsp'</span><span style="color:#fff">)[</span><span style="color:#fb923c">0</span><span style="color:#fff">]</span><br>
+                        <span style="color:#6b7280">zero_rax</span>   <span style="color:#fff">=</span> <span style="color:#6b7280">gadgets</span><span style="color:#fff">.</span><span style="color:#fbbf24">zero_register</span><span style="color:#fff">(</span><span style="color:#86efac">'rax'</span><span style="color:#fff">)[</span><span style="color:#fb923c">0</span><span style="color:#fff">]</span>
+                    </div>
+                </div>
+
+                <div class="exploit-card sharp" data-idx="1" data-pos="right" onclick="carouselClick(this)">
+                    <div class="exploit-card-accent" style="background:linear-gradient(to right,#F07C06,transparent);"></div>
+                    <div class="exploit-card-arch" style="color:#F07C06;">ARM64</div>
+                    <div class="exploit-card-title">arm_strong</div>
+                    <div class="exploit-card-ctf">ctfarm · mprotect + shellcode · 3-gadget chain</div>
+                    <div class="exploit-card-desc">
+                        Format-string leak → canary + stack addr. Three gadgets chain mprotect(stack, RWX) then jump to shellcode. LCSAJGadgets finds the indirect <code style="color:#F07C06;font-family:monospace;font-size:0.62rem">blr x22</code> and memory-read <code style="color:#F07C06;font-family:monospace;font-size:0.62rem">ldr x3,[x20]</code> dispatchers.
+                    </div>
+                    <div class="exploit-card-code sharp">
+                        <span style="color:#6b7280">gadgets</span>  <span style="color:#fff">=</span> <span style="color:#9BDB08">LCSAJGadgets</span><span style="color:#fff">('./chal', arch=</span><span style="color:#86efac">'arm64'</span><span style="color:#fff">)</span><br>
+                        <span style="color:#6b7280">g1</span>       <span style="color:#fff">=</span> <span style="color:#6b7280">gadgets</span><span style="color:#fff">.</span><span style="color:#fbbf24">pop_chain</span><span style="color:#fff">(</span><span style="color:#86efac">'x29'</span><span style="color:#fff">,</span><span style="color:#86efac">'x30'</span><span style="color:#fff">)[</span><span style="color:#fb923c">0</span><span style="color:#fff">]</span><br>
+                        <span style="color:#6b7280">g2</span>       <span style="color:#fff">=</span> <span style="color:#6b7280">gadgets</span><span style="color:#fff">.</span><span style="color:#fbbf24">call_reg</span><span style="color:#fff">(</span><span style="color:#86efac">'x22'</span><span style="color:#fff">)[</span><span style="color:#fb923c">0</span><span style="color:#fff">]</span><br>
+                        <span style="color:#6b7280">g3</span>       <span style="color:#fff">=</span> <span style="color:#6b7280">gadgets</span><span style="color:#fff">.</span><span style="color:#fbbf24">memory_read</span><span style="color:#fff">(</span><span style="color:#86efac">'x20'</span><span style="color:#fff">,</span><span style="color:#86efac">'x3'</span><span style="color:#fff">)[</span><span style="color:#fb923c">0</span><span style="color:#fff">]</span>
+                    </div>
+                </div>
+
+                <div class="exploit-card sharp" data-idx="2" data-pos="left" onclick="carouselClick(this)">
+                    <div class="exploit-card-accent" style="background:linear-gradient(to right,#60a5fa,transparent);"></div>
+                    <div class="exploit-card-arch" style="color:#60a5fa;">RISC-V 64</div>
+                    <div class="exploit-card-title">typicalROP</div>
+                    <div class="exploit-card-ctf">ctfriscv · classic ROP · execve via ecall</div>
+                    <div class="exploit-card-desc">
+                        Classic multi-gadget ROP chain on RISC-V. A fat gadget loads all argument registers from the stack in one shot, then jumps to <code style="color:#60a5fa;font-family:monospace;font-size:0.62rem">ecall</code> for <code style="color:#60a5fa;font-family:monospace;font-size:0.62rem">execve("/bin/sh")</code>.
+                    </div>
+                    <div class="exploit-card-code sharp">
+                        <span style="color:#6b7280">gadgets</span>  <span style="color:#fff">=</span> <span style="color:#9BDB08">LCSAJGadgets</span><span style="color:#fff">('./chal', arch=</span><span style="color:#86efac">'riscv64'</span><span style="color:#fff">)</span><br>
+                        <span style="color:#6b7280">ecall</span>    <span style="color:#fff">=</span> <span style="color:#6b7280">gadgets</span><span style="color:#fff">.</span><span style="color:#fbbf24">find</span><span style="color:#fff">(</span><span style="color:#86efac">'ecall'</span><span style="color:#fff">)[</span><span style="color:#fb923c">0</span><span style="color:#fff">]</span><br>
+                        <span style="color:#6b7280">load_all</span> <span style="color:#fff">=</span> <span style="color:#6b7280">gadgets</span><span style="color:#fff">.</span><span style="color:#fbbf24">pop_chain</span><span style="color:#fff">(</span><span style="color:#86efac">'a0'</span><span style="color:#fff">,</span><span style="color:#86efac">'a1'</span><span style="color:#fff">,</span><span style="color:#86efac">'a7'</span><span style="color:#fff">)[</span><span style="color:#fb923c">0</span><span style="color:#fff">]</span>
+                    </div>
+                </div>
+
+            </div><div class="carousel-nav">
+                <div class="carousel-arrow sharp" onclick="carouselShift(-1)">←</div>
+                <div class="carousel-dots" id="carousel-dots">
+                    <div class="carousel-dot sharp active" onclick="carouselGoto(0)"></div>
+                    <div class="carousel-dot sharp"        onclick="carouselGoto(1)"></div>
+                    <div class="carousel-dot sharp"        onclick="carouselGoto(2)"></div>
+                </div>
+                <div class="carousel-arrow sharp" onclick="carouselShift(1)">→</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-connector"></div>
+
+    <section class="py-16 bg-card/50 border-y border-white/5 accent-thread">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="section-label mb-4">Installation</p>
+            <h2 class="font-display text-4xl text-white uppercase mb-8">Setup</h2>
+
+            <div class="bg-secondary/10 border border-secondary/30 sharp p-4 mb-8 flex items-start gap-3">
+                <svg class="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <p class="text-sm text-gray-300">
+                    <span class="text-secondary font-semibold">LCSAJGadgets is not part of pwntools.</span>
+                    It is a standalone module that must be manually placed inside the pwntools package directory and registered in <code class="text-primary font-mono bg-black px-1 sharp border border-white/5">pwn/toplevel.py</code> to become available via <code class="text-primary font-mono bg-black px-1 sharp border border-white/5">from pwn import *</code>.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4 mb-6">
+                <div class="bg-darker border border-white/10 sharp p-6">
+                    <p class="text-xs text-gray-500 font-mono uppercase tracking-wider mb-3">Installazione Automatica</p>
+                    <div class="scanlines bg-black/80 border border-white/8 sharp p-4 font-mono text-sm">
+                        <span class="text-primary">❯</span> <span class="text-white">./install_integrations.sh --pwntools</span>
+                    </div>
+                    <p class="mt-3 text-xs text-gray-600">Questo comando installerà LCSAJdump in modalità "editable" (pip install -e) rendendo la classe <code class="text-primary">LCSAJGadgets</code> importabile globalmente nel tuo sistema.</p>
+                </div>
+
+                <div class="bg-darker border border-white/10 sharp p-6">
+                    <p class="text-xs text-gray-500 font-mono uppercase tracking-wider mb-3">Uso in Python / Pwntools</p>
+                    <div class="scanlines bg-black/80 border border-white/8 sharp p-4 font-mono text-sm">
+                        <span class="text-blue-400">from</span> <span class="text-white">pwn</span> <span class="text-blue-400">import</span> <span class="text-white">*</span><br>
+                        <span class="text-blue-400">from</span> <span class="text-white">lcsajdump.integrations.pwntools_helper</span> <span class="text-blue-400">import</span> <span class="text-primary">LCSAJGadgets</span><br><br>
+                        <span class="text-gray-400 text-xs"># The ML ranking model is loaded automatically by default</span><br>
+                        <span class="text-gray-300">gadgets</span> <span class="text-white">=</span> <span class="text-primary">LCSAJGadgets</span><span class="text-white">(</span><span class="text-green-400">'./chal'</span><span class="text-white">)</span><br><br>
+                        <span class="text-gray-400 text-xs"># Force classic heuristic ranking (bypass ML)</span><br>
+                        <span class="text-gray-300">gadgets_classic</span> <span class="text-white">=</span> <span class="text-primary">LCSAJGadgets</span><span class="text-white">(</span><span class="text-green-400">'./chal'</span><span class="text-white">, algo=</span><span class="text-orange-400">True</span><span class="text-white">)</span>
+                    </div>
+                </div>
+            </div>
+            <p class="text-sm text-gray-500">
+                When a pre-generated JSON is available, use
+                <code class="text-primary font-mono bg-black px-1 border border-white/5 sharp">LCSAJGadgets.from_json('gadgets.json')</code> to skip the re-analysis.
+            </p>
+        </div>
+    </section>
+
+    <div class="section-connector"></div>
+
+    <section class="py-16 bg-darker border-b border-white/5 accent-thread">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="section-label mb-4">Constructor</p>
+            <h2 class="font-display text-4xl text-white uppercase mb-8">LCSAJGadgets()</h2>
+
+            <div class="scanlines bg-black/80 border border-white/8 sharp p-5 font-mono text-sm mb-8 overflow-x-auto">
+                <span class="text-primary">LCSAJGadgets</span><span class="text-white">(</span><br>
+                &nbsp;&nbsp;<span class="text-yellow-400">binary_path</span><span class="text-white">: str,</span><br>
+                &nbsp;&nbsp;<span class="text-yellow-400">arch</span><span class="text-white">: str = </span><span class="text-green-400">'auto'</span><span class="text-gray-500">,          # auto · x86_64 · arm64 · riscv64</span><br>
+                &nbsp;&nbsp;<span class="text-yellow-400">bad_chars</span><span class="text-white">: str = </span><span class="text-green-400">''</span><span class="text-gray-500">,         # hex bytes to exclude, e.g. '000a0d'</span><br>
+                &nbsp;&nbsp;<span class="text-yellow-400">depth</span><span class="text-white">: int = </span><span class="text-orange-400">20</span><span class="text-gray-500">,               # max LCSAJ blocks per path</span><br>
+                &nbsp;&nbsp;<span class="text-yellow-400">darkness</span><span class="text-white">: int = </span><span class="text-orange-400">5</span><span class="text-gray-500">,             # per-node visit ceiling</span><br>
+                &nbsp;&nbsp;<span class="text-yellow-400">instructions</span><span class="text-white">: int = </span><span class="text-orange-400">15</span><span class="text-gray-500">,          # max instructions per node</span><br>
+                &nbsp;&nbsp;<span class="text-yellow-400">all_exec</span><span class="text-white">: bool = </span><span class="text-blue-400">False</span><span class="text-gray-500">,          # include all executable sections (.coldpath etc.)</span><br>
+                <span class="text-white">)</span>
+            </div>
+
+            <div class="scanlines bg-black/80 border border-white/8 sharp p-5 font-mono text-sm overflow-x-auto">
+                <span class="text-gray-500"># from a pre-generated JSON (faster — no re-analysis)</span><br>
+                <span class="text-gray-300">gadgets</span> <span class="text-white">=</span> <span class="text-primary">LCSAJGadgets</span><span class="text-white">.</span><span class="text-yellow-400">from_json</span><span class="text-white">(</span><span class="text-green-400">'gadgets_found.json'</span><span class="text-white">)</span>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-connector"></div>
+
+    <section class="py-16 bg-card/30 border-b border-white/5 accent-thread">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="section-label mb-4">API Reference</p>
+            <h2 class="font-display text-4xl text-white uppercase mb-12">Methods &amp; Properties</h2>
+
+            <div class="mb-12">
+                <h3 class="font-display text-2xl text-primary uppercase mb-6 border-b border-primary/20 pb-2">Search</h3>
+                <div class="space-y-4">
+
+                    <div class="bg-black border-l-2 border-primary/50 border-y border-r border-white/10 sharp p-6 mb-4 flex flex-col">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-4 border-b border-white/5">
+                            <h4 class="font-mono text-lg text-white">
+                                <span class="text-gray-500">gadgets.</span><span class="text-primary font-bold">find</span><span class="text-gray-400">(pattern)</span>
+                            </h4>
+                            <div class="flex items-center gap-2 text-xs font-mono">
+                                <span class="text-gray-500">Returns:</span>
+                                <span class="bg-primary/10 text-primary px-2 py-1 sharp border border-primary/20">list[int]</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-400 leading-relaxed mb-4">
+                            Case-insensitive substring match against the full instruction text. Returns all matching addresses (including duplicates), sorted.
+                        </p>
+                        <div class="scanlines bg-darker border border-white/5 sharp p-4 font-mono text-xs text-gray-300">
+                            <span class="text-gray-300">pop_rdi</span> <span class="text-white">=</span> <span class="text-gray-400">gadgets</span><span class="text-white">.</span><span class="text-yellow-400">find</span><span class="text-white">(</span><span class="text-green-400">'pop rdi'</span><span class="text-white">)[</span><span class="text-orange-400">0</span><span class="text-white">]</span><br>
+                            <span class="text-gray-300">fat</span>     <span class="text-white">=</span> <span class="text-gray-400">gadgets</span><span class="text-white">.</span><span class="text-yellow-400">find</span><span class="text-white">(</span><span class="text-green-400">'mov al, 0x3b'</span><span class="text-white">)[</span><span class="text-orange-400">0</span><span class="text-white">]</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-black border-l-2 border-primary/50 border-y border-r border-white/10 sharp p-6 mb-4 flex flex-col">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-4 border-b border-white/5">
+                            <h4 class="font-mono text-lg text-white">
+                                <span class="text-gray-500">gadgets.</span><span class="text-primary font-bold">best</span><span class="text-gray-400">(pattern)</span>
+                            </h4>
+                            <div class="flex items-center gap-2 text-xs font-mono">
+                                <span class="text-gray-500">Returns:</span>
+                                <span class="bg-primary/10 text-primary px-2 py-1 sharp border border-primary/20">Gadget | None</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-400 leading-relaxed mb-4">
+                            Returns the highest-scoring <code class="text-primary font-mono">Gadget</code> matching <code class="text-primary font-mono">pattern</code>, or <code class="text-primary font-mono">None</code> if not found. Use <code class="text-primary font-mono">.address</code> to get the integer address.
+                        </p>
+                        <div class="scanlines bg-darker border border-white/5 sharp p-4 font-mono text-xs text-gray-300">
+                            <span class="text-gray-300">tramp</span> <span class="text-white">=</span> <span class="text-gray-400">gadgets</span><span class="text-white">.</span><span class="text-yellow-400">best</span><span class="text-white">(</span><span class="text-green-400">'add rsp'</span><span class="text-white">)</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-black border-l-2 border-primary/50 border-y border-r border-white/10 sharp p-6 mb-4 flex flex-col">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-4 border-b border-white/5">
+                            <h4 class="font-mono text-lg text-white">
+                                <span class="text-gray-500">gadgets.</span><span class="text-primary font-bold">address_in_range</span><span class="text-gray-400">(low, high)</span>
+                            </h4>
+                            <div class="flex items-center gap-2 text-xs font-mono">
+                                <span class="text-gray-500">Returns:</span>
+                                <span class="bg-primary/10 text-primary px-2 py-1 sharp border border-primary/20">list[Gadget]</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-400 leading-relaxed mb-4">
+                            Filter gadgets to those with primary address in <code class="text-primary font-mono">[low, high)</code>. Useful when certain ranges contain bad characters, or when narrowing to a specific library after a partial leak.
+                        </p>
+                        <div class="scanlines bg-darker border border-white/5 sharp p-4 font-mono text-xs text-gray-300">
+                            <span class="text-gray-500"># only gadgets below 0x410000 (no null bytes in address)</span><br>
+                            <span class="text-gray-300">clean</span> <span class="text-white">=</span> <span class="text-gray-400">gadgets</span><span class="text-white">.</span><span class="text-yellow-400">address_in_range</span><span class="text-white">(</span><span class="text-orange-400">0x400000</span><span class="text-white">, </span><span class="text-orange-400">0x410000</span><span class="text-white">)</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-black border-l-2 border-primary/50 border-y border-r border-white/10 sharp p-6 mb-4 flex flex-col">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-4 border-b border-white/5">
+                            <h4 class="font-mono text-lg text-white">
+                                <span class="text-gray-500">gadgets.</span><span class="text-primary font-bold">sets_register</span><span class="text-gray-400">(reg)</span>
+                            </h4>
+                            <div class="flex items-center gap-2 text-xs font-mono">
+                                <span class="text-gray-500">Returns:</span>
+                                <span class="bg-primary/10 text-primary px-2 py-1 sharp border border-primary/20">list[Gadget]</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-400 leading-relaxed mb-4">
+                            Gadgets that write to <code class="text-primary font-mono">reg</code> (covers mov, ldr, pop, ldp, addi, li patterns). Sorted by score.
+                        </p>
+                        <div class="scanlines bg-darker border border-white/5 sharp p-4 font-mono text-xs text-gray-300">
+                            <span class="text-gray-300">g</span> <span class="text-white">=</span> <span class="text-gray-400">gadgets</span><span class="text-white">.</span><span class="text-yellow-400">sets_register</span><span class="text-white">(</span><span class="text-green-400">'rdi'</span><span class="text-white">)[</span><span class="text-orange-400">0</span><span class="text-white">].</span><span class="text-yellow-400">address</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-black border-l-2 border-primary/50 border-y border-r border-white/10 sharp p-6 mb-4 flex flex-col">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-4 border-b border-white/5">
+                            <h4 class="font-mono text-lg text-white">
+                                <span class="text-gray-500">gadgets.</span><span class="text-primary font-bold">loads_from_stack</span><span class="text-gray-400">(reg)</span>
+                            </h4>
+                            <div class="flex items-center gap-2 text-xs font-mono">
+                                <span class="text-gray-500">Returns:</span>
+                                <span class="bg-primary/10 text-primary px-2 py-1 sharp border border-primary/20">list[Gadget]</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-400 leading-relaxed mb-4">
+                            Gadgets that load <code class="text-primary font-mono">reg</code> from the stack (pop, ldr [sp+N], ldp with sp), sorted by score.
+                        </p>
+                        <div class="scanlines bg-darker border border-white/5 sharp p-4 font-mono text-xs text-gray-300">
+                            <span class="text-gray-300">GADGET_LOAD_A0</span> <span class="text-white">=</span> <span class="text-gray-400">gadgets</span><span class="text-white">.</span><span class="text-yellow-400">loads_from_stack</span><span class="text-white">(</span><span class="text-green-400">'a0'</span><span class="text-white">)[</span><span class="text-orange-400">0</span><span class="text-white">].</span><span class="text-yellow-400">address</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-black border-l-2 border-primary/50 border-y border-r border-white/10 sharp p-6 mb-4 flex flex-col">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-4 border-b border-white/5">
+                            <h4 class="font-mono text-lg text-white">
+                                <span class="text-gray-500">gadgets.</span><span class="text-primary font-bold">no_clobber</span><span class="text-gray-400">(*regs)</span>
+                            </h4>
+                            <div class="flex items-center gap-2 text-xs font-mono">
+                                <span class="text-gray-500">Returns:</span>
+                                <span class="bg-primary/10 text-primary px-2 py-1 sharp border border-primary/20">list[Gadget]</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-400 leading-relaxed">
+                            Gadgets that do <em>not</em> write to any of the given registers — useful to preserve register state across chain steps.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="mb-12">
+                <h3 class="font-display text-2xl text-primary uppercase mb-6 border-b border-primary/20 pb-2">Trampolines</h3>
+                <div class="space-y-4">
+                    <div class="bg-black border-l-2 border-primary/50 border-y border-r border-white/10 sharp p-6 mb-4 flex flex-col">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-4 border-b border-white/5">
+                            <h4 class="font-mono text-lg text-white">
+                                <span class="text-gray-500">gadgets.</span><span class="text-primary font-bold">trampolines</span><span class="text-gray-400">(mnem=None, pattern=None)</span>
+                            </h4>
+                            <div class="flex items-center gap-2 text-xs font-mono">
+                                <span class="text-gray-500">Returns:</span>
+                                <span class="bg-primary/10 text-primary px-2 py-1 sharp border border-primary/20">list[Gadget]</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-400 leading-relaxed mb-4">
+                            All trampoline gadgets (indirect call/jmp via register). Optionally filter by terminating mnemonic (<code class="text-primary font-mono">'call'</code>, <code class="text-primary font-mono">'jmp'</code>, <code class="text-primary font-mono">'blr'</code>…) and/or instruction substring.
+                        </p>
+                        <div class="scanlines bg-darker border border-white/5 sharp p-4 font-mono text-xs text-gray-300">
+                            <span class="text-gray-500"># all trampolines that dispatch via 'call'</span><br>
+                            <span class="text-gray-400">gadgets</span><span class="text-white">.</span><span class="text-yellow-400">trampolines</span><span class="text-white">(</span><span class="text-yellow-400">mnem</span><span class="text-white">=</span><span class="text-green-400">'call'</span><span class="text-white">)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-12">
+                <h3 class="font-display text-2xl text-primary uppercase mb-6 border-b border-primary/20 pb-2">Exploit Primitives</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                    <div class="bg-darker border border-white/8 sharp p-5 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-2">gadgets.pop_chain(*regs) → list[Gadget]</code>
+                        <p class="text-xs text-gray-500">Gadgets that pop a specific register sequence from the stack. <code class="text-primary font-mono">pop_chain('rdi')</code> finds <code class="text-primary font-mono">pop rdi; ret</code>.</p>
+                    </div>
+
+                    <div class="bg-darker border border-white/8 sharp p-5 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-2">gadgets.pivot_gadgets() → list[Gadget]</code>
+                        <p class="text-xs text-gray-500">Stack pivot gadgets — redirects rsp/sp to attacker-controlled data. See the <a href="#pivot" class="text-primary hover:underline">Stack Pivot</a> section for category breakdown.</p>
+                    </div>
+
+                    <div class="bg-darker border border-white/8 sharp p-5 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-2">gadgets.zero_register(reg) → list[Gadget]</code>
+                        <p class="text-xs text-gray-500">Gadgets that set <code class="text-primary font-mono">reg</code> to zero (xor, li 0, c.li 0…).</p>
+                    </div>
+
+                    <div class="bg-darker border border-white/8 sharp p-5 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-2">gadgets.reg_move(src, dst) → list[Gadget]</code>
+                        <p class="text-xs text-gray-500">Gadgets that copy <code class="text-primary font-mono">src</code> into <code class="text-primary font-mono">dst</code> (mov, mv, xchg…).</p>
+                    </div>
+
+                    <div class="bg-darker border border-white/8 sharp p-5 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-2">gadgets.write_what_where(what_reg, where_reg) → list[Gadget]</code>
+                        <p class="text-xs text-gray-500">Gadgets that write <code class="text-primary font-mono">what_reg</code> into memory pointed to by <code class="text-primary font-mono">where_reg</code>.</p>
+                    </div>
+
+                    <div class="bg-darker border border-white/8 sharp p-5 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-2">gadgets.memory_read(src_reg, dest_reg=None) → list[Gadget]</code>
+                        <p class="text-xs text-gray-500">Gadgets that read from memory at <code class="text-primary font-mono">src_reg</code> into <code class="text-primary font-mono">dest_reg</code> (or any register).</p>
+                    </div>
+
+                    <div class="bg-darker border border-white/8 sharp p-5 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-2">gadgets.call_reg(reg=None) → list[Gadget]</code>
+                        <p class="text-xs text-gray-500">Gadgets that perform an indirect call/blr/jalr via a register (optionally specific one).</p>
+                    </div>
+
+                    <div class="bg-darker border border-white/8 sharp p-5 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-2">gadgets.set_immediate(dst, value=None) → list[Gadget]</code>
+                        <p class="text-xs text-gray-500">Gadgets that load a constant into <code class="text-primary font-mono">dst</code>: <code class="text-primary font-mono">mov rax, 59</code> / <code class="text-primary font-mono">movz x8, #221</code> / <code class="text-primary font-mono">li a7, 221</code>. Optionally filter by exact value.</p>
+                    </div>
+
+                    <div class="bg-darker border border-white/8 sharp p-5 flex flex-col h-full hover:border-primary/30 transition-colors md:col-span-2">
+                        <code class="text-primary font-mono text-xs block mb-2">gadgets.stack_delta(n) → list[Gadget]</code>
+                        <p class="text-xs text-gray-500">Gadgets whose net rsp/sp adjustment (before the tail) equals <code class="text-primary font-mono">n</code> bytes. Positive = stack shrinks. Use <code class="text-primary font-mono">stack_delta(8)</code> for x86-64 alignment.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-12">
+                <h3 class="font-display text-2xl text-primary uppercase mb-6 border-b border-primary/20 pb-2">Arithmetic &amp; Logic</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                    <div class="bg-darker border border-white/8 sharp p-5 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-2">gadgets.add_register(dst, src=None) → list[Gadget]</code>
+                        <p class="text-xs text-gray-500">Gadgets containing <code class="text-primary font-mono">add dst, src</code>. Optionally filter by source operand. Covers x86, ARM64 (<code class="text-primary font-mono">adds</code>), RISC-V.</p>
+                    </div>
+
+                    <div class="bg-darker border border-white/8 sharp p-5 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-2">gadgets.sub_register(dst, src=None) → list[Gadget]</code>
+                        <p class="text-xs text-gray-500">Gadgets containing <code class="text-primary font-mono">sub dst, src</code>. Optionally filter by source operand.</p>
+                    </div>
+
+                    <div class="bg-darker border border-white/8 sharp p-5 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-2">gadgets.or_register(dst, src=None) → list[Gadget]</code>
+                        <p class="text-xs text-gray-500">Gadgets containing <code class="text-primary font-mono">or/orr/ori dst, src</code>. Covers x86, ARM64, RISC-V.</p>
+                    </div>
+
+                    <div class="bg-darker border border-white/8 sharp p-5 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-2">gadgets.and_register(dst, src=None) → list[Gadget]</code>
+                        <p class="text-xs text-gray-500">Gadgets containing <code class="text-primary font-mono">and/ands/andi dst, src</code>. Covers x86, ARM64, RISC-V.</p>
+                    </div>
+
+                    <div class="bg-darker border border-white/8 sharp p-5 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-2">gadgets.xor_register(dst, src=None) → list[Gadget]</code>
+                        <p class="text-xs text-gray-500">Gadgets containing <code class="text-primary font-mono">xor/eor dst, src</code>. For zeroing (<code class="text-primary font-mono">xor rax,rax</code>) prefer <code class="text-primary font-mono">zero_register()</code>.</p>
+                    </div>
+
+                    <div class="bg-darker border border-white/8 sharp p-5 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-2">gadgets.shift_register(dst, direction=None, amount=None) → list[Gadget]</code>
+                        <p class="text-xs text-gray-500">Gadgets that shift <code class="text-primary font-mono">dst</code>. <code class="text-primary font-mono">direction</code>: <code class="text-primary font-mono">'left'</code> / <code class="text-primary font-mono">'right'</code> / <code class="text-primary font-mono">'arith'</code> / <code class="text-primary font-mono">'rot'</code>. Optionally filter by shift count. Covers shl/lsl/slli, shr/lsr/srli, sar/asr/srai, rol/ror.</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="mb-12">
+                <h3 class="font-display text-2xl text-primary uppercase mb-6 border-b border-primary/20 pb-2">Chain Planning</h3>
+                <div class="space-y-4">
+                    <div class="bg-black border-l-2 border-primary/50 border-y border-r border-white/10 sharp p-6 mb-4 flex flex-col">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-4 border-b border-white/5">
+                            <h4 class="font-mono text-lg text-white">
+                                <span class="text-gray-500">gadgets.</span><span class="text-primary font-bold">find_chain</span><span class="text-gray-400">(start, end, max_depth=5)</span>
+                            </h4>
+                            <div class="flex items-center gap-2 text-xs font-mono">
+                                <span class="text-gray-500">Returns:</span>
+                                <span class="bg-primary/10 text-primary px-2 py-1 sharp border border-primary/20">list</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-400 leading-relaxed">
+                            BFS over the gadget graph. Returns up to 3 paths from <code class="text-primary font-mono">start</code> to <code class="text-primary font-mono">end</code>, shortest first.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-12">
+                <h3 class="font-display text-2xl text-primary uppercase mb-6 border-b border-primary/20 pb-2">Gadget Properties</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-darker border border-white/8 sharp p-4 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-1">gadget.address → int</code>
+                        <p class="text-xs text-gray-500">Primary address of the gadget.</p>
+                    </div>
+                    <div class="bg-darker border border-white/8 sharp p-4 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-1">gadget.all_addresses → list[int]</code>
+                        <p class="text-xs text-gray-500">Primary address + all duplicate entry points.</p>
+                    </div>
+                    <div class="bg-darker border border-white/8 sharp p-4 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-1">gadget.is_trampoline → bool</code>
+                        <p class="text-xs text-gray-500">True if the tail is an indirect jump/call via register.</p>
+                    </div>
+                    <div class="bg-darker border border-white/8 sharp p-4 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-1">gadget.trampoline_target → str | None</code>
+                        <p class="text-xs text-gray-500">Register name dispatched to (e.g. <code class="text-primary font-mono">'rax'</code>, <code class="text-primary font-mono">'x22'</code>).</p>
+                    </div>
+                    <div class="bg-darker border border-white/8 sharp p-4 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-1">gadget.is_chained → bool</code>
+                        <p class="text-xs text-gray-500">True if the gadget targets another known gadget in the collection.</p>
+                    </div>
+                    <div class="bg-darker border border-white/8 sharp p-4 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-1">gadget.target_gadget → Gadget | None</code>
+                        <p class="text-xs text-gray-500">The Gadget object this gadget dispatches to, if any.</p>
+                    </div>
+                    <div class="bg-darker border border-white/8 sharp p-4 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-1">gadget.clobbered_registers() → set[str]</code>
+                        <p class="text-xs text-gray-500">Set of registers written by this gadget.</p>
+                    </div>
+
+                    <div class="bg-darker border border-white/8 sharp p-4 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-1">gadget.entry_points() → list[int]</code>
+                        <p class="text-xs text-gray-500">All valid mid-gadget entry addresses (after harmless prologue instructions).</p>
+                    </div>
+                    <div class="bg-darker border border-white/8 sharp p-4 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-1">gadget.chains_to(other) → bool</code>
+                        <p class="text-xs text-gray-500">True if this gadget's tail transfers control to <code class="text-primary font-mono">other</code>.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h3 class="font-display text-2xl text-primary uppercase mb-6 border-b border-primary/20 pb-2">Iteration</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-darker border border-white/8 sharp p-4 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-1">gadgets.all() → list[Gadget]</code>
+                        <p class="text-xs text-gray-500">All gadgets (sequential + jump-based).</p>
+                    </div>
+                    <div class="bg-darker border border-white/8 sharp p-4 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-1">gadgets.sequential() → list[Gadget]</code>
+                        <p class="text-xs text-gray-500">Only ret-terminated gadgets.</p>
+                    </div>
+                    <div class="bg-darker border border-white/8 sharp p-4 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-1">gadgets.jump_based() → list[Gadget]</code>
+                        <p class="text-xs text-gray-500">Only JOP-style gadgets (call/jmp/blr via register, bl imm, ecall…).</p>
+                    </div>
+                    <div class="bg-darker border border-white/8 sharp p-4 flex flex-col h-full hover:border-primary/30 transition-colors">
+                        <code class="text-primary font-mono text-xs block mb-1">gadgets.by_tag(tag) → list[Gadget]</code>
+                        <p class="text-xs text-gray-500">Filter by lcsajdump tag string (e.g. <code class="text-primary font-mono">'JOP'</code>, <code class="text-primary font-mono">'lcsaj'</code>).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-connector"></div>
+
+    <section id="pivot" class="py-16 bg-card/50 border-y border-white/5 accent-thread">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="section-label mb-4">Stack Pivot</p>
+            <h2 class="font-display text-4xl text-white uppercase mb-8">pivot_gadgets()</h2>
+
+            <div class="bg-secondary/10 border border-secondary/30 sharp p-4 mb-8 flex items-start gap-3">
+                <svg class="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <p class="text-sm text-gray-300">
+                    A pivot redirects <code class="text-primary font-mono">rsp/sp</code> to attacker-controlled memory. The new value must come from a <span class="text-white font-medium">register or memory</span>, not an immediate constant —
+                    <code class="text-primary font-mono">add rsp, 8</code>, <code class="text-primary font-mono">sub rsp, 0x20</code> and <code class="text-primary font-mono">addi sp, sp, -16</code> are <span class="text-secondary font-semibold">not pivots</span> and are excluded.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <div class="bg-black border-l-2 border-primary/50 border-y border-r border-white/10 sharp p-6 hover:border-primary/30 transition-colors">
+                    <p class="text-xs text-gray-500 font-mono uppercase tracking-wider mb-4">Frame-based · x86-64</p>
+                    <p class="text-sm text-gray-400 mb-4"><code class="text-primary font-mono">leave</code> expands to <code class="text-primary font-mono">mov rsp, rbp; pop rbp</code>. If you control rbp the chain redirects into your fake frame — the classic ret2leave technique.</p>
+                    <div class="scanlines bg-darker border border-white/8 sharp p-4 font-mono text-xs text-gray-300 mb-3">
+                        <span class="text-gray-500"># gadget</span><br>
+                        <span class="text-white">leave ; ret</span>
+                    </div>
+                    <div class="scanlines bg-darker border border-white/8 sharp p-4 font-mono text-xs text-gray-300">
+                        <span class="text-gray-300">pivot</span> <span class="text-white">=</span> <span class="text-gray-400">gadgets</span><span class="text-white">.</span><span class="text-yellow-400">pivot_gadgets</span><span class="text-white">()[</span><span class="text-orange-400">0</span><span class="text-white">]</span>
+                    </div>
+                </div>
+
+                <div class="bg-black border-l-2 border-primary/50 border-y border-r border-white/10 sharp p-6 hover:border-primary/30 transition-colors">
+                    <p class="text-xs text-gray-500 font-mono uppercase tracking-wider mb-4">Register-load · x86-64 · ARM64 · RISC-V</p>
+                    <p class="text-sm text-gray-400 mb-4"><code class="text-primary font-mono">rsp</code> is loaded directly from a register the attacker controls. Common in JOP chains where a register was preloaded with the fake stack address.</p>
+                    <div class="scanlines bg-darker border border-white/8 sharp p-4 font-mono text-xs text-gray-300 mb-3">
+                        <span class="text-gray-500"># x86-64</span><br>
+                        <span class="text-white">xchg rsp, rax &nbsp;·&nbsp; mov rsp, rbp</span><br>
+                        <span class="text-gray-500"># ARM64</span><br>
+                        <span class="text-white">mov sp, x0</span><br>
+                        <span class="text-gray-500"># RISC-V</span><br>
+                        <span class="text-white">mv sp, a0</span>
+                    </div>
+                    <div class="scanlines bg-darker border border-white/8 sharp p-4 font-mono text-xs text-gray-300">
+                        <span class="text-gray-300">pivot</span> <span class="text-white">=</span> <span class="text-gray-400">gadgets</span><span class="text-white">.</span><span class="text-yellow-400">pivot_gadgets</span><span class="text-white">()[</span><span class="text-orange-400">0</span><span class="text-white">]</span><br>
+                        <span class="text-gray-500"># or: gadgets.best('xchg rsp')</span>
+                    </div>
+                </div>
+
+                <div class="bg-black border-l-2 border-primary/50 border-y border-r border-white/10 sharp p-6 hover:border-primary/30 transition-colors">
+                    <p class="text-xs text-gray-500 font-mono uppercase tracking-wider mb-4">Stack-load · x86-64</p>
+                    <p class="text-sm text-gray-400 mb-4"><code class="text-primary font-mono">pop rsp</code> reads the new rsp off the current stack. You write the target address at the right offset in the overflow buffer — rsp then points into your JOP/ROP chain.</p>
+                    <div class="scanlines bg-darker border border-white/8 sharp p-4 font-mono text-xs text-gray-300 mb-3">
+                        <span class="text-gray-500"># gadget</span><br>
+                        <span class="text-white">pop rsp ; pop rdi ; pop rcx ; ...</span>
+                    </div>
+                    <div class="scanlines bg-darker border border-white/8 sharp p-4 font-mono text-xs text-gray-300">
+                        <span class="text-gray-500"># trigger: write fake_rsp at offset 256</span><br>
+                        <span class="text-gray-300">payload</span> <span class="text-white">=</span> <span class="text-yellow-400">flat</span><span class="text-white">({</span><span class="text-orange-400">256</span><span class="text-white">:</span> <span class="text-yellow-400">p64</span><span class="text-white">(</span><span class="text-gray-300">pivot</span><span class="text-white">.</span><span class="text-yellow-400">address</span><span class="text-white">) +</span> <span class="text-yellow-400">p64</span><span class="text-white">(</span><span class="text-gray-300">rsp</span> <span class="text-white">+</span> <span class="text-orange-400">24</span><span class="text-white">)})</span>
+                    </div>
+                </div>
+
+                <div class="bg-black border-l-2 border-primary/50 border-y border-r border-white/10 sharp p-6 hover:border-primary/30 transition-colors">
+                    <p class="text-xs text-gray-500 font-mono uppercase tracking-wider mb-4">Memory-load · ARM64 · RISC-V</p>
+                    <p class="text-sm text-gray-400 mb-4"><code class="text-primary font-mono">rsp/sp</code> is loaded from memory at an address in a register. Predominant on ARM64 and RISC-V where direct <code class="text-primary font-mono">register-to-sp</code> moves are less common than on x86.</p>
+                    <div class="scanlines bg-darker border border-white/8 sharp p-4 font-mono text-xs text-gray-300 mb-3">
+                        <span class="text-gray-500"># ARM64</span><br>
+                        <span class="text-white">ldr sp, [x0]</span><br>
+                        <span class="text-gray-500"># RISC-V</span><br>
+                        <span class="text-white">ld sp, 0(a0)</span>
+                    </div>
+                    <div class="scanlines bg-darker border border-white/8 sharp p-4 font-mono text-xs text-gray-300">
+                        <span class="text-gray-500"># attacker controls what x0 / a0 points to</span><br>
+                        <span class="text-gray-300">pivot</span> <span class="text-white">=</span> <span class="text-gray-400">gadgets</span><span class="text-white">.</span><span class="text-yellow-400">pivot_gadgets</span><span class="text-white">()[</span><span class="text-orange-400">0</span><span class="text-white">]</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <script>
+    (function () {
+        var centerIdx = 0;
+        var N = 3;
+
+        function posFor(idx) {
+            var delta = ((idx - centerIdx) % N + N) % N;
+            if (delta === 0) return 'center';
+            if (delta === 1) return 'right';
+            return 'left';
+        }
+
+        function render() {
+            document.querySelectorAll('.exploit-card').forEach(function(card) {
+                card.dataset.pos = posFor(parseInt(card.dataset.idx));
+            });
+            document.querySelectorAll('#carousel-dots .carousel-dot').forEach(function(dot, i) {
+                dot.classList.toggle('active', i === centerIdx);
+            });
+        }
+
+        window.carouselShift = function(dir) {
+            centerIdx = ((centerIdx + dir) % N + N) % N;
+            render();
+        };
+        window.carouselGoto = function(idx) {
+            centerIdx = idx;
+            render();
+        };
+        window.carouselClick = function(card) {
+            var idx = parseInt(card.dataset.idx);
+            if (card.dataset.pos !== 'center') { centerIdx = idx; render(); }
+        };
+        
+        // Inizializzazione
+        render();
+    })();
+    </script>
+
+    <footer class="py-12 bg-darker border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <a href="../" class="font-display text-xl text-white uppercase hover:text-primary transition-colors">← LCSAJdump</a>
+                <div class="flex gap-6 text-sm text-gray-500">
+                    <a href="../gdb/" class="hover:text-primary transition-colors">GDB Plugin</a>
+                    <a href="../ida/" class="hover:text-purple-400 transition-colors">IDA Pro Plugin</a>
+                    <a href="https://github.com/chris1sflaggin/lcsajdump" target="_blank" class="hover:text-white transition-colors">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

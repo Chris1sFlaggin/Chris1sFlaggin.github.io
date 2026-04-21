@@ -322,7 +322,7 @@ images: images/LCSAJfull.png
                         <div class="border-l-2 border-primary pl-4 relative">
                             <h4 class="font-mono text-primary uppercase font-bold text-sm mb-1">Level 3: Deep ML Inference</h4>
                             <p class="text-sm text-gray-500 mb-1">Hybrid Model (LightGBM) pre-trained with semantic constraints (<i>angr/angrop</i>). Filters out syntactic noise with zero runtime overhead.</p>
-                            <p class="text-xs font-mono text-primary">NDCG@20: 100.0% <span class="text-gray-500">-> Flawless ranking for complex ROP chains.</span></p>
+                            <p class="text-xs font-mono text-primary"><a href="https://huggingface.co/chris1sflaggin/chainfinder_v4_hybrid" target="_blank" class="hover:underline text-blue-400">NDCG@1: 98.3%</a> <span class="text-gray-500">-> Flawless ranking for complex ROP chains.</span></p>
                         </div>
                     </div>
                 </div>
@@ -416,6 +416,14 @@ images: images/LCSAJfull.png
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <div class="md:col-span-3 bg-darker border border-white/10 sharp p-4 mb-2 font-mono text-sm">
+                    <p class="text-xs text-gray-500 uppercase tracking-wider mb-3">Installazione Centralizzata</p>
+                    <span class="text-gray-500"># Installa singole integrazioni</span><br>
+                    <span class="text-primary">❯</span> <span class="text-white">./install_integrations.sh --gdb --pwntools</span><br><br>
+                    <span class="text-gray-500"># Oppure installale tutte in un colpo solo</span><br>
+                    <span class="text-primary">❯</span> <span class="text-white">./install_integrations.sh --all</span>
+                </div>
+                
                 <a href="pwntools/" class="group bg-card border border-white/8 hover:border-primary/40 transition-all duration-300 p-6 relative overflow-hidden flex flex-col h-full">
                     <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     
