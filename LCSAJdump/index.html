@@ -95,7 +95,7 @@ images: images/LCSAJfull.png
                     <div class="flex items-center gap-2 justify-center lg:justify-start mb-4 flex-wrap">
                         <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/30 text-sm text-primary font-mono font-bold">
                             <span class="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
-                            v1.2.3
+                            v2.1.0
                         </div>
                         <a href="https://github.com/chris1sflaggin/lcsajdump" target="_blank"
                            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-gray-400 hover:border-yellow-400/50 hover:text-yellow-400 transition-all">
@@ -272,7 +272,7 @@ images: images/LCSAJfull.png
                     <div class="feature-num absolute bottom-4 right-4">02</div>
                     <div class="w-2 h-8 bg-secondary mb-6 shrink-0"></div>
                     <h3 class="font-display text-2xl text-white mb-3 uppercase">Rainbow<br>BFS</h3>
-                    <p class="text-sm text-gray-500 leading-relaxed flex-1">Backward traversal with O(1) Early-Drop filter and Hard-Cap limits. Fast and exhaustive.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed flex-1">Backward traversal with Qualitative Darkness Feedback Loop and Hard-Cap limits. Fast and exhaustive.</p>
                 </div>
 
                 <div class="feature-card bg-card p-8 hover:bg-[#111] transition-colors group cursor-default relative overflow-hidden flex flex-col h-full">
@@ -322,7 +322,7 @@ images: images/LCSAJfull.png
               <div class="border-l-2 border-primary pl-4 relative">
                 <h4 class="font-mono text-primary uppercase font-bold text-sm mb-1">Level 3: Hybrid ML (LGBM + angr)</h4>
                 <p class="text-sm text-gray-500 mb-1">LightGBM LambdaRank with 38 features (28 structural + 10 semantic via angr symbolic execution). Zero runtime overhead via pre-computed inference.</p>
-                <p class="text-xs font-mono text-primary"><a href="https://huggingface.co/chris1sflaggin/chainfinder_v4_hybrid" target="_blank" class="hover:underline text-blue-400">NDCG@1: 98.3% · NDCG@10: 96.6%</a> <span class="text-gray-500">(Production-ready ranking)</span></p>
+                <p class="text-xs font-mono text-primary"><a href="https://huggingface.co/chris1sflaggin/chainfinder_v5_hybrid" target="_blank" class="hover:underline text-blue-400">NDCG@1: 85.5% · NDCG@5: 83.7%</a> <span class="text-gray-500">(Production-ready ranking)</span></p>
               </div>
             </div>
                 </div>
@@ -340,10 +340,10 @@ images: images/LCSAJfull.png
             <br>
 
             <p class="text-primary font-bold"># NDCG Performance (Validation Set)</p>
-            <p>> NDCG@1  : <span class="text-white">0.9833</span> <span class="text-gray-500">(#1 ranked gadget is optimal 98% of the time)</span></p>
-            <p>> NDCG@3  : <span class="text-white">0.9833</span> <span class="text-gray-500">(Top-3 precision)</span></p>
-            <p>> NDCG@5  : <span class="text-white">0.9749</span> <span class="text-gray-500">(Top-5 recall)</span></p>
-            <p>> NDCG@10 : <span class="text-white">0.9656</span> <span class="text-gray-500">(Top-10 ranking quality)</span></p>
+            <p>> NDCG@1  : <span class="text-white">0.8549</span> <span class="text-gray-500">(#1 ranked gadget is optimal 85% of the time)</span></p>
+            <p>> NDCG@3  : <span class="text-white">0.8549</span> <span class="text-gray-500">(Top-3 precision)</span></p>
+            <p>> NDCG@5  : <span class="text-white">0.8374</span> <span class="text-gray-500">(Top-5 recall)</span></p>
+            <p>> NDCG@10 : <span class="text-white">0.8165</span> <span class="text-gray-500">(Top-10 ranking quality)</span></p>
             <br>
 
             <p class="text-primary font-bold"># Top Feature Importances (SHAP)</p>
