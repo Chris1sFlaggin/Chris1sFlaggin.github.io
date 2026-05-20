@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Sistemi Intelligenti — UniTO</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div style="flex:1"></div>
+    <div style="flex:2; text-align:center;">
+      <h1 style="margin:0;font-size:1.4rem;letter-spacing:-0.5px;">SISINT Quiz</h1>
+      <p style="margin:0.2rem 0 0;font-size:0.85rem;opacity:0.7" id="cfu-display-header">Simulazione Esame</p>
+    </div>
+    <div style="flex:1; text-align:right;">
+      <button id="theme-btn" class="theme-toggle">
+        <span class="icon">🌙</span> Dark
+      </button>
+    </div>
+  </header>
+
+  <main id="app">
+    <!-- Schermata iniziale: scelta CFU -->
+    <section id="start-screen" class="screen active">
+      <h2>Per quale taglio dell'esame ti stai preparando?</h2>
+      <div class="cfu-buttons">
+        <button class="cfu-btn" data-cfu="6">
+          <span class="cfu-num">6</span>
+          <span class="cfu-lbl">CFU</span>
+          <span class="cfu-desc">Programma ridotto:<br>RL omesso, no clustering né IA generativa</span>
+        </button>
+        <button class="cfu-btn" data-cfu="9">
+          <span class="cfu-num">9</span>
+          <span class="cfu-lbl">CFU</span>
+          <span class="cfu-desc">Programma esteso:<br>+ giochi stocastici, ontologie avanzate, RL, clustering, IA generativa, probabilità</span>
+        </button>
+      </div>
+      <div class="info-box">
+        <strong>Nota:</strong> alcune domande del programma 9 CFU (clustering, IA generativa, sviluppi recenti delle reti neurali, parti di probabilità e KR) sono <em>integrate</em> sulla base di conoscenze standard del corso e non sono direttamente estraibili dagli appunti SISINT-1 forniti. Saranno marcate con <span class="badge badge-integrato">argomento integrato</span> nel quiz.
+      </div>
+    </section>
+
+    <!-- Selezione modalità -->
+    <section id="mode-screen" class="screen">
+      <button class="back-btn" data-target="start-screen">&larr; Cambia CFU</button>
+      <h2>Modalità di studio</h2>
+      <p>Hai scelto: <strong id="cfu-display"></strong></p>
+      <div class="mode-grid">
+        <button class="mode-btn" data-mode="esame">
+          <h3>Simulazione esame (max 23 pt)</h3>
+          <p>Parte 1: 5 MCQ × 3 pt = 15 pt · Parte 2: 2 esercizi × 4 voci × 1 pt = 8 pt</p>
+        </button>
+        <button class="mode-btn" data-mode="topic">
+          <h3>Studio per argomento</h3>
+          <p>Filtra domande per Parte 1/2/3 o topic specifico. Bottone «Spiega» disponibile su ogni domanda.</p>
+        </button>
+        <button class="mode-btn" data-mode="review">
+          <h3>Sfoglia tutte le domande</h3>
+          <p>Vedi domande con risposta corretta e spiegazione (no scoring)</p>
+        </button>
+      </div>
+    </section>
+
+    <!-- Filtri argomento -->
+    <section id="topic-screen" class="screen">
+      <button class="back-btn" data-target="mode-screen">&larr; Indietro</button>
+      <h2>Scegli argomento</h2>
+      <div class="filters">
+        <label>Parte:
+          <select id="filter-parte">
+            <option value="all">Tutte</option>
+            <option value="1">Parte 1 — Problem solving</option>
+            <option value="2">Parte 2 — Conoscenza e ragionamento</option>
+            <option value="3">Parte 3 — Agenti e apprendimento</option>
+          </select>
+        </label>
+        <label>Topic:
+          <select id="filter-topic"><option value="all">Tutti</option></select>
+        </label>
+        <label>Tipo:
+          <select id="filter-type">
+            <option value="both">MCQ + Matching</option>
+            <option value="mcq">Solo MCQ</option>
+            <option value="matching">Solo Matching</option>
+          </select>
+        </label>
+        <label>Numero domande:
+          <input type="number" id="filter-count" value="10" min="1" max="200">
+        </label>
+      </div>
+      <button id="topic-start-btn" class="primary-btn">Inizia quiz</button>
+    </section>
+
+    <!-- Quiz attivo -->
+    <section id="quiz-screen" class="screen">
+      <div class="quiz-header">
+        <button class="back-btn" data-target="mode-screen">&larr; Esci</button>
+        <div class="progress">
+          Domanda <span id="q-num">1</span>/<span id="q-total">10</span>
+          <progress id="q-progress" value="0" max="10"></progress>
+        </div>
+      </div>
+      <div id="quiz-body"></div>
+      <div class="quiz-nav">
+        <button id="prev-btn" class="nav-btn">&larr; Precedente</button>
+        <button id="next-btn" class="nav-btn primary-btn">Successiva &rarr;</button>
+        <button id="submit-btn" class="nav-btn primary-btn" style="display:none">Termina e mostra risultati</button>
+      </div>
+    </section>
+
+    <!-- Risultati -->
+    <section id="results-screen" class="screen">
+      <h2>Risultati</h2>
+      <div class="score-summary">
+        <div class="score-num"><span id="score-correct">0</span> / <span id="score-total">0</span></div>
+        <div class="score-pct"><span id="score-pct">0</span>%</div>
+      </div>
+      <div id="results-detail"></div>
+      <div class="actions">
+        <button id="retry-btn" class="primary-btn">Riprova stesso quiz</button>
+        <button id="new-quiz-btn" class="primary-btn">Nuovo quiz</button>
+        <button id="home-btn" class="nav-btn">Torna all'inizio</button>
+      </div>
+    </section>
+
+    <!-- Review -->
+    <section id="review-screen" class="screen">
+      <button class="back-btn" data-target="mode-screen">&larr; Indietro</button>
+      <h2>Sfoglia domande</h2>
+      <div class="review-filters">
+        <label>Parte:
+          <select id="rev-parte">
+            <option value="all">Tutte</option>
+            <option value="1">Parte 1</option>
+            <option value="2">Parte 2</option>
+            <option value="3">Parte 3</option>
+          </select>
+        </label>
+        <label>Tipo:
+          <select id="rev-type">
+            <option value="all">Tutte</option>
+            <option value="mcq">MCQ</option>
+            <option value="matching">Matching</option>
+          </select>
+        </label>
+        <label>Cerca:
+          <input type="search" id="rev-search" placeholder="testo…">
+        </label>
+      </div>
+      <div id="review-list"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Materiale di partenza: appunti SISINT-1 (Altair, CC-BY 4.0) · slides Cristina Baroglio · Russell &amp; Norvig AIMA (4ed) · Format esame: esempio del 12/12/2022.</p>
+    <p>Quiz gratuito per studenti UniTO. <a href="https://github.com" target="_blank" rel="noreferrer">Codice su GitHub</a></p>
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

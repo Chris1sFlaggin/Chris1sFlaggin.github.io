@@ -1,0 +1,12 @@
+# Materiale didattico di terzi (non committare)
+*.pdf
+*.zip
+
+# Editor/system
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Local server
+*.log
