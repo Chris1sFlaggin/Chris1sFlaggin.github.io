@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flashcard SAS — Auto-test</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --card:#1d212b; --card2:#232838;
+    --ink:#e8ebf1; --muted:#9aa3b2; --line:#2a2f3a;
+    --accent:#5b8cff; --good:#2fbf71; --again:#ff6b6b; --chip:#2a3146;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:radial-gradient(1200px 600px at 50% -10%,#1a1f2b,var(--bg));
+    color:var(--ink);
+    font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    display:flex;flex-direction:column;min-height:100vh;
+  }
+  header{
+    padding:18px 20px 10px;border-bottom:1px solid var(--line);
+    display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+  }
+  h1{font-size:18px;margin:0;letter-spacing:.3px}
+  h1 small{color:var(--muted);font-weight:500}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  select,button{
+    font:inherit;color:var(--ink);background:var(--panel);
+    border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;
+    transition:.15s border-color,.15s background,.15s transform;
+  }
+  button:hover,select:hover{border-color:var(--accent)}
+  button:active{transform:translateY(1px)}
+  .progress{height:6px;background:var(--panel);border-bottom:1px solid var(--line)}
+  .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#7aa2ff);transition:width .25s}
+  main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px 16px}
+  .meta{color:var(--muted);font-size:13px;display:flex;gap:14px;align-items:center}
+  .scene{width:min(760px,94vw);height:min(52vh,520px);perspective:1400px}
+  .card{
+    position:relative;width:100%;height:100%;cursor:pointer;
+    transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.7,.2,1);
+  }
+  .card.flip{transform:rotateY(180deg)}
+  .face{
+    position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;
+    border:1px solid var(--line);box-shadow:var(--shadow);
+    padding:28px 30px;display:flex;flex-direction:column;
+  }
+  .front{background:linear-gradient(160deg,var(--card),#161a23)}
+  .back{background:linear-gradient(160deg,var(--card2),#1a1f2c);transform:rotateY(180deg);overflow:auto}
+  .back .body{align-items:flex-start}
+  .chip{
+    align-self:flex-start;font-size:12px;letter-spacing:.4px;text-transform:uppercase;
+    color:#cdd6ea;background:var(--chip);border:1px solid var(--line);
+    padding:4px 10px;border-radius:999px;margin-bottom:14px;
+  }
+  .qid{color:var(--muted);font-size:12px;margin-bottom:6px}
+  .body{flex:1;display:flex;align-items:center}
+  .q{font-size:clamp(18px,2.6vw,24px);font-weight:600}
+  .a{font-size:clamp(15px,2.1vw,19px)}
+  .a b{color:#fff}
+  .a .ex{display:block;margin-top:8px;color:#bfe6cd}
+  .a .ex b{color:#7ee0a0}
+  .a img{display:block;margin:12px auto 0;max-width:100%;max-height:30vh;
+         background:#fff;border-radius:8px;padding:6px}
+  .a .ps{font-size:clamp(13px,1.8vw,16px);color:var(--muted)}
+  .a .ps b{color:var(--ink)}
+  .hint{color:var(--muted);font-size:12px;text-align:center;margin-top:14px}
+  .markstate{position:absolute;top:14px;right:16px;font-size:12px;font-weight:700}
+  .markstate.known{color:var(--good)}
+  .markstate.again{color:var(--again)}
+  .nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
+  .nav .big{padding:10px 18px;font-weight:600}
+  .btn-good{border-color:#235; color:var(--good)}
+  .btn-good:hover{border-color:var(--good);background:rgba(47,191,113,.08)}
+  .btn-again{color:var(--again)}
+  .btn-again:hover{border-color:var(--again);background:rgba(255,107,107,.08)}
+  .stats{color:var(--muted);font-size:13px}
+  .stats b{color:var(--ink)}
+  footer{padding:10px 16px;color:var(--muted);font-size:12px;text-align:center;border-top:1px solid var(--line)}
+  kbd{background:var(--panel);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px;font-size:11px}
+  .empty{color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <h1>Flashcard SAS <small>— auto-test</small></h1>
+  <div class="controls">
+    <select id="cat" title="Filtra per categoria"></select>
+    <button id="shuffle" title="Mescola">🔀 Mescola</button>
+    <button id="onlyAgain" title="Mostra solo le card da rivedere">↻ Solo da rivedere</button>
+    <button id="reset" title="Azzera progressi">🗑 Reset</button>
+  </div>
+</header>
+<div class="progress"><i id="bar"></i></div>
+
+<main>
+  <div class="meta">
+    <span id="counter">–</span>
+    <span class="stats">✔ <b id="nKnown">0</b> &nbsp; ↻ <b id="nAgain">0</b></span>
+  </div>
+
+  <div class="scene">
+    <div class="card" id="card">
+      <div class="face front">
+        <span class="chip" id="catChip">—</span>
+        <span class="markstate" id="markFront"></span>
+        <div class="qid" id="qid"></div>
+        <div class="body"><div class="q" id="q">—</div></div>
+        <div class="hint">clicca o premi <kbd>Spazio</kbd> per girare</div>
+      </div>
+      <div class="face back">
+        <span class="chip" id="catChip2">Risposta</span>
+        <span class="markstate" id="markBack"></span>
+        <div class="body"><div class="a" id="a">—</div></div>
+        <div class="hint">↻ <kbd>←</kbd> indietro &nbsp;·&nbsp; <kbd>→</kbd> avanti</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="big" id="prev">← Indietro</button>
+    <button class="big" id="flip">Gira</button>
+    <button class="big" id="next">Avanti →</button>
+  </div>
+  <div class="nav">
+    <button class="btn-good" id="markKnown" title="Sapevo (G)">✔ Sapevo</button>
+    <button class="btn-again" id="markAgain" title="Da rivedere (A)">↻ Da rivedere</button>
+  </div>
+</main>
+
+<footer>
+  56 card · scorciatoie: <kbd>←</kbd>/<kbd>→</kbd> naviga · <kbd>Spazio</kbd> gira · <kbd>G</kbd> sapevo · <kbd>A</kbd> da rivedere · <kbd>S</kbd> mescola
+</footer>
+
+<script>
+const CARDS = [
+ {id:"A1",cat:"Processi",q:"Quali sono le 4 attività fondamentali di un processo software?",a:"Le 4 cose che fai in QUALSIASI progetto software: <b>1) Specifica</b> = decidere cosa deve fare. <b>2) Sviluppo</b> = progettarlo e scrivere il codice. <b>3) Convalida</b> = testare che funzioni davvero. <b>4) Evoluzione</b> = modificarlo dopo, quando cambiano i bisogni.<span class='ex'><b>Esempio:</b> app meteo → scegli «mostra previsioni» (specifica), la programmi (sviluppo), controlli che i dati siano giusti (convalida), poi aggiungi le allerte (evoluzione).</span>"},
+ {id:"A2",cat:"Processi",q:"Che differenza c'è tra modello a cascata e modello incrementale?",a:"<b>Cascata:</b> fai le 4 attività in fila, una finita inizi la prossima, senza tornare indietro. <b>Incrementale:</b> le ripeti a piccoli pezzi, ogni giro aggiunge funzioni e puoi correggere.<span class='ex'><b>Esempio:</b> cascata = costruisci tutta la casa dal progetto finale e basta; incrementale = prima una stanza abitabile, poi ne aggiungi altre una alla volta.</span>"},
+ {id:"A3",cat:"Processi",q:"Quali sono le 4 fasi di UP (Unified Process)?",a:"<b>Ideazione</b> (idea + è fattibile?) → <b>Elaborazione</b> (decidi architettura e affronti i rischi grossi) → <b>Costruzione</b> (scrivi la maggior parte del codice) → <b>Transizione</b> (consegni agli utenti).<span class='ex'><b>Memo:</b> I-E-C-T. UP è iterativo: queste fasi si attraversano facendo più giri (iterazioni).</span>"},
+ {id:"A4",cat:"Processi",q:"In UP le attività (requisiti, progettazione, test…) sono separate nel tempo?",a:"<b>NO.</b> In UP non sono blocchi separati: in ogni iterazione ne fai un po' di tutte insieme. («non si intrecciano mai» = <b>FALSO</b>.)<span class='ex'><b>Esempio:</b> mentre scrivi codice ti accorgi che manca un requisito e torni subito a sistemarlo, senza aspettare una «fase requisiti» chiusa.</span>"},
+ {id:"A5",cat:"Processi",q:"UP usa il refactoring?",a:"<b>SÌ (VERO).</b> Refactoring = ripulire/riorganizzare il codice senza cambiare cosa fa, per tenerlo gestibile. UP lo usa perché è iterativo e il codice cambia di continuo.<span class='ex'><b>Esempio:</b> rinomini variabili confuse e spezzi un metodo lungo 200 righe in tre più piccoli: stesso risultato, codice più pulito.</span>"},
+
+ {id:"B1",cat:"Requisiti",q:"Un caso d'uso è «l'insieme di tutte le funzionalità del sistema»?",a:"<b>FALSO.</b> Un caso d'uso = UN modo di usare il sistema per raggiungere UN obiettivo di un utente. Non tutte le funzioni insieme.<span class='ex'><b>Esempio:</b> «Prelevare contante» è UN caso d'uso del bancomat. «Tutto quello che fa il bancomat» NON è un caso d'uso.</span>"},
+ {id:"B2",cat:"Requisiti",q:"I requisiti non funzionali sono descritti completamente dai casi d'uso?",a:"<b>FALSO.</b> I casi d'uso dicono COSA fa il sistema (requisiti funzionali). Le qualità e i vincoli (velocità, sicurezza, usabilità = non funzionali) vanno nelle <b>Specifiche Supplementari</b>.<span class='ex'><b>Esempio:</b> «login» = caso d'uso; «il login deve rispondere in meno di 1 secondo» = requisito non funzionale → specifiche supplementari.</span>"},
+ {id:"B3",cat:"Requisiti",q:"A cosa serve la disciplina dei requisiti in UP?",a:"A capire COSA costruire prima di costruirlo: fare la lista dei requisiti, capire il contesto del sistema, raccogliere requisiti <b>funzionali</b> e <b>non funzionali</b>.<span class='ex'><b>Esempio:</b> per un'app di prenotazioni capisci chi la usa, cosa deve fare e quali vincoli (es. deve girare su mobile) prima di programmare.</span>"},
+
+ {id:"C1",cat:"Dominio",q:"Cos'è il modello di dominio?",a:"È un disegno (UML) che fa da <b>dizionario visuale</b> dei concetti del mondo reale del problema, con le loro relazioni. NON è codice.<span class='ex'><b>Esempio:</b> per un negozio → i concetti Cliente, Ordine, Prodotto e come si collegano (un Cliente fa Ordini, un Ordine contiene Prodotti).</span>"},
+ {id:"C2",cat:"Dominio",q:"Il modello di dominio include oggetti e attributi software?",a:"<b>FALSO.</b> Mostra concetti del <b>mondo reale</b> (concettuali), non le classi/metodi del programma.<span class='ex'><b>Esempio:</b> «Cliente» come idea del dominio — non la classe Java <code>Cliente</code> con i suoi metodi e tipi. Quella arriva dopo, nel design.</span>"},
+ {id:"C3",cat:"Dominio",q:"Il modello di dominio è testuale o visuale?",a:"È <b>visuale</b>: un diagramma UML fatto di scatole e linee. «rappresentazione testuale» = <b>FALSO</b>.<span class='ex'><b>Esempio:</b> non è un elenco scritto «Cliente: nome, cognome…», ma un disegno con le scatole Cliente–Ordine collegate.</span>"},
+ {id:"C4",cat:"Dominio",q:"Da dove nascono i concetti del modello di dominio?",a:"Dai casi d'uso scritti in dettaglio: leggi il testo e i <b>sostantivi</b> ti suggeriscono i concetti.<span class='ex'><b>Esempio:</b> dalla frase «il cliente effettua un ordine di prodotti» tiri fuori i concetti Cliente, Ordine, Prodotto.</span>"},
+
+ {id:"D1",cat:"Riuso",q:"Un attributo di una classe è una responsabilità di che tipo?",a:"Di <b>conoscenza</b> (knowing): un attributo è qualcosa che l'oggetto «sa». (VERO.)<span class='ex'><b>Esempio:</b> un Conto «sa» il proprio saldo → il saldo è una responsabilità di conoscenza. «Fare un bonifico» invece è una responsabilità di esecuzione (doing).</span>"},
+ {id:"D2",cat:"Riuso",q:"I pattern GRASP servono a scoprire i requisiti?",a:"<b>FALSO.</b> I GRASP servono nel <b>design</b>, per decidere quale classe ha quale responsabilità. Non servono a capire cosa vuole il cliente.<span class='ex'><b>Memo:</b> GRASP = «COME progetto» (chi fa cosa), non «COSA serve». I requisiti li raccogli prima, con i casi d'uso.</span>"},
+ {id:"D3",cat:"Riuso",q:"La composizione/delega è riuso black-box o white-box?",a:"<b>Black-box</b> (scatola nera): usi un oggetto tramite la sua interfaccia senza vederne l'interno. Rispetta l'incapsulamento.<span class='ex'><b>Esempio:</b> usi una <code>List</code> di Java senza sapere com'è fatta dentro: ti basta <code>add()</code> e <code>get()</code>.</span>"},
+ {id:"D4",cat:"Riuso",q:"L'ereditarietà rispetta l'incapsulamento?",a:"<b>FALSO.</b> L'ereditarietà è <b>white-box</b>: la sottoclasse vede i dettagli interni del padre, quindi non rispetta del tutto l'incapsulamento.<span class='ex'><b>Esempio:</b> se cambi come funziona dentro la classe padre, rischi di rompere tutte le classi figlie che ci si appoggiavano.</span>"},
+ {id:"D5",cat:"Riuso",q:"I GoF usano l'ereditarietà per il polimorfismo? E per riusare il codice?",a:"Per il <b>polimorfismo</b> sì (interfacce e classi astratte). Per <b>riusare il codice</b> preferiscono la <b>composizione</b> (un oggetto ne contiene un altro).<span class='ex'><b>Slogan GoF:</b> «favorisci la composizione sull'ereditarietà» — incastri oggetti invece di fare gerarchie profonde e rigide.</span>"},
+
+ {id:"E1",cat:"GRASP",q:"«Chi deve creare l'istanza di un oggetto?» — quale GRASP?",a:"<b>Creator.</b> Lo crea la classe che lo contiene, lo aggrega o lo usa di più.<span class='ex'><b>Esempio:</b> un Ordine contiene le sue RigheOrdine → è l'Ordine a creare le righe, non una classe a caso. Chi «possiede» il pezzo, lo fabbrica.</span>"},
+ {id:"E2",cat:"GRASP",q:"«Assegna il compito a chi ha le informazioni per farlo» — quale GRASP?",a:"<b>Information Expert.</b> Dai la responsabilità alla classe che ha già i dati necessari.<span class='ex'><b>Esempio:</b> per calcolare il totale di un Ordine, lo fa l'Ordine stesso, perché ha la lista delle righe e i prezzi. Inutile farlo fare a un'altra classe che dovrebbe chiedere tutto.</span>"},
+ {id:"E3",cat:"GRASP",q:"«Primo oggetto, oltre la UI, che riceve un'operazione di sistema» — quale GRASP?",a:"<b>Controller.</b> L'oggetto (non la finestra/bottone) che riceve l'azione dell'utente e la smista al resto del sistema.<span class='ex'><b>Esempio:</b> premi «Paga» → un oggetto GestoreVendita riceve la richiesta e coordina; il bottone non fa il lavoro, solo lo passa.</span>"},
+ {id:"E4",cat:"GRASP",q:"«Tieni le classi poco dipendenti tra loro» — quale GRASP?",a:"<b>Low Coupling</b> (accoppiamento basso). Meno una classe dipende dalle altre, meno cose rompi quando la cambi.<span class='ex'><b>Esempio:</b> se A parla con B solo tramite un'interfaccia, puoi sostituire B con un altro senza toccare A.</span>"},
+ {id:"E5",cat:"GRASP",q:"«Ogni classe fa una cosa sola e ben definita» — quale GRASP?",a:"<b>High Cohesion</b> (coesione alta). Una classe deve avere responsabilità correlate, non un po' di tutto.<span class='ex'><b>Esempio:</b> una classe Fattura gestisce la fattura — non anche l'invio email, la stampa e l'accesso al database. Quelle vanno in classi dedicate.</span>"},
+ {id:"E6",cat:"GRASP",q:"«Niente if sul tipo: usa metodi ridefiniti per ogni tipo» — quale GRASP?",a:"<b>Polymorphism.</b> Invece di tanti <code>if</code> che controllano il tipo, ogni tipo ha la sua versione dello stesso metodo.<span class='ex'><b>Esempio:</b> invece di «se è cerchio… altrimenti se è quadrato…», ogni Forma ha il proprio <code>area()</code> e tu chiami solo <code>forma.area()</code>.</span>"},
+ {id:"E7",cat:"GRASP",q:"«Classe inventata, non del dominio, per tenere pulito» — quale GRASP?",a:"<b>Pure Fabrication</b> (fabbricazione pura). Una classe artificiale che non esiste nel mondo reale, creata solo per non sporcare gli oggetti del dominio.<span class='ex'><b>Esempio:</b> una classe DatabaseManager per salvare i dati: «database manager» non è un concetto del negozio, ma serve e tiene il resto coeso.</span>"},
+ {id:"E8",cat:"GRASP",q:"«Metti un intermediario tra due oggetti» — quale GRASP?",a:"<b>Indirection.</b> Un oggetto in mezzo evita che due si parlino direttamente, riducendo l'accoppiamento.<span class='ex'><b>Esempio:</b> un mediatore tra l'interfaccia e il database: cambi il database e l'interfaccia non se ne accorge perché parla solo col mediatore.</span>"},
+ {id:"E9",cat:"GRASP",q:"«Nascondi ciò che può cambiare dietro un'interfaccia stabile» — quale GRASP?",a:"<b>Protected Variations.</b> Proteggi il resto del codice mettendo i punti instabili dietro un'interfaccia che non cambia.<span class='ex'><b>Esempio:</b> un'interfaccia Pagamento; domani aggiungi PayPal creando una nuova classe, senza toccare il codice che chiama «paga()».</span>"},
+ {id:"E10",cat:"GRASP",q:"Quanti e quali sono i pattern GRASP?",a:"Sono <b>9</b>: Creator, Information Expert, Controller, Low Coupling, High Cohesion, Polymorphism, Pure Fabrication, Indirection, Protected Variations.<span class='ex'><b>A cosa servono:</b> tutti insieme aiutano a decidere CHI (quale classe) fa COSA quando progetti — l'assegnazione delle responsabilità.</span>"},
+ {id:"E11",cat:"GRASP",q:"«Abstract Factory è un pattern GRASP» — Vero o Falso?",a:"<b>FALSO.</b> Abstract Factory è un <b>GoF</b> (serve a creare oggetti), non un GRASP.<span class='ex'><b>Trappola classica d'esame:</b> i GRASP sono 9 e riguardano l'assegnazione di responsabilità. Se in un elenco di «GRASP» vedi Abstract Factory, Singleton o Observer → sono GoF, quindi FALSO.</span>"},
+
+ {id:"F1",cat:"GoF",q:"«Famiglia di algoritmi variabili e intercambiabili» — quale pattern GoF?",a:"<b>Strategy.</b> Diversi modi di fare la stessa cosa, scambiabili a piacere.<span class='ex'><b>Esempio:</b> il navigatore calcola lo stesso percorso con strategia «auto», «bici» o «a piedi». Cambi la strategia, il resto del programma non cambia.</span>"},
+ {id:"F2",cat:"GoF",q:"«Aggiungere responsabilità a un oggetto in modo dinamico» — quale pattern GoF?",a:"<b>Decorator</b> (detto anche Wrapper). Aggiungi funzioni «avvolgendo» l'oggetto, invece di creare mille sottoclassi.<span class='ex'><b>Esempio:</b> caffè base → lo avvolgi con «+latte», poi con «+panna». Ogni strato aggiunge prezzo e descrizione, a runtime.</span>"},
+ {id:"F3",cat:"GoF",q:"«Far funzionare insieme interfacce incompatibili» — quale pattern GoF?",a:"<b>Adapter.</b> Metti un adattatore in mezzo per far combaciare due «prese» diverse.<span class='ex'><b>Esempio:</b> come l'adattatore presa italiana→inglese. Nel codice: avvolgi una libreria vecchia per usarla con la tua interfaccia nuova senza riscriverla.</span>"},
+ {id:"F4",cat:"GoF",q:"«Avvisare più oggetti quando uno cambia stato» — quale pattern GoF?",a:"<b>Observer</b> (publish-subscribe). Un oggetto notifica automaticamente quelli iscritti quando succede qualcosa.<span class='ex'><b>Esempio:</b> ti iscrivi a un canale YouTube (subscriber). Esce un video (evento) → ricevi la notifica, senza dover controllare ogni minuto.</span>"},
+ {id:"F5",cat:"GoF",q:"«Il comportamento cambia in base allo stato interno» — quale pattern GoF?",a:"<b>State.</b> L'oggetto si comporta in modo diverso secondo il suo stato, senza riempire tutto di if.<span class='ex'><b>Esempio:</b> un semaforo verde/giallo/rosso: lo stesso comando «prossimo()» fa cose diverse a seconda dello stato corrente.</span>"},
+ {id:"F6",cat:"GoF",q:"«Trattare un gruppo e un singolo allo stesso modo (ad albero)» — quale pattern GoF?",a:"<b>Composite.</b> Composti e singoli condividono la stessa interfaccia, così li usi nello stesso modo.<span class='ex'><b>Esempio:</b> una cartella contiene file e altre cartelle; chiedi la «dimensione» a un file o a una cartella con lo stesso comando.</span>"},
+ {id:"F7",cat:"GoF",q:"«Una sola istanza, raggiungibile da ovunque» — quale pattern GoF?",a:"<b>Singleton.</b> Garantisce che esista UN solo oggetto di quella classe in tutto il programma.<span class='ex'><b>Esempio:</b> le impostazioni dell'app o il logger: ne vuoi uno solo, condiviso da tutti, non venti copie scollegate.</span>"},
+ {id:"F8",cat:"GoF",q:"«Creare famiglie di oggetti coordinati» — quale pattern GoF?",a:"<b>Abstract Factory.</b> Crea gruppi di oggetti che vanno insieme, senza dire le classi concrete.<span class='ex'><b>Esempio:</b> tema chiaro vs scuro → la factory «chiara» crea bottoni e sfondi chiari, quella «scura» tutti scuri, sempre coerenti tra loro.</span>"},
+ {id:"F9",cat:"GoF",q:"«Aggiungere operazioni senza modificare le classi esistenti» — quale pattern GoF?",a:"<b>Visitor.</b> Metti la nuova operazione in un oggetto «visitatore» invece di toccare ogni classe.<span class='ex'><b>Esempio:</b> hai già le classi Forma. Vuoi una nuova operazione «esporta in SVG»: la scrivi in un Visitor, senza modificare Cerchio, Quadrato, ecc.</span>"},
+ {id:"F10",cat:"GoF",q:"Quali sono le 3 categorie dei pattern GoF?",a:"<b>Creazionali</b> (come creare oggetti): Singleton, Abstract Factory. <b>Strutturali</b> (come comporre classi/oggetti): Adapter, Composite, Decorator. <b>Comportamentali</b> (come interagiscono): Observer, State, Strategy, Visitor.<span class='ex'><b>Memo:</b> Creo / Costruisco la struttura / Faccio interagire.</span>"},
+
+ {id:"G1",cat:"State vs Strategy",q:"«Strategy incapsula un algoritmo» — Vero o Falso?",a:"<b>VERO.</b> Strategy racchiude un <b>algoritmo</b>, cioè un modo di svolgere un compito, e te ne fa scegliere uno.<span class='ex'><b>Esempio:</b> l'algoritmo di ordinamento o di calcolo del prezzo: ne scegli uno tra tanti.</span>"},
+ {id:"G2",cat:"State vs Strategy",q:"«State incapsula un algoritmo» — Vero o Falso?",a:"<b>FALSO.</b> State racchiude il <b>comportamento legato allo stato</b>, non un algoritmo scelto dal cliente.<span class='ex'><b>Esempio:</b> come si comporta un Ordine se è «in attesa» rispetto a «spedito»: cambia da solo col cambiare dello stato.</span>"},
+ {id:"G3",cat:"State vs Strategy",q:"«State consente una famiglia di algoritmi intercambiabili» — Vero o Falso?",a:"<b>FALSO.</b> La «famiglia di algoritmi intercambiabili» è <b>Strategy</b>, non State.<span class='ex'><b>Trappola:</b> all'esame scambiano apposta le definizioni di State e Strategy. Ricorda: algoritmi scambiabili = Strategy.</span>"},
+ {id:"G4",cat:"State vs Strategy",q:"«State e Strategy sono simili ma differiscono nell'applicazione» — Vero o Falso?",a:"<b>VERO.</b> Hanno quasi lo stesso disegno UML (Context + interfaccia + classi concrete), ma scopo diverso.<span class='ex'><b>Differenza:</b> Strategy = TU scegli quale algoritmo usare. State = l'oggetto cambia comportamento da solo quando cambia il suo stato interno.</span>"},
+
+ {id:"H1",cat:"Testing",q:"Cos'è il TDD e di quale metodo è pratica?",a:"<b>TDD</b> = scrivi PRIMA il test (che fallisce), poi il codice minimo per farlo passare, poi pulisci. Ciclo: rosso → verde → refactor. È pratica di <b>eXtreme Programming</b>, non della cascata.<span class='ex'><b>Esempio:</b> prima scrivi il test «somma(2,3) deve dare 5», lo vedi fallire, poi scrivi la funzione somma finché diventa verde.</span>"},
+ {id:"H2",cat:"Testing",q:"«Un test unitario verifica la comunicazione tra parti del sistema» — Vero o Falso?",a:"<b>FALSO.</b> Il test <b>unitario</b> prova UN pezzo isolato (una classe/metodo). La comunicazione TRA pezzi la prova il test di <b>integrazione</b>.<span class='ex'><b>Esempio:</b> unitario = provi <code>somma()</code> da sola; integrazione = provi che «carrello» e «pagamento» funzionino insieme.</span>"},
+ {id:"H3",cat:"Testing",q:"Quali sono le fasi di un test (schema AAA)?",a:"<b>Arrange</b> (prepara i dati) → <b>Act</b> (esegui il metodo da testare) → <b>Assert</b> (controlla che il risultato sia giusto). Non c'è nessun «rilascio».<span class='ex'><b>Esempio:</b> prepari un carrello con 2 articoli (Arrange) → chiami totale() (Act) → verifichi che dia la somma giusta (Assert).</span>"},
+
+ {id:"I1",cat:"Molteplicità UML",q:"Cosa significano 1, 0..1, *, 1..* su un'associazione?",a:"Dicono quanti oggetti si collegano: <b>1</b> = esattamente uno; <b>0..1</b> = zero o uno (opzionale); <b>*</b> o 0..* = zero o più; <b>1..*</b> = almeno uno.<span class='ex'><b>Esempio:</b> un Ordine ha 1 Cliente; un Cliente ha 0..* Ordini (può non averne ancora fatti, o averne tanti).</span>"},
+ {id:"I2",cat:"Molteplicità UML",q:"Quando una relazione (insieme di coppie) NON rispetta le molteplicità?",a:"È invalida se: un lato ha più o meno collegamenti di quanti la molteplicità permette, oppure un elemento obbligatorio (1..*) resta senza collegamento, oppure compare due volte la stessa coppia.<span class='ex'><b>Esempio:</b> se ogni Ordine DEVE avere 1 Cliente ma nell'elenco un Ordine non ha nessun Cliente → relazione invalida.</span>"},
+
+ {id:"U1",cat:"GoF — UML",q:"Singleton — Problema, Soluzione, struttura UML ed esempio?",a:"<div class='ps'><b>Problema:</b> serve UNA sola istanza, raggiungibile da ovunque.<br><b>Soluzione:</b> costruttore privato (nessuno può fare <code>new</code>) + metodo statico <code>getInstance()</code> che crea l'oggetto al primo uso e poi restituisce sempre quello.<br><b>Esempio:</b> il logger dell'app — uno solo, condiviso da tutte le classi.</div><img src='uml/01_singleton.png' alt='Singleton UML'>"},
+ {id:"U2",cat:"GoF — UML",q:"Abstract Factory — Problema, Soluzione, struttura UML ed esempio?",a:"<div class='ps'><b>Problema:</b> creare famiglie di oggetti correlati senza legare il codice alle classi concrete.<br><b>Soluzione:</b> un'interfaccia «factory astratta» con i metodi di creazione, e una factory concreta per ogni famiglia.<br><b>Esempio:</b> tema chiaro/scuro: la factory «scura» crea bottoni, sfondi e testi tutti scuri e coerenti.</div><img src='uml/02_abstract_factory.png' alt='Abstract Factory UML'>"},
+ {id:"U3",cat:"GoF — UML",q:"Adapter — Problema, Soluzione, struttura UML ed esempio?",a:"<div class='ps'><b>Problema:</b> due interfacce incompatibili devono lavorare insieme.<br><b>Soluzione:</b> un Adapter in mezzo converte l'interfaccia di chi hai (Adaptee) in quella che ti serve (Target).<br><b>Esempio:</b> adattatore presa elettrica; nel codice avvolgi una libreria vecchia per usarla con la tua interfaccia nuova.</div><img src='uml/03_adapter.png' alt='Adapter UML'>"},
+ {id:"U4",cat:"GoF — UML",q:"Composite — Problema, Soluzione, struttura UML ed esempio?",a:"<div class='ps'><b>Problema:</b> trattare una struttura ad albero (gruppi e singoli) allo stesso modo.<br><b>Soluzione:</b> tutti implementano la stessa interfaccia Component; il Composite contiene figli Component, la foglia no.<br><b>Esempio:</b> cartelle e file: chiedi la «dimensione» a entrambi con lo stesso comando.</div><img src='uml/04_composite.png' alt='Composite UML'>"},
+ {id:"U5",cat:"GoF — UML",q:"Decorator — Problema, Soluzione, struttura UML ed esempio?",a:"<div class='ps'><b>Problema:</b> aggiungere funzioni a un oggetto a runtime, senza una valanga di sottoclassi.<br><b>Soluzione:</b> un wrapper che implementa la stessa interfaccia, contiene l'oggetto originale e gli aggiunge comportamento prima/dopo.<br><b>Esempio:</b> caffè + latte + panna: ogni strato avvolge il precedente e aggiunge prezzo e descrizione.</div><img src='uml/05_decorator.png' alt='Decorator UML'>"},
+ {id:"U6",cat:"GoF — UML",q:"Observer — Problema, Soluzione, struttura UML ed esempio?",a:"<div class='ps'><b>Problema:</b> più oggetti vogliono sapere quando uno (il publisher) cambia, restando poco accoppiati.<br><b>Soluzione:</b> il Subject tiene una lista di Observer e, al cambiamento, chiama <code>update()</code> su ciascuno (attach/detach per iscriversi/disiscriversi).<br><b>Esempio:</b> iscrizione a un canale: esce il video → vieni notificato automaticamente.</div><img src='uml/06_observer.png' alt='Observer UML'>"},
+ {id:"U7",cat:"GoF — UML",q:"State — Problema, Soluzione, struttura UML ed esempio?",a:"<div class='ps'><b>Problema:</b> il comportamento dipende dallo stato e il codice si riempie di if.<br><b>Soluzione:</b> una classe per ogni stato con interfaccia comune; il Context delega allo stato corrente e lo cambia quando serve.<br><b>Esempio:</b> semaforo verde/giallo/rosso: lo stesso comando si comporta diversamente in ogni stato.</div><img src='uml/07_state.png' alt='State UML'>"},
+ {id:"U8",cat:"GoF — UML",q:"Strategy — Problema, Soluzione, struttura UML ed esempio?",a:"<div class='ps'><b>Problema:</b> hai più algoritmi per lo stesso scopo e vuoi poterli scambiare.<br><b>Soluzione:</b> ogni algoritmo in una classe separata con interfaccia comune; il Context ne tiene uno e gli delega il lavoro.<br><b>Esempio:</b> navigatore: stesso percorso, strategia auto / bici / a piedi, scelta a runtime.</div><img src='uml/08_strategy.png' alt='Strategy UML'>"},
+ {id:"U9",cat:"GoF — UML",q:"Visitor — Problema, Soluzione, struttura UML ed esempio?",a:"<div class='ps'><b>Problema:</b> aggiungere nuove operazioni a una struttura stabile senza modificarne le classi.<br><b>Soluzione:</b> doppio dispatch — ogni elemento espone <code>accept(visitor)</code> e il visitor ha un <code>visit()</code> per ogni tipo di elemento.<br><b>Esempio:</b> forme già scritte; aggiungi «esporta in SVG» dentro un Visitor senza toccare Cerchio e Quadrato.</div><img src='uml/09_visitor.png' alt='Visitor UML'>"},
+];
+
+const LS="flashSAS.progress.v1";
+let progress = JSON.parse(localStorage.getItem(LS)||"{}"); // id -> "known"|"again"
+let onlyAgain=false;
+let deck=[], i=0, flipped=false;
+
+const $=id=>document.getElementById(id);
+const card=$("card");
+
+function cats(){return ["Tutte",...[...new Set(CARDS.map(c=>c.cat))]];}
+function buildCatSelect(){
+  $("cat").innerHTML=cats().map(c=>`<option>${c}</option>`).join("");
+}
+
+// Rebuild deck from current filter + onlyAgain. Resets position. Optionally shuffles.
+function rebuildDeck({shuffle=false}={}){
+  const sel=$("cat").value||"Tutte";
+  deck=CARDS.filter(c=>(sel==="Tutte"||c.cat===sel)&&(!onlyAgain||progress[c.id]==="again"));
+  if(shuffle){
+    for(let j=deck.length-1;j>0;j--){const r=Math.floor(Math.random()*(j+1));[deck[j],deck[r]]=[deck[r],deck[j]];}
+  }
+  i=0;
+  showCard();
+}
+
+// Render the current card WITHOUT touching deck order (so shuffle survives nav).
+function showCard(){
+  const n=deck.length;
+  setFlip(false);
+  if(n===0){
+    $("q").innerHTML='<span class="empty">Nessuna card in questo filtro 🎉<br>(niente da rivedere o categoria vuota)</span>';
+    $("a").innerHTML=""; $("catChip").textContent="—"; $("qid").textContent="";
+    $("counter").textContent="0 / 0"; $("bar").style.width="0%";
+    updateMarks(); updateStats(); return;
+  }
+  if(i<0)i=n-1; if(i>=n)i=0;
+  const c=deck[i];
+  $("catChip").textContent=c.cat;
+  $("qid").textContent="Card "+c.id;
+  $("q").innerHTML=c.q;
+  $("a").innerHTML=c.a;
+  $("counter").textContent=(i+1)+" / "+n;
+  $("bar").style.width=((i+1)/n*100)+"%";
+  updateMarks(); updateStats();
+}
+
+function setFlip(v){flipped=v;card.classList.toggle("flip",v);}
+function toggleFlip(){setFlip(!flipped);}
+function next(){if(deck.length){i=(i+1)%deck.length;showCard();}}
+function prev(){if(deck.length){i=(i-1+deck.length)%deck.length;showCard();}}
+
+function mark(state){
+  if(!deck.length)return;
+  const id=deck[i].id;
+  if(progress[id]===state) delete progress[id]; else progress[id]=state; // toggle
+  localStorage.setItem(LS,JSON.stringify(progress));
+  updateMarks(); updateStats();
+  if(state==="known"){
+    if(onlyAgain){ rebuildDeck(); }
+    else { setTimeout(next,180); }
+  }
+}
+function updateMarks(){
+  const id=deck.length?deck[i].id:null;
+  const st=id?progress[id]:null;
+  const label = st==="known"?"✔ sapevo":st==="again"?"↻ da rivedere":"";
+  for(const el of [$("markFront"),$("markBack")]){
+    el.textContent=label;
+    el.className="markstate"+(st?(" "+st):"");
+  }
+}
+function updateStats(){
+  let k=0,a=0;
+  for(const v of Object.values(progress)){if(v==="known")k++;else if(v==="again")a++;}
+  $("nKnown").textContent=k; $("nAgain").textContent=a;
+}
+
+// events
+card.addEventListener("click",toggleFlip);
+$("flip").onclick=toggleFlip;
+$("next").onclick=next;
+$("prev").onclick=prev;
+$("markKnown").onclick=()=>mark("known");
+$("markAgain").onclick=()=>mark("again");
+$("shuffle").onclick=()=>rebuildDeck({shuffle:true});
+$("cat").onchange=()=>rebuildDeck();
+$("onlyAgain").onclick=()=>{onlyAgain=!onlyAgain;$("onlyAgain").style.borderColor=onlyAgain?"var(--accent)":"";rebuildDeck();};
+$("reset").onclick=()=>{if(confirm("Azzerare tutti i progressi (sapevo / da rivedere)?")){progress={};localStorage.removeItem(LS);rebuildDeck();}};
+document.addEventListener("keydown",e=>{
+  if(e.target.tagName==="SELECT")return;
+  if(e.key==="ArrowRight")next();
+  else if(e.key==="ArrowLeft")prev();
+  else if(e.key===" "){e.preventDefault();toggleFlip();}
+  else if(e.key==="g"||e.key==="G")mark("known");
+  else if(e.key==="a"||e.key==="A")mark("again");
+  else if(e.key==="s"||e.key==="S")rebuildDeck({shuffle:true});
+});
+
+buildCatSelect();
+rebuildDeck();
+</script>
+</body>
+</html>
