@@ -42,6 +42,7 @@
   details[open]{padding-bottom:12px}
   .sol b{color:#fff}
   .sol code{background:#11211d;border:1px solid var(--line);border-radius:5px;padding:0 5px}
+  .sol img{display:block;max-width:100%;background:#fff;border-radius:8px;padding:6px;margin-top:10px}
   .scorebar{position:sticky;bottom:0;background:rgba(15,17,21,.92);border-top:1px solid var(--line);
     padding:12px 16px;display:flex;gap:14px;align-items:center;justify-content:center;font-weight:600}
   .scorebar .big{font-size:20px}
@@ -62,74 +63,67 @@
 
 <main>
   <div class="lead">
-    Formato reale: <b>5 domande</b> (1 a scelta multipla + 4 aperte), <b>45 minuti</b>. Copre crittografia (anche i metodi
-    matematici), sicurezza di rete e software security approfondita. Rispondi, poi apri le <b>soluzioni modello</b> delle aperte
-    e premi <b>Correggi</b> per la scelta multipla.
+    Formato reale (esami UniTo Bergadano): <b>5 domande</b> = 1 a scelta multipla + 4 aperte, <b>45 minuti</b>.
+    Le scelte multiple sono prese <b>dagli esami reali</b>; premi <b>↻ Altra</b> per cambiarla. Le aperte hanno la soluzione modello.
   </div>
 
   <section id="mcSec">
-    <h2>1. Scelta multipla <span class="pts">· 1 risposta corretta</span> <button id="reroll" style="float:right;padding:4px 10px;font-size:12px">↻ Altra domanda</button></h2>
+    <h2>1. Scelta multipla <span class="pts">· dagli esami reali</span> <button id="reroll" style="float:right;padding:4px 10px;font-size:12px">↻ Altra domanda</button></h2>
     <p id="mcQ"></p>
     <div id="mcOpts"></div>
     <div class="res" id="mcRes"></div>
   </section>
 
   <section>
-    <h2>2. Domanda aperta — Crittografia <span class="pts">· metodi matematici</span></h2>
-    <p>Descrivi l'algoritmo <b>RSA</b>: generazione delle chiavi, cifratura e decifratura. Su quale problema matematico si basa la sua sicurezza?</p>
+    <h2>2. Domanda aperta — Diffie-Hellman <span class="pts">· crittografia / metodi matematici</span></h2>
+    <p>Definire lo scambio di chiavi <b>Diffie-Hellman</b> (messaggi scambiati e valori calcolati) e spiegare <b>perché è sicuro</b>.</p>
     <textarea placeholder="Scrivi qui..."></textarea>
     <details><summary>Mostra soluzione modello</summary><div class="sol">
-      <b>Generazione chiavi:</b> si scelgono due primi grandi <code>p, q</code>; si calcola <code>n = p·q</code> e <code>φ(n) = (p-1)(q-1)</code>;
-      si sceglie <code>e</code> coprimo con φ(n); si calcola <code>d</code> = inverso moltiplicativo di e modulo φ(n) (con l'algoritmo di Euclide esteso).
-      La chiave <b>pubblica</b> è (e, n), la <b>privata</b> è d (con p, q, φ tenuti segreti).<br>
-      <b>Cifratura:</b> <code>c = m^e mod n</code>. <b>Decifratura:</b> <code>m = c^d mod n</code> (si usa l'esponenziazione modulare veloce, square-and-multiply).<br>
-      <b>Sicurezza:</b> si basa sulla <b>difficoltà di fattorizzare n</b> per ritrovare p e q: conoscendoli si calcolerebbe φ(n) e quindi d.
+      Parametri pubblici: un primo <code>p</code> e un generatore <code>g</code>.<br>
+      U1 sceglie il segreto <b>a</b> e invia <code>A = g^a mod p</code>. U2 sceglie il segreto <b>b</b> e invia <code>B = g^b mod p</code>.<br>
+      Chiave condivisa: U1 calcola <code>B^a mod p</code>, U2 calcola <code>A^b mod p</code> → entrambi ottengono <code>S = g^(ab) mod p</code>.<br>
+      <b>Sicurezza:</b> sul canale viaggiano solo g, p, A, B; per ricavare a (o b) servirebbe il <b>logaritmo discreto</b>, computazionalmente difficile per p grande. (Vulnerabile però al man-in-the-middle senza autenticazione.)
     </div></details>
   </section>
 
   <section>
-    <h2>3. Domanda aperta — Sicurezza di rete</h2>
-    <p>Spiega l'<b>ARP poisoning</b>: come funziona, a quale scopo, e perché consente lo sniffing anche su una LAN con switch.</p>
-    <textarea placeholder="Scrivi qui..."></textarea>
-    <details><summary>Mostra soluzione modello</summary><div class="sol">
-      Su una LAN switchata lo switch invia ogni frame solo alla porta del MAC destinatario, quindi non si può sniffare passivamente
-      il traffico altrui. Con l'ARP poisoning l'attaccante invia <b>risposte ARP falsificate</b> che associano il <b>proprio MAC</b>
-      all'IP della vittima e/o del gateway. Le cache ARP degli host vengono «avvelenate»: il traffico destinato a quegli IP viene
-      inviato al MAC dell'attaccante, che si pone come <b>man-in-the-middle</b> (può leggere, e all'occorrenza modificare, i pacchetti
-      e poi inoltrarli). Scopo: <b>sniffing logico</b> e intercettazione su rete switchata. Contromisure: ARP statico, Dynamic ARP
-      Inspection, rilevamento di MAC duplicati.
+    <h2>3. Domanda aperta — AES <span class="pts">· con schema grafico</span></h2>
+    <p>Descrivere il cifrario <b>AES</b> utilizzando uno <b>schema grafico</b> (struttura, round e operazioni).</p>
+    <textarea placeholder="Scrivi qui... (e disegna lo schema su carta)"></textarea>
+    <details><summary>Mostra soluzione modello + schema</summary><div class="sol">
+      AES è un <b>cifrario simmetrico a blocchi</b> (blocchi 128 bit; chiavi 128/192/256). Una <b>AddRoundKey</b> iniziale, poi
+      <b>Nr−1 round</b> con <b>SubBytes</b> (S-box, sostituzione non lineare → confusione), <b>ShiftRows</b> e <b>MixColumns</b>
+      (→ diffusione), <b>AddRoundKey</b>; il <b>round finale</b> omette MixColumns. Le chiavi di round derivano dalla key expansion.
+      <img src="img/aes.svg" alt="Schema AES">
     </div></details>
   </section>
 
   <section>
-    <h2>4. Domanda aperta — Software security <span class="pts">· memory corruption (in profondità)</span></h2>
-    <p>Descrivi un attacco di <b>buffer overflow con EIP rewriting</b>: cosa si sovrascrive sullo stack, come si arriva a eseguire uno <b>shellcode</b>, e come lo ostacolano <b>ASLR</b>, <b>stack canary</b> e <b>NX</b>.</p>
+    <h2>4. Domanda aperta — Software security <span class="pts">· buffer overflow (in profondità)</span></h2>
+    <p>Con riferimento a semplici attacchi di <b>buffer overflow</b> su stack, spiegare: <b>(a)</b> perché può essere utile riempire una parte dello stack con byte <code>0x90</code> (“nop”); <b>(b)</b> perché può essere utile riempirla con l'indirizzo di ritorno desiderato (“spraying”).</p>
     <textarea placeholder="Scrivi qui..."></textarea>
     <details><summary>Mostra soluzione modello</summary><div class="sol">
-      Una funzione che legge input senza controllarne la lunghezza (es. <code>gets()</code>) permette di scrivere oltre il
-      <b>buffer locale</b> sullo stack. Continuando a scrivere si sovrascrivono l'EBP salvato e soprattutto l'<b>indirizzo di ritorno
-      (EIP salvato)</b>. Vi si scrive l'indirizzo di uno <b>shellcode</b> (breve codice macchina che apre una shell, posto in input o
-      in una variabile d'ambiente): al <code>return</code> la CPU salta lì e lo esegue, spesso con escalation a root se il binario è
-      setuid. Gli indirizzi vanno scritti in <b>little-endian</b>.<br>
-      <b>Protezioni:</b> <b>ASLR</b> randomizza gli indirizzi a ogni esecuzione → l'attaccante non sa dove saltare; lo <b>stack canary</b>
-      è un valore casuale tra variabili e indirizzo di ritorno, controllato prima del return (se l'overflow lo altera, abort);
-      <b>NX/DEP</b> rende lo stack non eseguibile → lo shellcode iniettato non parte, costringendo a tecniche di <b>code reuse</b>
-      (return-to-libc / ROP).
+      <b>(a) NOP sled:</b> una sequenza di istruzioni NOP (0x90) prima dello shellcode. L'indirizzo esatto dello shellcode è spesso
+      incerto (lo stack può variare): se l'indirizzo di ritorno “atterra” in un punto qualsiasi dello sled, le NOP non fanno nulla e
+      l'esecuzione <b>scivola fino allo shellcode</b>. Aumenta la probabilità di colpire.<br>
+      <b>(b) Spraying dell'indirizzo di ritorno:</b> si riempie una larga porzione di stack con <b>molte copie dell'indirizzo di ritorno
+      desiderato</b>, così che — qualunque sia l'allineamento o la posizione esatta della parola di ritorno — la CPU ne prelevi una e
+      salti dove vuole l'attaccante. Spesso si combinano: si spruzza un indirizzo che punta dentro il NOP sled.<br>
+      <b>Difese:</b> ASLR (indirizzi casuali), stack canary, NX (stack non eseguibile).
     </div></details>
   </section>
 
   <section>
-    <h2>5. Domanda aperta — Firewall / VPN</h2>
-    <p>Spiega la differenza tra <b>AH</b> ed <b>ESP</b> in IPSEC e tra le modalità <b>transport</b> e <b>tunnel</b>.</p>
+    <h2>5. Domanda aperta — Sicurezza di rete <span class="pts">· con schema grafico</span></h2>
+    <p>Utilizzando uno <b>schema grafico</b>, illustrare il funzionamento dell'attacco noto come <b>ARP poisoning</b>.</p>
     <textarea placeholder="Scrivi qui..."></textarea>
-    <details><summary>Mostra soluzione modello</summary><div class="sol">
-      <b>AH</b> (Authentication Header) fornisce <b>autenticazione e integrità</b> del pacchetto, ma <b>non la riservatezza</b> (non cifra).
-      <b>ESP</b> (Encapsulating Security Payload) fornisce autenticazione, integrità e anche <b>riservatezza</b> (cifratura del payload);
-      per questo è il più usato.<br>
-      <b>Transport mode:</b> protegge solo il <b>payload</b> del pacchetto IP (l'header IP originale resta), tipicamente host-to-host.
-      <b>Tunnel mode:</b> incapsula l'<b>intero pacchetto IP</b> dentro un nuovo pacchetto con nuovo header, tipicamente
-      gateway-to-gateway → è la modalità delle <b>VPN site-to-site</b>.
+    <details><summary>Mostra soluzione modello + schema</summary><div class="sol">
+      L'attaccante invia <b>risposte ARP falsificate</b> che associano il <b>proprio MAC</b> all'IP del gateway (e/o della vittima).
+      La cache ARP della vittima viene “avvelenata”: il traffico destinato al gateway viene inviato al MAC dell'attaccante, che si
+      pone come <b>man-in-the-middle</b> (legge/modifica e inoltra). Consente lo sniffing anche su LAN switchata.
+      <img src="img/arp.svg" alt="Schema ARP poisoning">
     </div></details>
+    <p class="muted">Altre aperte reali da allenare (flashcard): MAC, esempio di DoS, perché MD5 non si usa più nelle firme, ACL di un packet filter, VPN, firewall HA.</p>
   </section>
 </main>
 
@@ -137,31 +131,40 @@
 
 <script>
 const MC=[
- {q:"Quale protocollo IPSEC fornisce anche la riservatezza (cifratura) del payload?",
-  opts:["AH (Authentication Header)","ESP (Encapsulating Security Payload)","Entrambi allo stesso modo","Nessuno dei due"],
-  c:1, why:"AH dà solo autenticazione/integrità; ESP cifra (riservatezza) ed è il più usato."},
- {q:"Su quale problema matematico si basa la sicurezza di RSA?",
-  opts:["Il logaritmo discreto","La fattorizzazione di n in p·q","Le collisioni delle hash","Il problema dello zaino"],
-  c:1, why:"RSA si basa sulla difficoltà di fattorizzare n; il logaritmo discreto è invece il problema di Diffie-Hellman."},
- {q:"Quale protezione rende lo stack non eseguibile, impedendo l'esecuzione dello shellcode iniettato?",
-  opts:["ASLR","Stack canary","NX / DEP (no-execute)","Il bit setuid"],
-  c:2, why:"NX/DEP marca lo stack come non eseguibile. ASLR randomizza gli indirizzi; il canary rileva la sovrascrittura."},
- {q:"Lo sniffing del traffico altrui su una LAN con switch richiede tipicamente:",
-  opts:["solo la modalità promiscua","un attacco di ARP poisoning","la sostituzione dello switch con un hub","un firewall mal configurato"],
-  c:1, why:"Lo switch isola il traffico per porta: serve dirottarlo con ARP poisoning (man-in-the-middle)."},
- {q:"Il one-time pad (Vernam) è perfettamente sicuro a condizione che la chiave sia:",
-  opts:["corta e riutilizzabile","casuale, lunga quanto il messaggio e usata una sola volta","pubblica","derivata da una password"],
-  c:1, why:"Sicurezza perfetta solo con chiave veramente casuale, lunga quanto il messaggio e mai riutilizzata."},
- {q:"Una firma digitale si ottiene:",
-  opts:["cifrando il messaggio con la chiave pubblica","cifrando l'hash del messaggio con la chiave privata","calcolando l'hash del messaggio","cifrando l'hash con la chiave pubblica"],
-  c:1, why:"Si cifra l'HASH con la chiave PRIVATA; si verifica con la pubblica. Garantisce integrità, autenticità, non ripudio."},
+ {q:"Una funzione di hash H non resistente alle collisioni permette di affermare che:",
+  opts:["se H(x)=H(y), allora x=y","non esistono due input diversi x,y con H(x)=H(y)","esiste un algoritmo lineare per trovare x,y con H(x)=H(y)","esiste un algoritmo polinomiale per trovare x,y con H(x)=H(y)","esiste un algoritmo esponenziale per trovare x,y con H(x)=H(y)"],
+  c:3, why:"«Non resistente» significa che le collisioni sono trovabili in modo efficiente, cioè in tempo polinomiale."},
+ {q:"In RSA, se il modulo è n=pq e la chiave pubblica è e, la chiave privata:",
+  opts:["è l'inverso moltiplicativo di e, mod pq","è l'inverso moltiplicativo di e, mod (p-1)(q-1)","è l'inverso moltiplicativo di e, mod n-1","non può essere calcolata da e,p,q: è random","è generata casualmente, indipendente da e,p,q"],
+  c:1, why:"d = e^(-1) mod φ(n), con φ(n)=(p-1)(q-1) (Euclide esteso)."},
+ {q:"Quale asserzione è utile per la sicurezza di RSA?",
+  opts:["Esistono infiniti numeri primi","Esistono più di 100 numeri primi","Esistono più di 2^100 numeri primi","È difficile fattorizzare x, sapendo che è primo","È difficile fattorizzare x, senza vincoli sulla sua primalità"],
+  c:4, why:"RSA si regge sulla difficoltà di fattorizzare un n generico (=p·q); fattorizzare un primo è banale (è sé stesso)."},
+ {q:"Avendo installato un firewall applicativo trasparente, full inspection:",
+  opts:["ogni utente deve configurare un proxy con l'indirizzo del firewall","non è possibile un'analisi stateful del traffico applicativo","è possibile l'analisi stateful solo installando un proxy","è possibile un'analisi stateful del traffico applicativo","il firewall non introduce ritardi né rischi di sicurezza"],
+  c:3, why:"«Trasparente» = nessun proxy da configurare lato client; «full inspection» = ispezione stateful a livello applicativo."},
+ {q:"Un certificato di chiave pubblica serve per:",
+  opts:["evitare l'uso di una password troppo corta","evitare l'uso di una password troppo semplice","evitare l'attacco meet in the middle","evitare l'attacco man in the middle","trasmettere in modo segreto la chiave pubblica"],
+  c:3, why:"Lega (firma CA) la chiave pubblica all'identità del proprietario, impedendo a un MITM di spacciare la propria chiave."},
+ {q:"L'attacco XSS (Cross Site Scripting):",
+  opts:["sfrutta l'autenticazione di sessione tramite link fraudolenti","usa link fraudolenti per intercettare una password","permette di eseguire codice malevolo in un database","si basa su input malevolo eseguito nel Browser","si basa su input malevolo eseguito dal Server"],
+  c:3, why:"Lo script XSS viene eseguito nel browser della vittima (la prima opzione descrive il CSRF)."},
+ {q:"Nel cifrario AES:",
+  opts:["si genera al massimo 1 chiave pubblica e 1 privata","si generano 2 chiavi pubbliche e 1 privata","si generano 2 pubbliche e 2 private","si deve generare una chiave segreta condivisa","si generano due chiavi segrete: una per cifrare, una per decifrare"],
+  c:3, why:"AES è simmetrico: una sola chiave segreta condivisa per cifrare e decifrare."},
+ {q:"In un Web Application Firewall (WAF):",
+  opts:["si filtra solo in base allo header IP","si filtra solo in base allo header TCP","si filtra solo in base allo header HTTP","è possibile rilevare tentativi di Cross Site Scripting","è possibile rilevare tentativi di Buffer Overflow"],
+  c:3, why:"Il WAF ispeziona il livello applicativo HTTP e rileva attacchi web (XSS/SQLi); il buffer overflow è un attacco al software locale, non al traffico."},
+ {q:"Nel cifrario RSA:",
+  opts:["si genera al massimo una chiave condivisa","si generano 2 pubbliche per ogni privata","si generano 2 private per ogni pubblica","si deve generare una coppia: una pubblica e una privata","si generano due chiavi segrete: una per cifrare, una per decifrare"],
+  c:3, why:"RSA è asimmetrico: una coppia (chiave pubblica, chiave privata) legata matematicamente."},
 ];
 
 const $=id=>document.getElementById(id);
-let mc=null, mcSel=null, mcDone=false;
+let mc=null, mcSel=null;
 
 function loadMC(idx){
-  mc=MC[idx]; mcSel=null; mcDone=false;
+  mc=MC[idx]; mcSel=null;
   $("mcQ").textContent=mc.q;
   const box=$("mcOpts"); box.innerHTML="";
   mc.opts.forEach((o,i)=>{
@@ -172,25 +175,24 @@ function loadMC(idx){
     box.appendChild(d);
   });
   const r=$("mcRes"); r.className="res"; r.textContent="";
+  $("scorebar").innerHTML='<span class="muted">Compila la scelta multipla e premi «Correggi».</span>';
 }
 function correctMC(){
   if(!mc) return;
   const box=$("mcOpts");
   [...box.children].forEach(c=>{c.classList.remove("ok","no");
     const i=+c.dataset.i;
-    if(i===mc.c)c.classList.add("ok");
-    else if(i===mcSel)c.classList.add("no");
+    if(i===mc.c)c.classList.add("ok"); else if(i===mcSel)c.classList.add("no");
   });
   const r=$("mcRes"); r.className="res show";
-  if(mcSel===null){ r.innerHTML="<span class='ko'>Nessuna risposta.</span> Corretta: <b>"+mc.opts[mc.c]+"</b>. "+mc.why; }
-  else if(mcSel===mc.c){ r.innerHTML="<span class='ok'>✔ Corretto!</span> "+mc.why; }
-  else { r.innerHTML="<span class='ko'>✗ Sbagliato.</span> Corretta: <b>"+mc.opts[mc.c]+"</b>. "+mc.why; }
+  if(mcSel===null) r.innerHTML="<span class='ko'>Nessuna risposta.</span> Corretta: <b>"+mc.opts[mc.c]+"</b>. "+mc.why;
+  else if(mcSel===mc.c) r.innerHTML="<span class='ok'>✔ Corretto!</span> "+mc.why;
+  else r.innerHTML="<span class='ko'>✗ Sbagliato.</span> Corretta: <b>"+mc.opts[mc.c]+"</b>. "+mc.why;
   const ok=mcSel===mc.c;
   $("scorebar").innerHTML='<span class="big '+(ok?"ok":"ko")+'">'+(ok?"1 / 1":"0 / 1")+'</span>'+
     '<span class="muted">scelta multipla · le 4 aperte valutale con le soluzioni modello</span>';
 }
 
-// timer 45 min
 let total=45*60,left=total,tick=null;
 function fmt(s){const m=Math.floor(s/60),x=s%60;return (m<10?"0":"")+m+":"+(x<10?"0":"")+x;}
 function render(){const t=$("timer");t.textContent=fmt(left);

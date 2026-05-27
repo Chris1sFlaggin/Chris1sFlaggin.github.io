@@ -27,6 +27,18 @@
 - **RSA**: chiavi → primi `p,q`; `n=p·q`; `φ=(p-1)(q-1)`; `e` coprimo con φ; `d` = inverso moltiplicativo di e mod φ (Euclide esteso). Cifra `c=m^e mod n`, decifra `m=c^d mod n`. Sicurezza = **difficoltà di fattorizzare n**. Si usa l'**esponenziazione modulare veloce** (square-and-multiply).
 - **Diffie-Hellman**: accordo su chiave condivisa su canale insicuro (si scambiano `g^a`, `g^b`; chiave comune `g^(ab)`). Sicurezza = **logaritmo discreto**.
 
+#### Dimostrazioni (metodi matematici — chiesti all'esame)
+- **φ(n) = (p-1)(q-1)**: i non coprimi con n=p·q sono i multipli di p (q-1) e di q (p-1) → φ(n)=(n-1)-(p-1)-(q-1)=(p-1)(q-1).
+- **Teorema di Eulero**: se gcd(m,n)=1 allora `m^φ(n) ≡ 1 (mod n)` (Fermat: `m^(p-1)≡1 mod p`).
+- **Correttezza RSA**: `e·d ≡ 1 (mod φ(n))` ⇒ `ed = 1+kφ(n)` ⇒ `m^(ed)=m·(m^φ(n))^k ≡ m·1 = m (mod n)` (caso gcd(m,n)=1; l'altro caso via CRT su p e q).
+- **Inverso d**: esiste sse `gcd(e,φ)=1`; lo trova **Euclide esteso** (`e·x+φ·y=1` ⇒ d=x mod φ).
+- **Correttezza DH**: `(g^a)^b = (g^b)^a = g^(ab) mod p`.
+- **Esponenziazione veloce**: square-and-multiply, riducendo mod n a ogni passo → O(log e) moltiplicazioni.
+
+#### Modalità a blocchi (schemi disegnati nelle flashcard)
+- **ECB**: blocchi indipendenti → pattern visibili (insicuro). **CBC**: `C_i = E(P_i ⊕ C_{i-1})`, IV sul primo → la più usata. **CFB**: il cifrato precedente entra in E, output in XOR col messaggio (flusso). **OFB**: l'output di E (keystream) alimenta il blocco dopo, indipendente dal messaggio. **CTR**: cifra un contatore crescente, XOR col messaggio (parallelizzabile).
+- **Propagazione errori**: ECB/OFB/CTR locale · CBC blocco corrente+successivo · CFB più blocchi.
+
 ## 3. Integrità
 
 ### 3.1 Hash resistenti alle collisioni
