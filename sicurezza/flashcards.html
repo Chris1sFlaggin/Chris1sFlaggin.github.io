@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flashcard Cybersecurity — Auto-test</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --card:#1d212b; --card2:#232838;
+    --ink:#e8ebf1; --muted:#9aa3b2; --line:#2a2f3a;
+    --accent:#36c2a8; --good:#2fbf71; --again:#ff6b6b; --chip:#1f3a36;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:radial-gradient(1200px 600px at 50% -10%,#15241f,var(--bg));
+    color:var(--ink);
+    font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    display:flex;flex-direction:column;min-height:100vh;
+  }
+  header{
+    padding:18px 20px 10px;border-bottom:1px solid var(--line);
+    display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+  }
+  h1{font-size:18px;margin:0;letter-spacing:.3px}
+  h1 small{color:var(--muted);font-weight:500}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  select,button{
+    font:inherit;color:var(--ink);background:var(--panel);
+    border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;
+    transition:.15s border-color,.15s background,.15s transform;
+  }
+  button:hover,select:hover{border-color:var(--accent)}
+  button:active{transform:translateY(1px)}
+  a.back{color:var(--muted);text-decoration:none;font-size:13px;align-self:center}
+  a.back:hover{color:var(--accent)}
+  .progress{height:6px;background:var(--panel);border-bottom:1px solid var(--line)}
+  .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#5ee0c6);transition:width .25s}
+  main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px 16px}
+  .meta{color:var(--muted);font-size:13px;display:flex;gap:14px;align-items:center}
+  .scene{width:min(760px,94vw);height:min(52vh,520px);perspective:1400px}
+  .card{
+    position:relative;width:100%;height:100%;cursor:pointer;
+    transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.7,.2,1);
+  }
+  .card.flip{transform:rotateY(180deg)}
+  .face{
+    position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;
+    border:1px solid var(--line);box-shadow:var(--shadow);
+    padding:28px 30px;display:flex;flex-direction:column;
+  }
+  .front{background:linear-gradient(160deg,var(--card),#161a23)}
+  .back{background:linear-gradient(160deg,var(--card2),#1a1f2c);transform:rotateY(180deg);overflow:auto}
+  .back .body{align-items:flex-start}
+  .chip{
+    align-self:flex-start;font-size:12px;letter-spacing:.4px;text-transform:uppercase;
+    color:#bdeee2;background:var(--chip);border:1px solid var(--line);
+    padding:4px 10px;border-radius:999px;margin-bottom:14px;
+  }
+  .qid{color:var(--muted);font-size:12px;margin-bottom:6px}
+  .body{flex:1;display:flex;align-items:center}
+  .q{font-size:clamp(18px,2.6vw,24px);font-weight:600}
+  .a{font-size:clamp(15px,2.1vw,19px)}
+  .a b{color:#fff}
+  .a code{background:#0e1a17;border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:.92em}
+  .a .ex{display:block;margin-top:8px;color:#a9e6d4}
+  .a .ex b{color:#76e3c4}
+  .hint{color:var(--muted);font-size:12px;text-align:center;margin-top:14px}
+  .markstate{position:absolute;top:14px;right:16px;font-size:12px;font-weight:700}
+  .markstate.known{color:var(--good)}
+  .markstate.again{color:var(--again)}
+  .nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
+  .nav .big{padding:10px 18px;font-weight:600}
+  .btn-good{border-color:#235; color:var(--good)}
+  .btn-good:hover{border-color:var(--good);background:rgba(47,191,113,.08)}
+  .btn-again{color:var(--again)}
+  .btn-again:hover{border-color:var(--again);background:rgba(255,107,107,.08)}
+  .stats{color:var(--muted);font-size:13px}
+  .stats b{color:var(--ink)}
+  footer{padding:10px 16px;color:var(--muted);font-size:12px;text-align:center;border-top:1px solid var(--line)}
+  kbd{background:var(--panel);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px;font-size:11px}
+  .empty{color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <h1>Flashcard Cybersecurity <small>— auto-test</small></h1>
+  <div class="controls">
+    <select id="cat" title="Filtra per categoria"></select>
+    <button id="shuffle" title="Mescola">🔀 Mescola</button>
+    <button id="onlyAgain" title="Mostra solo le card da rivedere">↻ Solo da rivedere</button>
+    <button id="reset" title="Azzera progressi">🗑 Reset</button>
+    <a class="back" href="index.html">↩ Home</a>
+  </div>
+</header>
+<div class="progress"><i id="bar"></i></div>
+
+<main>
+  <div class="meta">
+    <span id="counter">–</span>
+    <span class="stats">✔ <b id="nKnown">0</b> &nbsp; ↻ <b id="nAgain">0</b></span>
+  </div>
+
+  <div class="scene">
+    <div class="card" id="card">
+      <div class="face front">
+        <span class="chip" id="catChip">—</span>
+        <span class="markstate" id="markFront"></span>
+        <div class="qid" id="qid"></div>
+        <div class="body"><div class="q" id="q">—</div></div>
+        <div class="hint">clicca o premi <kbd>Spazio</kbd> per girare</div>
+      </div>
+      <div class="face back">
+        <span class="chip">Risposta</span>
+        <span class="markstate" id="markBack"></span>
+        <div class="body"><div class="a" id="a">—</div></div>
+        <div class="hint">↻ <kbd>←</kbd> indietro &nbsp;·&nbsp; <kbd>→</kbd> avanti</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="big" id="prev">← Indietro</button>
+    <button class="big" id="flip">Gira</button>
+    <button class="big" id="next">Avanti →</button>
+  </div>
+  <div class="nav">
+    <button class="btn-good" id="markKnown" title="Sapevo (G)">✔ Sapevo</button>
+    <button class="btn-again" id="markAgain" title="Da rivedere (A)">↻ Da rivedere</button>
+  </div>
+</main>
+
+<footer>
+  59 card · scorciatoie: <kbd>←</kbd>/<kbd>→</kbd> naviga · <kbd>Spazio</kbd> gira · <kbd>G</kbd> sapevo · <kbd>A</kbd> da rivedere · <kbd>S</kbd> mescola
+</footer>
+
+<script>
+const CARDS = [
+ // ---- 1. Introduzione ----
+ {id:"I1",cat:"Introduzione",q:"Cosa significa la triade CIA in sicurezza?",a:"<b>C</b>onfidentiality (Riservatezza), <b>I</b>ntegrity (Integrità), <b>A</b>vailability (Disponibilità): i tre obiettivi fondamentali della sicurezza.<span class='ex'><b>Esempio:</b> cifrare un file → riservatezza; un hash che rileva modifiche → integrità; difendersi da un DDoS → disponibilità.</span>"},
+ {id:"I2",cat:"Introduzione",q:"Cos'è la Confidentiality (riservatezza)?",a:"Le informazioni sono accessibili <b>solo ai soggetti autorizzati</b>.<span class='ex'><b>Esempio:</b> i tuoi messaggi sono cifrati così solo tu e il destinatario li leggete; uno sniffer non capisce nulla.</span>"},
+ {id:"I3",cat:"Introduzione",q:"Cos'è l'Integrity (integrità)?",a:"Dati e comportamento del sistema <b>non vengono modificati senza autorizzazione</b>.<span class='ex'><b>Esempio:</b> un hash o una firma digitale ti accorgi se qualcuno ha alterato un file scaricato.</span>"},
+ {id:"I4",cat:"Introduzione",q:"Cos'è l'Availability (disponibilità)?",a:"I servizi sono <b>disponibili agli utenti autorizzati</b> con prestazioni garantite.<span class='ex'><b>Esempio:</b> un attacco DDoS satura un sito e lo rende irraggiungibile → viola la disponibilità.</span>"},
+ {id:"I5",cat:"Introduzione",q:"Differenza tra Computer Security e Communications Security?",a:"<b>Computer Security</b> = sicurezza dei dispositivi (PC, IoT): intrusioni, malware, accessi fisici. <b>Communications Security</b> = sicurezza della comunicazione tra dispositivi (sulla rete).<span class='ex'><b>Esempio:</b> un virus su USB = computer security; un'intercettazione del traffico = communications security.</span>"},
+ {id:"I6",cat:"Introduzione",q:"Quali sono i 4 tipi di attacco a una comunicazione e quale obiettivo CIA violano?",a:"<b>Interruption</b> (il msg non arriva → disponibilità), <b>Interception/Eavesdropping</b> (intercettato → riservatezza), <b>Modification</b> (alterato → integrità), <b>Fabrication</b> (msg falso → autenticità/integrità).<span class='ex'><b>Memo:</b> taglia, ascolta, modifica, inventa.</span>"},
+ {id:"I7",cat:"Introduzione",q:"Differenza tra attacco passivo e attivo?",a:"<b>Passivo</b>: solo osserva, non altera (difficile da rilevare). <b>Attivo</b>: modifica/crea traffico o dati.<span class='ex'><b>Esempio:</b> sniffing e analisi del traffico = passivi; spoofing, ARP poisoning, modifica di un messaggio = attivi.</span>"},
+
+ // ---- 2. Crittografia simmetrica ----
+ {id:"S1",cat:"Simmetrica",q:"Cos'è la crittografia simmetrica?",a:"Si usa la <b>stessa chiave segreta</b> per cifrare e decifrare; mittente e destinatario devono condividerla.<span class='ex'><b>Esempio:</b> AES. Veloce, ma serve un modo sicuro per scambiarsi la chiave.</span>"},
+ {id:"S2",cat:"Simmetrica",q:"Qual è il problema principale della crittografia simmetrica?",a:"La <b>distribuzione della chiave</b>: come scambiarsi la chiave segreta su un canale insicuro? E con n utenti servono O(n²) chiavi.<span class='ex'><b>Soluzione:</b> i sistemi a chiave pubblica (es. Diffie-Hellman) risolvono lo scambio.</span>"},
+ {id:"S3",cat:"Simmetrica",q:"Come funziona il cifrario di Cesare e perché è debole?",a:"<b>Sostituzione</b>: ogni lettera è spostata di un numero fisso di posizioni. Debolissimo: solo 25 chiavi e si rompe con l'<b>analisi delle frequenze</b> delle lettere.<span class='ex'><b>Esempio:</b> shift di 3 → A→D, B→E. «ciao» → «fldr».</span>"},
+ {id:"S4",cat:"Simmetrica",q:"Cosa sono i cifrari polialfabetici (es. Vigenère)?",a:"Usano <b>più alfabeti di sostituzione</b> alternati in base a una chiave ripetuta: la stessa lettera si cifra in modi diversi, rendendo inutile la semplice analisi delle frequenze.<span class='ex'><b>Esempio:</b> Vigenère con chiave «SOLE» applica shift diversi a lettere consecutive.</span>"},
+ {id:"S5",cat:"Simmetrica",q:"Cos'è il cifrario di Vernam (one-time pad)?",a:"Si fa lo <b>XOR</b> del messaggio con una chiave <b>casuale, lunga quanto il messaggio e usata una sola volta</b>. È l'unico cifrario con <b>sicurezza perfetta</b>.<span class='ex'><b>Limite:</b> la chiave è enorme e non riutilizzabile; se la riusi diventa rompibile.</span>"},
+ {id:"S6",cat:"Simmetrica",q:"Differenza tra le modalità ECB e CBC?",a:"<b>ECB</b>: cifra ogni blocco indipendentemente → blocchi uguali danno cifrato uguale (i pattern restano visibili). <b>CBC</b>: ogni blocco viene messo in XOR col cifrato precedente (+ un IV iniziale) → nasconde i pattern.<span class='ex'><b>Esempio classico:</b> l'immagine cifrata in ECB lascia ancora vedere la figura; in CBC no.</span>"},
+ {id:"S7",cat:"Simmetrica",q:"Differenza tra steganografia e crittografia?",a:"La <b>steganografia nasconde l'esistenza</b> del messaggio (lo occulta, es. dentro un'immagine). La <b>crittografia</b> non lo nasconde ma lo rende <b>illeggibile</b>.<span class='ex'><b>Esempio:</b> nascondere bit in una foto = steganografia; cifrare un testo = crittografia. Si possono combinare.</span>"},
+
+ // ---- 3. Chiave pubblica ----
+ {id:"P1",cat:"Chiave pubblica",q:"Come funziona la crittografia a chiave pubblica (asimmetrica)?",a:"Ogni utente ha una <b>coppia</b>: chiave <b>pubblica</b> (nota a tutti) e <b>privata</b> (segreta). Si cifra con la pubblica del destinatario, solo lui decifra con la sua privata.<span class='ex'><b>Vantaggio:</b> niente scambio di segreti — risolve la distribuzione delle chiavi.</span>"},
+ {id:"P2",cat:"Chiave pubblica",q:"In RSA, come si cifra e si decifra un messaggio?",a:"Cifratura: <code>c = m^e mod n</code>. Decifratura: <code>m = c^d mod n</code>. La coppia <b>(e, n)</b> è pubblica, <b>d</b> è privata.<span class='ex'><b>Esempio:</b> chi vuole scriverti usa la tua (e,n); solo tu, con d, recuperi m.</span>"},
+ {id:"P3",cat:"Chiave pubblica",q:"Come si generano le chiavi RSA?",a:"Scegli due primi grandi <b>p, q</b>; <code>n = p·q</code>; <code>φ(n) = (p-1)(q-1)</code>; scegli <b>e</b> coprimo con φ(n); calcola <b>d</b> = inverso moltiplicativo di e mod φ(n) (con l'algoritmo di Euclide esteso).<span class='ex'><b>Pubblica:</b> (e,n). <b>Privata:</b> d (e segreti p,q,φ).</span>"},
+ {id:"P4",cat:"Chiave pubblica",q:"Su quale problema matematico si basa la sicurezza di RSA?",a:"Sulla <b>difficoltà di fattorizzare n</b> (cioè ritrovare p e q) quando n è il prodotto di due primi molto grandi.<span class='ex'><b>Idea:</b> chi conoscesse p e q calcolerebbe φ(n) e poi d. Fattorizzare numeri di migliaia di bit è oggi infattibile.</span>"},
+ {id:"P5",cat:"Chiave pubblica",q:"Perché serve l'esponenziazione modulare e come si rende efficiente?",a:"RSA richiede <code>m^e mod n</code> con esponenti enormi. Si usa il <b>square-and-multiply</b> (esponenziazione veloce) facendo i mod a ogni passo, per non gestire numeri giganteschi.<span class='ex'><b>Esempio:</b> m^13 = m^8·m^4·m^1, riducendo mod n ad ogni quadratura.</span>"},
+ {id:"P6",cat:"Chiave pubblica",q:"A cosa serve il protocollo Diffie-Hellman?",a:"A <b>concordare una chiave segreta condivisa</b> su un canale insicuro, <b>senza mai trasmetterla</b>.<span class='ex'><b>Esempio:</b> Alice e Bob si scambiano g^a e g^b in chiaro; entrambi calcolano g^(ab) = chiave comune, che un intercettatore non può ricavare.</span>"},
+ {id:"P7",cat:"Chiave pubblica",q:"Su quale problema si basa la sicurezza di Diffie-Hellman?",a:"Sul <b>logaritmo discreto</b>: dato <code>g^x mod p</code>, ricavare x è computazionalmente difficile per p grande.<span class='ex'><b>Quindi:</b> l'attaccante vede g^a e g^b ma non riesce a calcolare a, b né g^(ab).</span>"},
+
+ // ---- 4. Integrità ----
+ {id:"H1",cat:"Integrità",q:"Cos'è una funzione di hash crittografica?",a:"Una funzione che mappa un input di <b>qualsiasi lunghezza</b> in un <b>digest di lunghezza fissa</b>, ed è <b>a senso unico</b> (one-way): dal digest non si risale all'input.<span class='ex'><b>Esempio:</b> SHA-256 produce sempre 256 bit, qualsiasi sia il file.</span>"},
+ {id:"H2",cat:"Integrità",q:"Quali proprietà deve avere una buona hash crittografica?",a:"<b>1) Resistenza alla preimmagine</b> (one-way). <b>2) Resistenza alla seconda preimmagine.</b> <b>3) Resistenza alle collisioni.</b> + <b>effetto valanga</b> (un bit cambiato stravolge il digest).<span class='ex'><b>Esempio:</b> non devi poter costruire un file diverso con lo stesso hash.</span>"},
+ {id:"H3",cat:"Integrità",q:"Cos'è una collisione in una funzione di hash?",a:"Due input <b>diversi</b> che producono lo <b>stesso digest</b>. Una hash sicura le rende <b>difficili da trovare</b>.<span class='ex'><b>Perché conta:</b> se trovo una collisione posso sostituire un documento firmato con un altro che ha lo stesso hash.</span>"},
+ {id:"H4",cat:"Integrità",q:"Cos'è il paradosso del compleanno e perché conta per le hash?",a:"Trovare una collisione richiede solo circa <b>2^(n/2)</b> tentativi (non 2^n), come la probabilità sorprendentemente alta che due persone compiano gli anni lo stesso giorno.<span class='ex'><b>Conseguenza:</b> per 128 bit di sicurezza contro collisioni serve un digest di <b>256 bit</b>.</span>"},
+ {id:"H5",cat:"Integrità",q:"Come funziona una firma digitale?",a:"Si calcola l'<b>hash</b> del messaggio e lo si <b>cifra con la chiave privata</b> del firmatario. Chiunque verifica con la sua chiave <b>pubblica</b>.<span class='ex'><b>Garantisce:</b> integrità (se il msg cambia l'hash non torna), autenticità e <b>non ripudio</b> (solo il firmatario ha la privata).</span>"},
+ {id:"H6",cat:"Integrità",q:"Perché si firma l'hash del messaggio e non il messaggio intero?",a:"Per <b>efficienza</b>: l'hash è corto e di lunghezza fissa, mentre cifrare l'intero messaggio con la chiave privata sarebbe lento. Il messaggio resta in chiaro, si allega solo la firma del digest.<span class='ex'><b>Esempio:</b> firmi i 256 bit dell'hash, non i megabyte del file.</span>"},
+ {id:"H7",cat:"Integrità",q:"Perché serve la distribuzione autenticata delle chiavi pubbliche?",a:"Una chiave pubblica va legata con certezza al suo proprietario, altrimenti un attaccante può spacciare la propria (man-in-the-middle). Servono <b>certificati</b> firmati da una Certification Authority.<span class='ex'><b>Esempio:</b> il lucchetto HTTPS verifica il certificato del sito tramite una CA fidata.</span>"},
+
+ // ---- 5. Sicurezza di rete ----
+ {id:"N1",cat:"Rete",q:"Cosa c'entra la pila ISO/OSI con la sicurezza?",a:"Ogni livello dei 7 ha <b>minacce e protezioni proprie</b>; le difese si collocano a livelli diversi.<span class='ex'><b>Esempio:</b> IPSEC protegge a livello <b>Rete</b>; TLS/HTTPS a livello Trasporto/Applicazione; un packet filter lavora a Rete/Trasporto.</span>"},
+ {id:"N2",cat:"Rete",q:"Cos'è lo sniffing?",a:"Intercettare <b>passivamente</b> il traffico di rete. La scheda di rete in <b>modalità promiscua</b> accetta tutti i pacchetti, non solo quelli destinati al proprio MAC.<span class='ex'><b>Esempio:</b> Wireshark che cattura tutto il traffico del segmento.</span>"},
+ {id:"N3",cat:"Rete",q:"Perché sniffare è facile con un hub ma non con uno switch?",a:"L'<b>hub</b> ripete ogni pacchetto a tutte le porte → tutti ricevono tutto. Lo <b>switch</b> manda il pacchetto solo alla porta del MAC destinatario → per sniffare serve dirottare il traffico (ARP poisoning).<span class='ex'><b>Quindi:</b> su LAN switchata lo sniffing «logico» richiede un attacco attivo.</span>"},
+ {id:"N4",cat:"Rete",q:"Cos'è l'ARP poisoning (ARP spoofing)?",a:"Si inviano <b>risposte ARP falsificate</b> per associare il <b>proprio MAC</b> all'IP della vittima o del gateway. Il traffico viene così deviato verso l'attaccante (<b>man-in-the-middle</b>) e può essere sniffato anche su switch.<span class='ex'><b>Esempio:</b> dico a tutti «l'IP del router corrisponde al MIO MAC» → tutto il traffico passa da me.</span>"},
+ {id:"N5",cat:"Rete",q:"Cos'è lo spoofing?",a:"<b>Falsificare un indirizzo</b> (IP o MAC) sorgente per fingersi qualcun altro o nascondersi.<span class='ex'><b>Esempio:</b> IP spoofing per superare un filtro che si fida di un indirizzo interno, o per nascondere l'origine di un attacco.</span>"},
+ {id:"N6",cat:"Rete",q:"Differenza tra DoS e DDoS?",a:"<b>DoS</b> (Denial of Service): rendere un servizio <b>indisponibile</b> saturandone le risorse. <b>DDoS</b> (Distributed): lo stesso attacco condotto da <b>moltissime macchine</b> insieme (botnet), molto più difficile da bloccare.<span class='ex'><b>Esempio:</b> migliaia di bot inondano un sito di richieste finché collassa.</span>"},
+ {id:"N7",cat:"Rete",q:"Fai due esempi di tecniche DoS.",a:"<b>Ping/ICMP echo flood</b> (inondare di ping), <b>SYN flood</b> (aprire connessioni TCP a metà finché si esauriscono le risorse), abuso di <b>SMTP relay</b> per spam.<span class='ex'><b>Idea comune:</b> consumare banda, CPU, memoria o tabelle di stato del bersaglio.</span>"},
+
+ // ---- 6. Software security ----
+ {id:"SW1",cat:"Software security",q:"Cos'è la memory corruption?",a:"Sfruttare un bug per <b>scrivere in zone di memoria non previste</b>, alterando dati o il <b>flusso di esecuzione</b> del programma.<span class='ex'><b>Esempio tipico:</b> il buffer overflow, che sovrascrive memoria adiacente al buffer.</span>"},
+ {id:"SW2",cat:"Software security",q:"Cos'è un buffer overflow?",a:"Scrivere <b>più dati della capacità di un buffer</b>, sconfinando nella memoria adiacente. Causato da funzioni che non controllano la lunghezza dell'input.<span class='ex'><b>Esempio:</b> <code>gets()</code> che legge una stringa più lunga del buffer e sovrascrive le variabili vicine sullo stack.</span>"},
+ {id:"SW3",cat:"Software security",q:"Cos'è l'EIP rewriting in un buffer overflow?",a:"Far traboccare il buffer fino a <b>sovrascrivere l'indirizzo di ritorno salvato (EIP)</b> sullo stack. Al <code>return</code> della funzione, l'esecuzione salta all'indirizzo scelto dall'attaccante.<span class='ex'><b>Esempio:</b> riempio con «A»·80 + l'indirizzo dello shellcode; al ritorno la CPU ci salta.</span>"},
+ {id:"SW4",cat:"Software security",q:"Cos'è uno shellcode?",a:"Un breve <b>codice macchina</b> (spesso che apre una shell) iniettato in memoria; si fa puntare l'EIP al suo indirizzo per eseguirlo.<span class='ex'><b>Perché in assembly:</b> deve essere cortissimo e senza librerie, così sta nello spazio disponibile (es. una variabile d'ambiente o l'input).</span>"},
+ {id:"SW5",cat:"Software security",q:"Cos'è il code reuse (return-to-libc / ROP)?",a:"Quando lo stack non è eseguibile (NX), invece di iniettare codice si <b>riusa codice già presente</b>: si salta a funzioni di libreria (return-to-libc) o si concatenano «gadget» esistenti (ROP).<span class='ex'><b>Esempio:</b> far ritornare la funzione dentro <code>system(\"/bin/sh\")</code> della libc.</span>"},
+ {id:"SW6",cat:"Software security",q:"Perché il little-endian conta nello scrivere un exploit?",a:"Su architetture <b>little-endian</b> i byte di un indirizzo vanno scritti <b>al contrario</b> (byte meno significativo per primo).<span class='ex'><b>Esempio:</b> per scrivere il valore <code>0x41424344</code> immetti i caratteri «DCBA».</span>"},
+ {id:"SW7",cat:"Software security",q:"Cos'è l'ASLR e come ostacola un exploit?",a:"<b>Address Space Layout Randomization</b>: gli indirizzi di stack, heap e librerie sono <b>casuali a ogni esecuzione</b>, così l'attaccante non sa a quale indirizzo far saltare l'EIP.<span class='ex'><b>Linux:</b> <code>kernel.randomize_va_space</code> (0=off, 2=stack+heap).</span>"},
+ {id:"SW8",cat:"Software security",q:"Cos'è uno stack canary?",a:"Un <b>valore casuale</b> messo tra le variabili locali e l'indirizzo di ritorno. Prima del <code>return</code> il programma ne verifica l'integrità: se un overflow l'ha alterato, <b>aborta</b>.<span class='ex'><b>gcc:</b> attivo di default; <code>-fno-stack-protector</code> lo disabilita.</span>"},
+ {id:"SW9",cat:"Software security",q:"Cos'è la protezione NX / separazione data-program (W^X)?",a:"Si marcano stack e dati come <b>non eseguibili</b>: la CPU rifiuta di eseguire codice (shellcode) che si trova in quelle aree.<span class='ex'><b>gcc:</b> <code>-z execstack</code> rende lo stack eseguibile (per testare l'attacco). Conseguenza di NX → si passa al code reuse (ROP).</span>"},
+ {id:"SW10",cat:"Software security",q:"Cos'è la privilege escalation?",a:"Passare da privilegi limitati a <b>privilegi elevati (root)</b>, ad esempio sfruttando un programma vulnerabile con bit <b>setuid</b>.<span class='ex'><b>Esempio:</b> un binario setuid-root con buffer overflow → lo shellcode gira come root → root shell.</span>"},
+
+ // ---- 7. Firewall ----
+ {id:"F1",cat:"Firewall",q:"Cos'è un packet filter?",a:"Un firewall (spesso un router) che <b>filtra i pacchetti</b> in base agli header (IP sorgente/destinazione, porta, flag) tramite regole <b>ACL</b>. Lavora a livello Rete/Trasporto.<span class='ex'><b>Esempio:</b> «blocca tutto verso la porta 23 (telnet), consenti la 443».</span>"},
+ {id:"F2",cat:"Firewall",q:"Differenza tra packet filter stateless e stateful?",a:"<b>Stateless</b>: valuta ogni pacchetto isolatamente (fatica con protocolli come FTP che aprono connessioni dinamiche). <b>Stateful</b>: tiene traccia dello <b>stato delle connessioni</b> e decide di conseguenza.<span class='ex'><b>Trucco stateless:</b> si controlla il flag <code>ACK</code> per distinguere risposte da nuove connessioni.</span>"},
+ {id:"F3",cat:"Firewall",q:"Cos'è un firewall application proxy (application-aware)?",a:"Un intermediario che <b>analizza il contenuto a livello applicativo</b> (es. HTTP, SMTP), non solo gli header. Più potente e selettivo, ma più lento.<span class='ex'><b>Esempio:</b> un proxy che blocca specifiche richieste HTTP malevole, cosa che un packet filter non vede.</span>"},
+ {id:"F4",cat:"Firewall",q:"Quale regola ACL essenziale contrasta lo spoofing?",a:"<b>Anti-spoofing</b>: scartare in <b>ingresso</b> i pacchetti che dichiarano un <b>IP sorgente interno</b> (non dovrebbero mai arrivare dall'esterno).<span class='ex'><b>Esempio:</b> un pacchetto che arriva da Internet ma con sorgente 192.168.x.x è falsificato → drop.</span>"},
+ {id:"F5",cat:"Firewall",q:"Cos'è il NAPT (NAT con porte)?",a:"<b>Network Address Port Translation</b>: traduce molti indirizzi privati in <b>un solo IP pubblico</b> distinguendoli per porta. Effetto collaterale: <b>nasconde</b> la struttura della rete interna.<span class='ex'><b>Esempio:</b> tutti i PC di casa escono su Internet con l'unico IP del router.</span>"},
+
+ // ---- 8. VPN / IPSEC ----
+ {id:"V1",cat:"VPN / IPSEC",q:"Cos'è una VPN?",a:"Un <b>tunnel cifrato e autenticato</b> su una rete pubblica (Internet): permette di comunicare come se si fosse su una rete privata.<span class='ex'><b>Esempio:</b> da casa ti colleghi alla rete aziendale in modo sicuro tramite VPN.</span>"},
+ {id:"V2",cat:"VPN / IPSEC",q:"Cos'è IPSEC?",a:"Una suite di protocolli che opera a <b>livello IP</b> per garantire <b>autenticazione, integrità e riservatezza</b> dei pacchetti.<span class='ex'><b>Componenti:</b> i protocolli AH ed ESP, in modalità transport o tunnel.</span>"},
+ {id:"V3",cat:"VPN / IPSEC",q:"Differenza tra AH ed ESP in IPSEC?",a:"<b>AH</b> (Authentication Header): autenticazione + integrità, <b>senza riservatezza</b> (niente cifratura). <b>ESP</b> (Encapsulating Security Payload): autenticazione + integrità + <b>riservatezza</b> (cifra). ESP è il più usato.<span class='ex'><b>Memo:</b> vuoi anche segretezza? → ESP.</span>"},
+ {id:"V4",cat:"VPN / IPSEC",q:"Differenza tra modalità Transport e Tunnel di IPSEC?",a:"<b>Transport</b>: protegge solo il <b>payload</b> del pacchetto IP (header originale resta), host-to-host. <b>Tunnel</b>: incapsula l'<b>intero pacchetto IP</b> in uno nuovo, gateway-to-gateway (tipico delle VPN site-to-site).<span class='ex'><b>Esempio:</b> due sedi aziendali collegate = tunnel mode tra i due gateway.</span>"},
+
+ // ---- 9. Sicurezza applicativa web ----
+ {id:"W1",cat:"Web security",q:"Cos'è una SQL injection?",a:"Inserire input non validato dentro una query SQL così da <b>alterarne la logica</b> ed eseguire comandi non previsti.<span class='ex'><b>Esempio:</b> in un login, immettere <code>' OR '1'='1</code> per rendere la condizione sempre vera. <b>Difesa:</b> query parametrizzate (prepared statement).</span>"},
+ {id:"W2",cat:"Web security",q:"Cos'è il Cross-Site Scripting (XSS)?",a:"Iniettare <b>script</b> in una pagina web che vengono poi eseguiti nel <b>browser di altri utenti</b>.<span class='ex'><b>Esempio:</b> un commento con <code>&lt;script&gt;</code> che ruba i cookie di chi lo legge. <b>Difesa:</b> validare/escapare l'output.</span>"},
+ {id:"W3",cat:"Web security",q:"Differenza tra XSS Reflected e Stored?",a:"<b>Reflected</b>: lo script è nella richiesta (es. un URL) e «rimbalza» nella risposta immediata. <b>Stored</b>: lo script è <b>salvato sul server</b> (es. in un commento) e colpisce <b>ogni</b> visitatore della pagina.<span class='ex'><b>Stored</b> è più pericoloso perché persiste.</span>"},
+ {id:"W4",cat:"Web security",q:"Cos'è OWASP?",a:"Un progetto open che <b>cataloga le vulnerabilità web più critiche</b> (la celebre <b>OWASP Top 10</b>) e le contromisure.<span class='ex'><b>Esempi dalla Top 10:</b> injection, XSS, autenticazione/sessione deboli, misconfigurazione, storage crittografico insicuro, redirect non validati.</span>"},
+ {id:"W5",cat:"Web security",q:"Cos'è il CSRF (Cross-Site Request Forgery)?",a:"Indurre il browser di una vittima <b>già autenticata</b> a inviare a sua insaputa una richiesta a un sito fidato.<span class='ex'><b>Esempio:</b> un link/immagine malevola che fa eseguire un bonifico sul sito dove sei loggato. <b>Difesa:</b> token anti-CSRF.</span>"},
+];
+
+const LS="flashSEC.progress.v1";
+let progress = JSON.parse(localStorage.getItem(LS)||"{}");
+let onlyAgain=false;
+let deck=[], i=0, flipped=false;
+
+const $=id=>document.getElementById(id);
+const card=$("card");
+
+function cats(){return ["Tutte",...[...new Set(CARDS.map(c=>c.cat))]];}
+function buildCatSelect(){ $("cat").innerHTML=cats().map(c=>`<option>${c}</option>`).join(""); }
+
+function rebuildDeck({shuffle=false}={}){
+  const sel=$("cat").value||"Tutte";
+  deck=CARDS.filter(c=>(sel==="Tutte"||c.cat===sel)&&(!onlyAgain||progress[c.id]==="again"));
+  if(shuffle){ for(let j=deck.length-1;j>0;j--){const r=Math.floor(Math.random()*(j+1));[deck[j],deck[r]]=[deck[r],deck[j]];} }
+  i=0; showCard();
+}
+function showCard(){
+  const n=deck.length; setFlip(false);
+  if(n===0){
+    $("q").innerHTML='<span class="empty">Nessuna card in questo filtro 🎉</span>';
+    $("a").innerHTML=""; $("catChip").textContent="—"; $("qid").textContent="";
+    $("counter").textContent="0 / 0"; $("bar").style.width="0%"; updateMarks(); updateStats(); return;
+  }
+  if(i<0)i=n-1; if(i>=n)i=0;
+  const c=deck[i];
+  $("catChip").textContent=c.cat; $("qid").textContent="Card "+c.id;
+  $("q").innerHTML=c.q; $("a").innerHTML=c.a;
+  $("counter").textContent=(i+1)+" / "+n; $("bar").style.width=((i+1)/n*100)+"%";
+  updateMarks(); updateStats();
+}
+function setFlip(v){flipped=v;card.classList.toggle("flip",v);}
+function toggleFlip(){setFlip(!flipped);}
+function next(){if(deck.length){i=(i+1)%deck.length;showCard();}}
+function prev(){if(deck.length){i=(i-1+deck.length)%deck.length;showCard();}}
+function mark(state){
+  if(!deck.length)return;
+  const id=deck[i].id;
+  if(progress[id]===state) delete progress[id]; else progress[id]=state;
+  localStorage.setItem(LS,JSON.stringify(progress));
+  updateMarks(); updateStats();
+  if(state==="known"){ if(onlyAgain){rebuildDeck();} else {setTimeout(next,180);} }
+}
+function updateMarks(){
+  const id=deck.length?deck[i].id:null; const st=id?progress[id]:null;
+  const label = st==="known"?"✔ sapevo":st==="again"?"↻ da rivedere":"";
+  for(const el of [$("markFront"),$("markBack")]){ el.textContent=label; el.className="markstate"+(st?(" "+st):""); }
+}
+function updateStats(){
+  let k=0,a=0; for(const v of Object.values(progress)){if(v==="known")k++;else if(v==="again")a++;}
+  $("nKnown").textContent=k; $("nAgain").textContent=a;
+}
+card.addEventListener("click",toggleFlip);
+$("flip").onclick=toggleFlip; $("next").onclick=next; $("prev").onclick=prev;
+$("markKnown").onclick=()=>mark("known"); $("markAgain").onclick=()=>mark("again");
+$("shuffle").onclick=()=>rebuildDeck({shuffle:true});
+$("cat").onchange=()=>rebuildDeck();
+$("onlyAgain").onclick=()=>{onlyAgain=!onlyAgain;$("onlyAgain").style.borderColor=onlyAgain?"var(--accent)":"";rebuildDeck();};
+$("reset").onclick=()=>{if(confirm("Azzerare tutti i progressi?")){progress={};localStorage.removeItem(LS);rebuildDeck();}};
+document.addEventListener("keydown",e=>{
+  if(e.target.tagName==="SELECT")return;
+  if(e.key==="ArrowRight")next(); else if(e.key==="ArrowLeft")prev();
+  else if(e.key===" "){e.preventDefault();toggleFlip();}
+  else if(e.key==="g"||e.key==="G")mark("known"); else if(e.key==="a"||e.key==="A")mark("again");
+  else if(e.key==="s"||e.key==="S")rebuildDeck({shuffle:true});
+});
+buildCatSelect();
+rebuildDeck();
+</script>
+</body>
+</html>

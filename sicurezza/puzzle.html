@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Puzzle Sicurezza — incastra lo schema</title>
+<style>
+  :root{--bg:#0f1115;--panel:#171a21;--card:#1d212b;--ink:#e8ebf1;--muted:#9aa3b2;--line:#2a2f3a;
+    --accent:#36c2a8;--good:#2fbf71;--bad:#ff6b6b;--chip:#1f3a36;--shadow:0 10px 30px rgba(0,0,0,.45)}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%}
+  body{background:radial-gradient(1200px 600px at 50% -10%,#15241f,var(--bg));color:var(--ink);
+    font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    display:flex;flex-direction:column;min-height:100vh}
+  header{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+  h1{font-size:18px;margin:0}
+  h1 small{color:var(--muted);font-weight:500}
+  a.back{color:var(--muted);text-decoration:none;font-size:13px}
+  a.back:hover{color:var(--accent)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  select,button{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);
+    border-radius:10px;padding:8px 12px;cursor:pointer;transition:.15s}
+  button:hover,select:hover{border-color:var(--accent)}
+  button:active{transform:translateY(1px)}
+  main{flex:1;display:flex;flex-direction:column;align-items:center;gap:16px;padding:18px 14px 30px}
+  .intro{color:var(--muted);font-size:14px;max-width:760px;text-align:center}
+  .intro b{color:var(--ink)}
+  #board{position:relative;width:min(760px,96vw);height:520px;background:linear-gradient(160deg,var(--card),#161a23);
+    border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  #edges{position:absolute;inset:0;pointer-events:none}
+  .elabel{position:absolute;transform:translate(-50%,-50%);font-size:11px;color:#cdd6ea;background:#11141b;
+    border:1px solid var(--line);border-radius:6px;padding:1px 6px;white-space:nowrap;pointer-events:none}
+  .slot{position:absolute;transform:translate(-50%,-50%);width:240px;min-height:42px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;padding:6px 8px;border:2px dashed #3a4256;border-radius:10px;
+    background:#12151d;color:var(--muted);font-size:13px;cursor:pointer;transition:.15s}
+  .slot:hover{border-color:var(--accent)}
+  .slot.filled{border-style:solid;background:#1f2533;color:var(--ink);font-weight:600}
+  .slot.ok{border-color:var(--good);background:rgba(47,191,113,.12)}
+  .slot.no{border-color:var(--bad);background:rgba(255,107,107,.12)}
+  .slot .role{font-size:10px;color:var(--muted);font-weight:400;display:block;margin-top:2px}
+  .bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:760px}
+  .chip{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:13px;cursor:pointer}
+  .chip:hover{border-color:var(--accent)}
+  .chip.sel{border-color:var(--accent);background:#27514a;box-shadow:0 0 0 2px rgba(54,194,168,.25)}
+  .status{min-height:24px;font-weight:600}
+  .status.win{color:var(--good)}
+  .status.miss{color:var(--bad)}
+  .hint{color:var(--muted);font-size:12px;text-align:center;max-width:720px}
+  footer{padding:10px;color:var(--muted);font-size:12px;text-align:center;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Puzzle Sicurezza <small>— incastra lo schema</small></h1>
+  <div class="controls">
+    <select id="pat" title="Scegli lo schema"></select>
+    <button id="shuffle">🔀 Mescola</button>
+    <button id="check">✔ Verifica</button>
+    <button id="solve">💡 Soluzione</button>
+    <button id="reset">↺ Reset</button>
+    <a class="back" href="index.html">↩ Home</a>
+  </div>
+</header>
+
+<main>
+  <div class="intro">
+    Tocca un'<b>etichetta</b> in basso, poi tocca lo <b>slot</b> giusto. Ricostruisci lo schema nell'ordine corretto.
+    Tocca uno slot pieno per rimetterne il contenuto nella banca.
+  </div>
+  <div id="board"><svg id="edges"></svg></div>
+  <div class="status" id="status"></div>
+  <div class="bank" id="bank"></div>
+  <div class="hint" id="hint"></div>
+</main>
+
+<footer>Memorizza visivamente lo stack frame e la pila ISO/OSI — ricorrono nelle domande aperte di rete e software security.</footer>
+
+<script>
+// nodo: {id, x%, y%, label, role}; arco: {from,to,label,offset?}
+const BOARDS = {
+ "Stack frame (buffer overflow)":{
+   hint:"Lo stack dal basso (indirizzi alti in cima). Un overflow nel buffer cresce verso l'alto e può raggiungere l'indirizzo di ritorno.",
+   nodes:[
+     {id:"args", x:50,y:12, label:"Argomenti della funzione", role:"parametri passati alla funzione"},
+     {id:"ret",  x:50,y:30, label:"Indirizzo di ritorno (EIP salvato)", role:"dove torna la CPU al return ← bersaglio"},
+     {id:"ebp",  x:50,y:48, label:"EBP salvato (base pointer)", role:"base dello stack frame"},
+     {id:"can",  x:50,y:66, label:"Stack canary", role:"valore casuale di controllo"},
+     {id:"buf",  x:50,y:85, label:"Buffer locale", role:"qui scrive gets() — overflow parte da qui"},
+   ],
+   edges:[ {from:"buf", to:"ret", label:"overflow →", offset:150} ],
+   distract:["Heap","Segmento codice"]
+ },
+ "Pila ISO/OSI":{
+   hint:"7 livelli, dall'Applicazione (in alto) al Fisico (in basso). Memo: All People Seem To Need Data Processing.",
+   nodes:[
+     {id:"l7", x:50,y:8,  label:"Applicazione", role:"7 — HTTP, DNS, SMTP"},
+     {id:"l6", x:50,y:21, label:"Presentazione", role:"6 — formati, cifratura"},
+     {id:"l5", x:50,y:34, label:"Sessione", role:"5 — gestione sessioni"},
+     {id:"l4", x:50,y:47, label:"Trasporto", role:"4 — TCP / UDP, porte"},
+     {id:"l3", x:50,y:60, label:"Rete", role:"3 — IP, routing"},
+     {id:"l2", x:50,y:73, label:"Collegamento", role:"2 — MAC, switch (data link)"},
+     {id:"l1", x:50,y:86, label:"Fisico", role:"1 — bit, cavi, segnali"},
+   ],
+   edges:[],
+   distract:["Internet","Trasmissione"]
+ },
+};
+
+const $=id=>document.getElementById(id);
+const board=$("board"), svg=$("edges"), bankEl=$("bank");
+let current=Object.keys(BOARDS)[0], selected=null, placed={}, bankLabels=[];
+const SVGNS="http://www.w3.org/2000/svg";
+
+function initSelect(){ $("pat").innerHTML=Object.keys(BOARDS).map(p=>`<option>${p}</option>`).join(""); }
+function shuffleArr(a){for(let i=a.length-1;i>0;i--){const r=Math.floor(Math.random()*(i+1));[a[i],a[r]]=[a[r],a[i]];}return a;}
+
+function loadBoard(name,{shuffleBank=true}={}){
+  current=name; selected=null; placed={};
+  $("pat").value=name;
+  const p=BOARDS[name];
+  $("hint").textContent="💡 "+p.hint;
+  $("status").textContent=""; $("status").className="status";
+  bankLabels=p.nodes.map(n=>n.label).concat(p.distract||[]);
+  if(shuffleBank) shuffleArr(bankLabels); else bankLabels.sort();
+  renderBoard(); renderBank();
+}
+function renderBoard(){
+  [...board.querySelectorAll(".slot,.elabel")].forEach(e=>e.remove());
+  const p=BOARDS[current];
+  for(const n of p.nodes){
+    const d=document.createElement("div");
+    d.className="slot"; d.dataset.id=n.id; d.style.left=n.x+"%"; d.style.top=n.y+"%";
+    if(placed[n.id]){d.classList.add("filled");d.textContent=placed[n.id];}
+    d.onclick=()=>onSlot(n.id,d);
+    board.appendChild(d);
+  }
+  requestAnimationFrame(drawEdges);
+}
+function nodeCenter(id){
+  const el=board.querySelector('.slot[data-id="'+id+'"]');
+  const br=board.getBoundingClientRect(), r=el.getBoundingClientRect();
+  return {x:r.left-br.left+r.width/2, y:r.top-br.top+r.height/2, w:r.width, h:r.height};
+}
+function clipToRect(c, tx,ty){
+  const dx=tx-c.x, dy=ty-c.y;
+  if(dx===0&&dy===0) return {x:c.x,y:c.y};
+  const sx=dx!==0?(c.w/2)/Math.abs(dx):Infinity;
+  const sy=dy!==0?(c.h/2)/Math.abs(dy):Infinity;
+  const t=Math.min(sx,sy);
+  return {x:c.x+dx*t, y:c.y+dy*t};
+}
+function drawEdges(){
+  const w=board.clientWidth, h=board.clientHeight;
+  svg.setAttribute("width",w); svg.setAttribute("height",h);
+  svg.innerHTML='<defs><marker id="ah" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">'+
+    '<path d="M0,0 L8,3 L0,6 Z" fill="#7f8aa3"/></marker></defs>';
+  [...board.querySelectorAll(".elabel")].forEach(e=>e.remove());
+  const p=BOARDS[current];
+  for(const e of p.edges){
+    let c1=nodeCenter(e.from), c2=nodeCenter(e.to);
+    let off=e.offset||0;
+    if(off){ const dx=c2.x-c1.x, dy=c2.y-c1.y, len=Math.hypot(dx,dy)||1;
+      const px=-dy/len*off, py=dx/len*off;
+      c1={...c1,x:c1.x+px,y:c1.y+py}; c2={...c2,x:c2.x+px,y:c2.y+py}; }
+    const a=clipToRect(c1,c2.x,c2.y), b=clipToRect(c2,c1.x,c1.y);
+    const ln=document.createElementNS(SVGNS,"line");
+    ln.setAttribute("x1",a.x);ln.setAttribute("y1",a.y);ln.setAttribute("x2",b.x);ln.setAttribute("y2",b.y);
+    ln.setAttribute("stroke","#7f8aa3");ln.setAttribute("stroke-width","2");ln.setAttribute("marker-end","url(#ah)");
+    svg.appendChild(ln);
+    const lab=document.createElement("div"); lab.className="elabel"; lab.textContent=e.label;
+    lab.style.left=((a.x+b.x)/2)+"px"; lab.style.top=((a.y+b.y)/2)+"px"; board.appendChild(lab);
+  }
+}
+function renderBank(){
+  bankEl.innerHTML="";
+  bankLabels.forEach((lab,idx)=>{
+    const b=document.createElement("button");
+    b.className="chip"+(selected===idx?" sel":""); b.textContent=lab;
+    b.onclick=()=>{selected=(selected===idx?null:idx); renderBank();};
+    bankEl.appendChild(b);
+  });
+  if(bankLabels.length===0){const s=document.createElement("span");s.style.color="var(--muted)";s.textContent="(banca vuota — premi Verifica)";bankEl.appendChild(s);}
+}
+function onSlot(id,el){
+  $("status").textContent=""; $("status").className="status";
+  if(placed[id]){ bankLabels.push(placed[id]); delete placed[id]; selected=null; renderBoard(); renderBank(); return; }
+  if(selected===null) return;
+  placed[id]=bankLabels[selected]; bankLabels.splice(selected,1); selected=null;
+  renderBoard(); renderBank();
+}
+function check(){
+  const p=BOARDS[current]; let ok=0;
+  for(const n of p.nodes){
+    const el=board.querySelector('.slot[data-id="'+n.id+'"]'); el.classList.remove("ok","no");
+    if(placed[n.id]===n.label){el.classList.add("ok");ok++;}
+    else if(placed[n.id]){el.classList.add("no");}
+  }
+  const tot=p.nodes.length, st=$("status");
+  if(ok===tot){st.textContent="✔ Perfetto! "+ok+"/"+tot+" — schema corretto.";st.className="status win";}
+  else{st.textContent=ok+"/"+tot+" giusti. Sistema i rossi e i vuoti, poi riprova.";st.className="status miss";}
+}
+function solve(){
+  const p=BOARDS[current];
+  placed={}; p.nodes.forEach(n=>placed[n.id]=n.label);
+  bankLabels=(p.distract||[]).slice();
+  renderBoard(); renderBank();
+  requestAnimationFrame(()=>{
+    p.nodes.forEach(n=>{const el=board.querySelector('.slot[data-id="'+n.id+'"]');el.classList.add("ok");
+      if(n.role){const role=document.createElement("span");role.className="role";role.textContent=n.role;el.appendChild(role);}});
+    const st=$("status");st.textContent="💡 Soluzione mostrata.";st.className="status";
+  });
+}
+$("pat").onchange=e=>loadBoard(e.target.value);
+$("shuffle").onclick=()=>loadBoard(current);
+$("check").onclick=check;
+$("solve").onclick=solve;
+$("reset").onclick=()=>loadBoard(current);
+window.addEventListener("resize",()=>requestAnimationFrame(drawEdges));
+initSelect();
+loadBoard(Object.keys(BOARDS)[0]);
+</script>
+</body>
+</html>

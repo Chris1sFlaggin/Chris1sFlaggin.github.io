@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cybersecurity — Kit di ripasso esame</title>
+<style>
+  :root{--bg:#0f1115;--panel:#171a21;--card:#1d212b;--ink:#e8ebf1;--muted:#9aa3b2;--line:#2a2f3a;
+    --accent:#36c2a8;--good:#2fbf71;--shadow:0 14px 40px rgba(0,0,0,.5)}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%}
+  body{background:radial-gradient(1200px 700px at 50% -12%,#163029,var(--bg));color:var(--ink);
+    font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    display:flex;flex-direction:column;min-height:100vh}
+  .wrap{max-width:920px;margin:0 auto;padding:54px 20px 40px;width:100%}
+  .eyebrow{color:var(--accent);font-weight:700;letter-spacing:2px;font-size:12px;text-transform:uppercase}
+  h1{font-size:clamp(28px,5vw,44px);margin:6px 0 8px;letter-spacing:-.5px}
+  .sub{color:var(--muted);font-size:17px;max-width:660px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:34px 0 28px}
+  @media(max-width:620px){.grid{grid-template-columns:1fr}}
+  a.tile{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit;
+    background:linear-gradient(160deg,var(--card),#161a23);border:1px solid var(--line);border-radius:16px;
+    padding:22px;box-shadow:var(--shadow);transition:.18s transform,.18s border-color}
+  a.tile:hover{transform:translateY(-3px);border-color:var(--accent)}
+  .tile .ico{font-size:28px}
+  .tile h2{margin:0;font-size:20px}
+  .tile p{margin:0;color:var(--muted);font-size:14px}
+  .tile .tag{align-self:flex-start;margin-top:4px;font-size:12px;font-weight:700;color:#b6efe2;
+    background:#1d3f39;border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+  .how{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-top:8px}
+  .how h3{margin:0 0 8px;font-size:15px}
+  .how ol{margin:0;padding-left:20px;color:var(--muted)}
+  .how b{color:var(--ink)}
+  .exam{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;color:var(--muted);font-size:13px}
+  .exam span{background:#0e1a17;border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+  footer{margin-top:auto;padding:20px;text-align:center;color:var(--muted);font-size:12px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Cybersecurity · Prof. Bergadano · UniTo</div>
+  <h1>Kit di ripasso esame</h1>
+  <p class="sub">Tutto il programma in un posto solo: flashcard, puzzle a incastri, prova cronometrata e ripasso teorico. Costruito sul programma del corso e sugli appunti (Stallings, Du).</p>
+
+  <div class="grid">
+    <a class="tile" href="flashcards.html">
+      <span class="ico">🃏</span>
+      <h2>Flashcard</h2>
+      <p>Auto-test attivo con esempi: CIA, crittografia simmetrica e a chiave pubblica, hash e firme, rete, software security, firewall, IPSEC, web.</p>
+      <span class="tag">59 card · filtri · progressi salvati</span>
+    </a>
+    <a class="tile" href="puzzle.html">
+      <span class="ico">🧩</span>
+      <h2>Puzzle a incastri</h2>
+      <p>Ricostruisci lo <b>stack frame</b> di un buffer overflow e la <b>pila ISO/OSI</b>. Memoria visiva per le aperte.</p>
+      <span class="tag">2 schemi · verifica</span>
+    </a>
+    <a class="tile" href="mock.html">
+      <span class="ico">⏱️</span>
+      <h2>Mock 45 minuti</h2>
+      <p>Formato reale: 1 domanda a scelta multipla (autocorretta) + 4 aperte con soluzione modello.</p>
+      <span class="tag">5 domande · timer 45:00</span>
+    </a>
+    <a class="tile" href="RIPASSO_SICUREZZA.md">
+      <span class="ico">📖</span>
+      <h2>Ripasso teoria</h2>
+      <p>La teoria del programma in sintesi: crittografia, integrità, rete, software security, firewall, VPN, web.</p>
+      <span class="tag">riferimento · markdown</span>
+    </a>
+  </div>
+
+  <div class="how">
+    <h3>Come studiare (metodo 80/20)</h3>
+    <ol>
+      <li>Sfoglia le <b>Flashcard</b> finché rispondi a colpo (filtra per argomento debole).</li>
+      <li>Fissa gli schemi col <b>Puzzle</b>: lo stack frame e l'OSI tornano nelle aperte.</li>
+      <li>Fai il <b>Mock</b> a tempo (45 min), poi confronta le aperte con le soluzioni modello.</li>
+      <li>Usa il <b>Ripasso</b> come dizionario per i dubbi.</li>
+    </ol>
+  </div>
+
+  <div class="exam">
+    <span><b>Esame:</b> scritto, 5 domande (1 scelta multipla + 4 aperte) · 45 minuti</span>
+    <span><b>Copre:</b> metodi matematici della crittografia · sicurezza di rete · memory corruption in profondità</span>
+  </div>
+</div>
+<footer>In bocca al lupo 🍀 — kit personale di studio, non materiale ufficiale del corso.</footer>
+</body>
+</html>
