@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Puzzle UML — incastra i pattern</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --card:#1d212b; --ink:#e8ebf1; --muted:#9aa3b2;
+    --line:#2a2f3a; --accent:#5b8cff; --good:#2fbf71; --bad:#ff6b6b; --chip:#283049;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%}
+  body{background:radial-gradient(1200px 600px at 50% -10%,#1a1f2b,var(--bg));color:var(--ink);
+    font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    display:flex;flex-direction:column;min-height:100vh}
+  header{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+  h1{font-size:18px;margin:0}
+  h1 small{color:var(--muted);font-weight:500}
+  a.back{color:var(--muted);text-decoration:none;font-size:13px}
+  a.back:hover{color:var(--accent)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  select,button{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);
+    border-radius:10px;padding:8px 12px;cursor:pointer;transition:.15s}
+  button:hover,select:hover{border-color:var(--accent)}
+  button:active{transform:translateY(1px)}
+  main{flex:1;display:flex;flex-direction:column;align-items:center;gap:16px;padding:18px 14px 30px}
+  .intro{color:var(--muted);font-size:14px;max-width:760px;text-align:center}
+  .intro b{color:var(--ink)}
+  #board{position:relative;width:min(760px,96vw);height:500px;background:linear-gradient(160deg,var(--card),#161a23);
+    border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  #edges{position:absolute;inset:0;pointer-events:none}
+  .elabel{position:absolute;transform:translate(-50%,-50%);font-size:11px;color:#cdd6ea;background:#11141b;
+    border:1px solid var(--line);border-radius:6px;padding:1px 6px;white-space:nowrap;pointer-events:none}
+  .slot{position:absolute;transform:translate(-50%,-50%);width:148px;min-height:46px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;padding:6px 8px;border:2px dashed #3a4256;border-radius:10px;
+    background:#12151d;color:var(--muted);font-size:13px;cursor:pointer;transition:.15s}
+  .slot:hover{border-color:var(--accent)}
+  .slot.filled{border-style:solid;background:#1f2533;color:var(--ink);font-weight:600}
+  .slot.ok{border-color:var(--good);background:rgba(47,191,113,.12)}
+  .slot.no{border-color:var(--bad);background:rgba(255,107,107,.12)}
+  .slot .role{font-size:10px;color:var(--muted);font-weight:400;display:block;margin-top:2px}
+  .bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:760px}
+  .chip{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:13px;cursor:pointer}
+  .chip:hover{border-color:var(--accent)}
+  .chip.sel{border-color:var(--accent);background:#33406a;box-shadow:0 0 0 2px rgba(91,140,255,.25)}
+  .status{min-height:24px;font-weight:600}
+  .status.win{color:var(--good)}
+  .status.miss{color:var(--bad)}
+  .hint{color:var(--muted);font-size:12px;text-align:center;max-width:720px}
+  footer{padding:10px;color:var(--muted);font-size:12px;text-align:center;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Puzzle UML <small>— incastra il pattern</small></h1>
+  <div class="controls">
+    <select id="pat" title="Scegli il pattern"></select>
+    <button id="shuffle">🔀 Mescola</button>
+    <button id="check">✔ Verifica</button>
+    <button id="solve">💡 Soluzione</button>
+    <button id="reset">↺ Reset</button>
+    <a class="back" href="index.html">↩ Home</a>
+  </div>
+</header>
+
+<main>
+  <div class="intro">
+    Tocca un'<b>etichetta</b> in basso, poi tocca lo <b>slot</b> giusto del diagramma.
+    Le frecce e le loro scritte (estende, implementa, contiene, usa…) ti dicono dove va ogni ruolo.
+    Tocca uno slot pieno per rimetterne il contenuto nella banca.
+  </div>
+  <div id="board"><svg id="edges"></svg></div>
+  <div class="status" id="status"></div>
+  <div class="bank" id="bank"></div>
+  <div class="hint" id="hint"></div>
+</main>
+
+<footer>Stesso schema dei diagrammi GoF — allena la memoria visiva per l'UML da disegnare all'esame.</footer>
+
+<script>
+// ---- dati dei pattern -------------------------------------------------
+// nodo: {id, x%, y%, label(corretto), role(stereotipo mostrato dopo la verifica)}
+// arco: {from, to, label, offset?(px perpendicolare per archi paralleli)}
+const PATTERNS = {
+ Observer:{
+   hint:"Subject notifica gli Observer iscritti. notify() chiama update() su ciascuno.",
+   nodes:[
+     {id:"sub", x:24,y:18, label:"Subject", role:"+attach/detach/notify"},
+     {id:"obs", x:78,y:26, label:"Observer", role:"«interface» +update()"},
+     {id:"csub",x:24,y:80, label:"ConcreteSubject", role:"-state"},
+     {id:"cobs",x:78,y:80, label:"ConcreteObserver", role:"+update()"},
+   ],
+   edges:[
+     {from:"sub", to:"obs", label:"contiene * (observers)"},
+     {from:"csub",to:"sub", label:"estende"},
+     {from:"cobs",to:"obs", label:"implementa"},
+     {from:"cobs",to:"csub",label:"osserva"},
+   ],
+   distract:["Strategy","Adaptee"]
+ },
+ Strategy:{
+   hint:"Il Context delega a una Strategy. Le strategie concrete implementano l'interfaccia.",
+   nodes:[
+     {id:"ctx", x:22,y:48, label:"Context", role:"+execute()"},
+     {id:"str", x:72,y:18, label:"Strategy", role:"«interface» +algorithm()"},
+     {id:"a",   x:72,y:58, label:"ConcreteStrategyA", role:"+algorithm()"},
+     {id:"b",   x:72,y:86, label:"ConcreteStrategyB", role:"+algorithm()"},
+   ],
+   edges:[
+     {from:"ctx",to:"str",label:"usa"},
+     {from:"a",  to:"str",label:"implementa"},
+     {from:"b",  to:"str",label:"implementa"},
+   ],
+   distract:["State","Observer"]
+ },
+ State:{
+   hint:"Stessa forma di Strategy! Ma qui il comportamento cambia con lo STATO interno del Context.",
+   nodes:[
+     {id:"ctx", x:22,y:48, label:"Context", role:"-state +request()"},
+     {id:"st",  x:72,y:18, label:"State", role:"«interface» +handle()"},
+     {id:"a",   x:72,y:58, label:"ConcreteStateA", role:"+handle()"},
+     {id:"b",   x:72,y:86, label:"ConcreteStateB", role:"+handle()"},
+   ],
+   edges:[
+     {from:"ctx",to:"st",label:"stato corrente"},
+     {from:"a",  to:"st",label:"implementa"},
+     {from:"b",  to:"st",label:"implementa"},
+   ],
+   distract:["Strategy","Context2"]
+ },
+ Composite:{
+   hint:"Foglie e Composite condividono Component. Il Composite contiene figli Component (albero).",
+   nodes:[
+     {id:"cli", x:50,y:12, label:"Client", role:""},
+     {id:"cmp", x:50,y:45, label:"Component", role:"«interface» +operation()"},
+     {id:"leaf",x:24,y:83, label:"Leaf", role:"+operation()"},
+     {id:"comp",x:76,y:83, label:"Composite", role:"+add()/operation()"},
+   ],
+   edges:[
+     {from:"cli", to:"cmp", label:"usa"},
+     {from:"leaf",to:"cmp", label:"implementa"},
+     {from:"comp",to:"cmp", label:"implementa"},
+     {from:"comp",to:"cmp", label:"contiene *", offset:26},
+   ],
+   distract:["Decorator","Adapter"]
+ },
+ Decorator:{
+   hint:"Il Decorator implementa Component E ne contiene uno (wrapped), per aggiungere comportamento.",
+   nodes:[
+     {id:"cmp", x:50,y:12, label:"Component", role:"«interface» +operation()"},
+     {id:"cc",  x:24,y:50, label:"ConcreteComponent", role:"+operation()"},
+     {id:"dec", x:76,y:50, label:"Decorator", role:"+operation()"},
+     {id:"cd",  x:76,y:85, label:"ConcreteDecorator", role:"-addedState"},
+   ],
+   edges:[
+     {from:"cc", to:"cmp", label:"implementa"},
+     {from:"dec",to:"cmp", label:"implementa"},
+     {from:"dec",to:"cmp", label:"contiene 1 (wrapped)", offset:30},
+     {from:"cd", to:"dec", label:"estende"},
+   ],
+   distract:["Composite","Leaf"]
+ },
+ Adapter:{
+   hint:"Il Client usa Target. L'Adapter implementa Target e adatta l'Adaptee (interfaccia diversa).",
+   nodes:[
+     {id:"cli", x:16,y:46, label:"Client", role:""},
+     {id:"tgt", x:50,y:18, label:"Target", role:"«interface» +request()"},
+     {id:"ada", x:50,y:74, label:"Adapter", role:"+request()"},
+     {id:"adp", x:85,y:46, label:"Adaptee", role:"+specificRequest()"},
+   ],
+   edges:[
+     {from:"cli",to:"tgt",label:"usa"},
+     {from:"ada",to:"tgt",label:"implementa"},
+     {from:"ada",to:"adp",label:"adatta"},
+   ],
+   distract:["Decorator","Subject"]
+ },
+};
+
+const $=id=>document.getElementById(id);
+const board=$("board"), svg=$("edges"), bankEl=$("bank");
+let current="Observer", selected=null, placed={}, bankLabels=[];
+
+const SVGNS="http://www.w3.org/2000/svg";
+
+function initSelect(){
+  $("pat").innerHTML=Object.keys(PATTERNS).map(p=>`<option>${p}</option>`).join("");
+}
+
+function shuffleArr(a){for(let i=a.length-1;i>0;i--){const r=Math.floor(Math.random()*(i+1));[a[i],a[r]]=[a[r],a[i]];}return a;}
+
+function loadPattern(name,{shuffleBank=true}={}){
+  current=name; selected=null; placed={};
+  $("pat").value=name;
+  const p=PATTERNS[name];
+  $("hint").textContent="💡 "+p.hint;
+  $("status").textContent=""; $("status").className="status";
+  // build bank: corretti + distrattori
+  bankLabels=p.nodes.map(n=>n.label).concat(p.distract||[]);
+  if(shuffleBank) shuffleArr(bankLabels); else bankLabels.sort();
+  renderBoard();
+  renderBank();
+}
+
+function renderBoard(){
+  // rimuovi vecchi slot/label (tieni l'svg)
+  [...board.querySelectorAll(".slot,.elabel")].forEach(e=>e.remove());
+  const p=PATTERNS[current];
+  // slot
+  for(const n of p.nodes){
+    const d=document.createElement("div");
+    d.className="slot"; d.dataset.id=n.id;
+    d.style.left=n.x+"%"; d.style.top=n.y+"%";
+    if(placed[n.id]) fillSlotEl(d,placed[n.id]);
+    d.onclick=()=>onSlot(n.id,d);
+    board.appendChild(d);
+  }
+  // archi (dopo che gli slot hanno una posizione)
+  requestAnimationFrame(drawEdges);
+}
+
+function fillSlotEl(d,label){
+  d.classList.add("filled");
+  d.textContent=label;
+}
+
+function nodeCenter(id){
+  const el=board.querySelector('.slot[data-id="'+id+'"]');
+  const br=board.getBoundingClientRect(), r=el.getBoundingClientRect();
+  return {x:r.left-br.left+r.width/2, y:r.top-br.top+r.height/2, w:r.width, h:r.height};
+}
+function clipToRect(c, tx,ty){
+  const dx=tx-c.x, dy=ty-c.y;
+  if(dx===0&&dy===0) return {x:c.x,y:c.y};
+  const sx=dx!==0?(c.w/2)/Math.abs(dx):Infinity;
+  const sy=dy!==0?(c.h/2)/Math.abs(dy):Infinity;
+  const t=Math.min(sx,sy);
+  return {x:c.x+dx*t, y:c.y+dy*t};
+}
+function drawEdges(){
+  const w=board.clientWidth, h=board.clientHeight;
+  svg.setAttribute("width",w); svg.setAttribute("height",h);
+  svg.innerHTML='<defs><marker id="ah" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">'+
+    '<path d="M0,0 L8,3 L0,6 Z" fill="#7f8aa3"/></marker></defs>';
+  [...board.querySelectorAll(".elabel")].forEach(e=>e.remove());
+  const p=PATTERNS[current];
+  for(const e of p.edges){
+    let c1=nodeCenter(e.from), c2=nodeCenter(e.to);
+    let off=e.offset||0;
+    if(off){
+      // sposta perpendicolarmente i centri per archi paralleli
+      const dx=c2.x-c1.x, dy=c2.y-c1.y, len=Math.hypot(dx,dy)||1;
+      const px=-dy/len*off, py=dx/len*off;
+      c1={...c1,x:c1.x+px,y:c1.y+py}; c2={...c2,x:c2.x+px,y:c2.y+py};
+    }
+    const a=clipToRect(c1,c2.x,c2.y), b=clipToRect(c2,c1.x,c1.y);
+    const ln=document.createElementNS(SVGNS,"line");
+    ln.setAttribute("x1",a.x);ln.setAttribute("y1",a.y);
+    ln.setAttribute("x2",b.x);ln.setAttribute("y2",b.y);
+    ln.setAttribute("stroke","#7f8aa3");ln.setAttribute("stroke-width","2");
+    ln.setAttribute("marker-end","url(#ah)");
+    svg.appendChild(ln);
+    const lab=document.createElement("div");
+    lab.className="elabel"; lab.textContent=e.label;
+    lab.style.left=((a.x+b.x)/2)+"px"; lab.style.top=((a.y+b.y)/2)+"px";
+    board.appendChild(lab);
+  }
+}
+
+function renderBank(){
+  bankEl.innerHTML="";
+  bankLabels.forEach((lab,idx)=>{
+    const b=document.createElement("button");
+    b.className="chip"+(selected===idx?" sel":"");
+    b.textContent=lab;
+    b.onclick=()=>{selected=(selected===idx?null:idx); renderBank();};
+    bankEl.appendChild(b);
+  });
+  if(bankLabels.length===0){const s=document.createElement("span");s.style.color="var(--muted)";s.textContent="(banca vuota — premi Verifica)";bankEl.appendChild(s);}
+}
+
+function onSlot(id,el){
+  $("status").textContent=""; $("status").className="status";
+  if(placed[id]){            // svuota → torna in banca
+    bankLabels.push(placed[id]); delete placed[id];
+    el.className="slot"; el.textContent=""; el.style.left=el.style.left; // keep pos
+    el.style.removeProperty("background");
+    selected=null; renderBoard(); renderBank(); return;
+  }
+  if(selected===null) return;
+  const lab=bankLabels[selected];
+  placed[id]=lab;
+  bankLabels.splice(selected,1); selected=null;
+  renderBoard(); renderBank();
+}
+
+function check(){
+  const p=PATTERNS[current]; let ok=0;
+  for(const n of p.nodes){
+    const el=board.querySelector('.slot[data-id="'+n.id+'"]');
+    el.classList.remove("ok","no");
+    if(placed[n.id]===n.label){el.classList.add("ok");ok++;}
+    else if(placed[n.id]){el.classList.add("no");}
+  }
+  const tot=p.nodes.length, st=$("status");
+  if(ok===tot){st.textContent="✔ Perfetto! "+ok+"/"+tot+" — diagramma "+current+" corretto.";st.className="status win";}
+  else{st.textContent=ok+"/"+tot+" giusti. Sistemi i rossi e i vuoti, poi riprova.";st.className="status miss";}
+}
+
+function solve(){
+  const p=PATTERNS[current];
+  placed={}; p.nodes.forEach(n=>placed[n.id]=n.label);
+  // togli dalla banca i corretti, lascia i distrattori
+  const correct=new Set(p.nodes.map(n=>n.label));
+  bankLabels=(p.distract||[]).slice();
+  renderBoard(); renderBank();
+  requestAnimationFrame(()=>{ // mostra verde
+    p.nodes.forEach(n=>{const el=board.querySelector('.slot[data-id="'+n.id+'"]');el.classList.add("ok");
+      const role=document.createElement("span");role.className="role";role.textContent=n.role;if(n.role)el.appendChild(role);});
+    const st=$("status");st.textContent="💡 Soluzione mostrata. I riquadrini grigi sotto i nomi sono i contenuti tipici.";st.className="status";
+  });
+}
+
+$("pat").onchange=e=>loadPattern(e.target.value);
+$("shuffle").onclick=()=>loadPattern(current);
+$("check").onclick=check;
+$("solve").onclick=solve;
+$("reset").onclick=()=>loadPattern(current);
+window.addEventListener("resize",()=>requestAnimationFrame(drawEdges));
+
+initSelect();
+loadPattern("Observer");
+</script>
+</body>
+</html>

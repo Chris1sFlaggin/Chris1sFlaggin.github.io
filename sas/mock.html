@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock Esonero SAS — prova cronometrata</title>
+<style>
+  :root{--bg:#0f1115;--panel:#171a21;--card:#1d212b;--ink:#e8ebf1;--muted:#9aa3b2;--line:#2a2f3a;
+    --accent:#5b8cff;--good:#2fbf71;--bad:#ff6b6b;--shadow:0 10px 30px rgba(0,0,0,.45)}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:radial-gradient(1200px 600px at 50% -10%,#1a1f2b,var(--bg));color:var(--ink);
+    font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  header{position:sticky;top:0;z-index:5;backdrop-filter:blur(8px);background:rgba(15,17,21,.82);
+    border-bottom:1px solid var(--line);padding:12px 18px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+  h1{font-size:17px;margin:0}
+  h1 small{color:var(--muted);font-weight:500}
+  .timer{font-variant-numeric:tabular-nums;font-size:26px;font-weight:700;letter-spacing:1px;padding:2px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+  .timer.low{color:var(--bad);border-color:var(--bad)}
+  .timer.zero{color:#fff;background:var(--bad);border-color:var(--bad)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  button,a.btn{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;text-decoration:none;transition:.15s}
+  button:hover,a.btn:hover{border-color:var(--accent)}
+  button:active{transform:translateY(1px)}
+  .primary{background:#23406e;border-color:#3a5da0}
+  main{max-width:860px;margin:0 auto;padding:22px 16px 60px}
+  .lead{color:var(--muted);font-size:14px;margin-bottom:18px}
+  section{background:linear-gradient(160deg,var(--card),#161a23);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:16px 0;box-shadow:var(--shadow)}
+  h2{font-size:16px;margin:0 0 4px}
+  .pts{color:var(--muted);font-size:12px;font-weight:600}
+  .item{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+  .item:first-of-type{border-top:none}
+  .stmt{flex:1}
+  .vf{display:flex;gap:6px;flex-shrink:0}
+  .vf button{padding:5px 12px;font-weight:700;min-width:42px}
+  .vf button.sel[data-v="V"]{background:#1f5138;border-color:var(--good);color:#bdf0cf}
+  .vf button.sel[data-v="F"]{background:#5a2230;border-color:var(--bad);color:#ffc9cf}
+  .res{font-size:13px;margin-top:6px;display:none}
+  .item.correct .res{display:block;color:var(--good)}
+  .item.wrong .res{display:block;color:var(--bad)}
+  .item.correct{background:rgba(47,191,113,.06)}
+  .item.wrong{background:rgba(255,107,107,.06)}
+  select{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+  textarea{width:100%;min-height:120px;background:#12151d;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;resize:vertical}
+  details{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:#12151d}
+  summary{cursor:pointer;padding:10px 0;color:var(--accent);font-weight:600}
+  details[open]{padding-bottom:12px}
+  .sol b{color:#fff}
+  .sol img{max-width:100%;background:#fff;border-radius:8px;padding:6px;margin-top:8px}
+  .scorebar{position:sticky;bottom:0;background:rgba(15,17,21,.92);border-top:1px solid var(--line);
+    padding:12px 16px;display:flex;gap:14px;align-items:center;justify-content:center;font-weight:600}
+  .scorebar .big{font-size:20px}
+  .ok{color:var(--good)} .ko{color:var(--bad)}
+  .muted{color:var(--muted);font-weight:400;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Mock Esonero SAS <small>— prova cronometrata</small></h1>
+  <div class="controls">
+    <span class="timer" id="timer">30:00</span>
+    <button id="start">▶ Avvia</button>
+    <button id="reset">↺ Reset timer</button>
+    <button class="primary" id="correct">✔ Correggi chiuse</button>
+    <a class="btn" href="index.html">↩ Home</a>
+  </div>
+</header>
+
+<main>
+  <div class="lead">
+    Simula l'esonero: <b>30 minuti</b>. Rispondi alle chiuse (Vero/Falso e associazioni), poi premi
+    <b>Correggi chiuse</b> per il punteggio. Le due aperte si correggono da sole: scrivi la tua risposta,
+    poi apri la <b>soluzione modello</b>. Domande prese da prove reali (2021 e 2024).
+  </div>
+
+  <div id="closed"></div>
+
+  <section>
+    <h2>Domanda aperta 1 <span class="pts">· processi · ~5,5 pt</span></h2>
+    <p>Spiega in non più di 5 righe la differenza sostanziale tra <b>modello a cascata</b> e <b>modello incrementale</b>, facendo riferimento alle <b>quattro attività fondamentali</b> di un processo di sviluppo software.</p>
+    <textarea placeholder="Scrivi qui la tua risposta..."></textarea>
+    <details><summary>Mostra soluzione modello</summary>
+      <div class="sol">Le quattro attività di un processo software sono <b>specifica, sviluppo, convalida ed evoluzione</b>.
+      Nel modello <b>a cascata</b> sono fasi separate e sequenziali: ciascuna termina prima dell'inizio della
+      successiva, rendendo costosi i ritorni indietro. Nel modello <b>incrementale</b> le stesse attività si
+      <b>intrecciano e si ripetono</b> su incrementi successivi del sistema, permettendo feedback continuo e una
+      migliore gestione dei requisiti che cambiano.</div>
+    </details>
+  </section>
+
+  <section>
+    <h2>Domanda aperta 2 <span class="pts">· pattern GoF · ~5,5 pt</span></h2>
+    <p>Completa la descrizione del pattern GoF <b>Observer</b> (Nome / Problema / Soluzione) e <b>disegna</b> la struttura del pattern in UML.</p>
+    <textarea placeholder="Nome:&#10;Problema:&#10;Soluzione:&#10;(UML: descrivila o disegnala su carta)"></textarea>
+    <details><summary>Mostra soluzione modello + UML</summary>
+      <div class="sol">
+        <b>Nome:</b> Observer (Publish-Subscribe), comportamentale.<br>
+        <b>Problema:</b> più oggetti subscriber sono interessati ai cambiamenti di stato o agli eventi di un
+        oggetto publisher e vogliono esserne notificati, mantenendo basso l'accoppiamento.<br>
+        <b>Soluzione:</b> si definisce un'interfaccia Observer con <code>update()</code>; il Subject mantiene una
+        lista di observer, espone <code>attach/detach</code> e, al cambiamento, esegue <code>notify()</code>
+        chiamando <code>update()</code> su ciascun observer registrato.
+        <img src="uml/06_observer.png" alt="Observer UML">
+      </div>
+    </details>
+    <p class="muted">All'esame potrebbe chiederti un altro pattern: allenali tutti col <a href="puzzle.html" style="color:var(--accent)">Puzzle UML</a>.</p>
+  </section>
+</main>
+
+<div class="scorebar" id="scorebar"><span class="muted">Premi «Correggi chiuse» per vedere il punteggio.</span></div>
+
+<script>
+const VF=[
+ {title:"1. Analisi OO e responsabilità", items:[
+   {t:"L'analisi orientata agli oggetti è guidata dalle responsabilità.", c:true},
+   {t:"L'analisi OO vede un progetto software come una «comunità di oggetti» con responsabilità che collaborano.", c:true},
+   {t:"Identificazione, assegnazione e indagine su come soddisfare le responsabilità sono i passi del responsibility-driven development.", c:true},
+   {t:"Controller, High Cohesion e Abstract Factory sono tutti esempi di pattern GRASP.", c:false, why:"Abstract Factory è un GoF, non un GRASP."},
+   {t:"I pattern GRASP sono lo strumento principale della disciplina dei requisiti di UP.", c:false, why:"I GRASP servono al design (assegnare responsabilità), non a raccogliere requisiti."},
+ ]},
+ {title:"2. Unified Process (UP)", items:[
+   {t:"UP organizza il ciclo di sviluppo in quattro iterazioni e le iterazioni in diverse fasi.", c:false, why:"È il contrario: 4 FASI, e ogni fase contiene più iterazioni."},
+   {t:"Ideazione, elaborazione, costruzione e transizione sono separate temporalmente e non si intrecciano mai.", c:false, why:"Le discipline si intrecciano nelle iterazioni."},
+   {t:"Specifica, sviluppo, convalida ed evoluzione in UP sono separate temporalmente e non si intrecciano mai.", c:false},
+   {t:"Durante UP non si fa uso di refactoring per gestire i cambiamenti.", c:false, why:"UP usa il refactoring."},
+   {t:"Modellazione del business, requisiti, progettazione, implementazione, test e rilascio in UP sono separate temporalmente e non si intrecciano mai.", c:false},
+ ]},
+ {title:"3. Testing", items:[
+   {t:"Il TDD è una pratica del metodo a cascata che prevede lo sviluppo preceduto dai test.", c:false, why:"Il TDD è pratica di eXtreme Programming, non della cascata."},
+   {t:"I test unitari verificano la comunicazione tra specifiche parti del sistema.", c:false, why:"Quella è l'integrazione; l'unitario prova un pezzo isolato."},
+   {t:"I test unitari verificano il collegamento complessivo tra tutti gli elementi del sistema.", c:false, why:"Anche questo riguarda integrazione/sistema, non l'unitario."},
+   {t:"I test unitari si compongono di preparazione, esecuzione, verifica e rilascio.", c:false, why:"Sono Arrange-Act-Assert; nessun «rilascio»."},
+   {t:"TDD e refactoring sono pratiche promosse in particolare dall'extreme programming.", c:true},
+ ]},
+ {title:"4. Strategy vs State", items:[
+   {t:"Il pattern Strategy si occupa di come un oggetto esegue un compito e incapsula un algoritmo.", c:true},
+   {t:"Il pattern State si occupa di come un oggetto esegue un compito e incapsula un algoritmo.", c:false, why:"State incapsula il comportamento legato allo stato, non un algoritmo."},
+   {t:"Il pattern State consente la definizione di una famiglia di algoritmi intercambiabili.", c:false, why:"Quella è la definizione di Strategy."},
+   {t:"Il pattern State disaccoppia gli algoritmi dai clienti che vogliono usarli dinamicamente.", c:false, why:"Descrizione di Strategy, non di State."},
+   {t:"State e Strategy sono sintatticamente equivalenti ma differiscono nell'applicazione.", c:true},
+ ]},
+ {title:"5. Modello di Dominio", items:[
+   {t:"Il modello di dominio è un dizionario visuale delle classi concettuali.", c:true},
+   {t:"Il modello di dominio include la definizione di oggetti, associazioni e attributi di classi software.", c:false, why:"È concettuale (mondo reale), non software."},
+   {t:"L'analisi linguistica dei casi d'uso in formato dettagliato è una fonte d'ispirazione per costruirlo.", c:true},
+   {t:"Il modello di dominio riporta i concetti significativi relativi ai casi d'uso.", c:true},
+   {t:"Il modello di dominio è una rappresentazione testuale delle classi concettuali.", c:false, why:"È visuale (UML), non testuale."},
+ ]},
+ {title:"6. Riuso del codice e GoF", items:[
+   {t:"Il meccanismo di delega è preferibile alla specializzazione per il riuso del codice.", c:true},
+   {t:"I pattern GoF prediligono l'ereditarietà per ottenere il polimorfismo.", c:true},
+   {t:"I GoF incentivano l'ereditarietà come riuso del codice, in particolare tramite il pattern Composite.", c:false, why:"Il Composite usa la COMPOSIZIONE, non l'ereditarietà per il riuso."},
+   {t:"La composizione di oggetti è un meccanismo di riuso del codice detto black-box.", c:true},
+   {t:"L'ereditarietà rispetta l'incapsulamento.", c:false, why:"È white-box: lo viola."},
+ ]},
+];
+
+const MATCH={
+  options:["Strategy","Decorator","Adapter","Observer"],
+  items:[
+    {t:"Definisci un'interfaccia subscriber/listener; il publisher registra i subscriber interessati e li avvisa quando si verifica un evento.", a:"Observer"},
+    {t:"Converti l'interfaccia originale di un componente in un'altra interfaccia, tramite un oggetto intermedio.", a:"Adapter"},
+    {t:"Ingloba l'oggetto all'interno di un altro che aggiunge le nuove funzionalità.", a:"Decorator"},
+    {t:"Definisci ciascuna strategia in una classe separata, con un'interfaccia comune.", a:"Strategy"},
+  ]
+};
+
+const MULT={
+  intro:"Associazione UML tra A e B: <b>ogni A è collegata a esattamente 1 B</b>; <b>ogni B è collegata a esattamente 2 A</b>. Dati A={a1,a2,a3,a4} e B={b1,b2}, quali relazioni R sono valide?",
+  items:[
+    {t:"R = {(a1,b1),(a2,b1),(a3,b1),(a4,b2)}", c:false, why:"b1 avrebbe 3 A e b2 solo 1: viola «ogni B esattamente 2 A»."},
+    {t:"R = {(a1,b1),(a2,b2)}", c:false, why:"a3 e a4 restano senza B, ma ogni A deve avere 1 B."},
+    {t:"R = {(a1,b1),(a2,b2),(a3,b1),(a4,b2)}", c:true, why:"Ogni A ha 1 B; b1={a1,a3} e b2={a2,a4}: ogni B ha 2 A. ✔"},
+    {t:"R = {(a1,b1),(a2,b2),(a2,b2),(a3,b2)}", c:false, why:"Coppia (a2,b2) duplicata e a4 mancante."},
+  ]
+};
+
+const $=id=>document.getElementById(id);
+let vfEls=[];   // {el,item}
+let matchEls=[]; // {sel,item}
+
+function vfRow(item){
+  const row=document.createElement("div"); row.className="item";
+  const s=document.createElement("div"); s.className="stmt";
+  s.innerHTML=item.t+'<div class="res"></div>'; row.appendChild(s);
+  const vf=document.createElement("div"); vf.className="vf";
+  ["V","F"].forEach(v=>{
+    const b=document.createElement("button"); b.dataset.v=v; b.textContent=v;
+    b.onclick=()=>{item.user=(v==="V"); [...vf.children].forEach(c=>c.classList.remove("sel")); b.classList.add("sel");
+      row.classList.remove("correct","wrong");};
+    vf.appendChild(b);
+  });
+  row.appendChild(vf);
+  vfEls.push({row,item,resEl:s.querySelector(".res")});
+  return row;
+}
+
+function buildClosed(){
+  const root=$("closed");
+  VF.forEach((g,gi)=>{
+    const sec=document.createElement("section");
+    sec.innerHTML='<h2>'+g.title+' <span class="pts">· Vero/Falso · 5 pt</span></h2>';
+    g.items.forEach(it=>sec.appendChild(vfRow(it)));
+    root.appendChild(sec);
+  });
+  // match
+  const ms=document.createElement("section");
+  ms.innerHTML='<h2>7. Associa la soluzione al pattern <span class="pts">· 5 pt</span></h2>';
+  MATCH.items.forEach(it=>{
+    const row=document.createElement("div"); row.className="item";
+    const s=document.createElement("div"); s.className="stmt"; s.innerHTML=it.t+'<div class="res"></div>';
+    const sel=document.createElement("select");
+    sel.innerHTML='<option value="">— scegli —</option>'+MATCH.options.map(o=>'<option>'+o+'</option>').join("");
+    row.appendChild(s); row.appendChild(sel); ms.appendChild(row);
+    matchEls.push({row,sel,item:it,resEl:s.querySelector(".res")});
+  });
+  root.appendChild(ms);
+  // multiplicity
+  const mu=document.createElement("section");
+  mu.innerHTML='<h2>8. Molteplicità UML <span class="pts">· Vero/Falso · 5 pt</span></h2><p class="muted">'+MULT.intro+'</p>';
+  MULT.items.forEach(it=>mu.appendChild(vfRow(it)));
+  root.appendChild(mu);
+}
+
+function correct(){
+  let ok=0, tot=0, answered=0;
+  vfEls.forEach(({row,item,resEl})=>{
+    tot++; row.classList.remove("correct","wrong");
+    if(item.user===undefined){resEl.textContent="(non risposta) — corretta: "+(item.c?"VERO":"FALSO")+(item.why?" — "+item.why:""); row.classList.add("wrong"); return;}
+    answered++;
+    if(item.user===item.c){ok++; row.classList.add("correct"); resEl.textContent="✔ corretto ("+(item.c?"VERO":"FALSO")+")";}
+    else{row.classList.add("wrong"); resEl.textContent="✗ sbagliato — corretta: "+(item.c?"VERO":"FALSO")+(item.why?" — "+item.why:"");}
+  });
+  matchEls.forEach(({row,sel,item,resEl})=>{
+    tot++; row.classList.remove("correct","wrong");
+    if(!sel.value){resEl.textContent="(non risposta) — corretto: "+item.a; row.classList.add("wrong"); return;}
+    answered++;
+    if(sel.value===item.a){ok++; row.classList.add("correct"); resEl.textContent="✔ "+item.a;}
+    else{row.classList.add("wrong"); resEl.textContent="✗ sbagliato — corretto: "+item.a;}
+  });
+  const pct=Math.round(ok/tot*100);
+  const cls=pct>=80?"ok":pct>=60?"":"ko";
+  $("scorebar").innerHTML='<span class="big '+cls+'">'+ok+' / '+tot+'</span>'+
+    '<span class="muted">risposte chiuse corrette ('+pct+'%) · '+answered+' compilate</span>';
+  $("scorebar").scrollIntoView({behavior:"smooth",block:"end"});
+}
+
+// ---- timer ----
+let total=30*60, left=total, tick=null;
+function fmt(s){const m=Math.floor(s/60),x=s%60;return (m<10?"0":"")+m+":"+(x<10?"0":"")+x;}
+function render(){const t=$("timer");t.textContent=fmt(left);
+  t.classList.toggle("low",left<=300&&left>0);t.classList.toggle("zero",left===0);}
+function start(){
+  if(tick){clearInterval(tick);tick=null;$("start").textContent="▶ Riprendi";return;}
+  $("start").textContent="⏸ Pausa";
+  tick=setInterval(()=>{ if(left>0){left--;render();} if(left===0){clearInterval(tick);tick=null;$("start").textContent="▶ Avvia";render();
+    $("scorebar").innerHTML='<span class="big ko">⏰ Tempo scaduto!</span><span class="muted">Premi «Correggi chiuse» per il punteggio.</span>';} },1000);
+}
+function resetTimer(){if(tick){clearInterval(tick);tick=null;} left=total;$("start").textContent="▶ Avvia";render();}
+
+$("start").onclick=start;
+$("reset").onclick=resetTimer;
+$("correct").onclick=correct;
+
+buildClosed();
+render();
+</script>
+</body>
+</html>
