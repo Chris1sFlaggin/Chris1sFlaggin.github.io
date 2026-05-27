@@ -132,7 +132,7 @@
 </main>
 
 <footer>
-  77 card · scorciatoie: <kbd>←</kbd>/<kbd>→</kbd> naviga · <kbd>Spazio</kbd> gira · <kbd>G</kbd> sapevo · <kbd>A</kbd> da rivedere · <kbd>S</kbd> mescola
+  84 card · scorciatoie: <kbd>←</kbd>/<kbd>→</kbd> naviga · <kbd>Spazio</kbd> gira · <kbd>G</kbd> sapevo · <kbd>A</kbd> da rivedere · <kbd>S</kbd> mescola
 </footer>
 
 <script>
@@ -227,6 +227,17 @@ const CARDS = [
  {id:"DD3",cat:"DSD",q:"Da cosa parte un DSD e chi riceve il primo messaggio?",a:"Parte da un'<b>operazione di sistema</b> (presa da SSD/contratto). Il primo messaggio arriva al <b>Controller</b>.<span class='ex'><b>Esempio:</b> approveMenu(serviceId) entra in EventManager, che poi smista a Service ed Event.</span>"},
  {id:"DD4",cat:"DSD",q:"Cosa sono i frame opt, alt e loop in un diagramma di sequenza?",a:"<b>opt</b> = blocco opzionale (eseguito se vale una condizione). <b>alt</b> = rami alternativi (if/else). <b>loop</b> = ciclo ripetuto.<span class='ex'><b>Esempio (tuo):</b> terminaEvento usa <b>opt</b> per note/documentazione; decisioneDeroga usa <b>alt</b> su applicaPenale; impostaFrequenza usa <b>loop</b> sulle date.</span>"},
  {id:"DD5",cat:"DSD",q:"Qual è la sequenza del DSD creaEvento nel tuo progetto?",a:"EventManager → <code>UserManager.getCurrentUser()</code> → <code>Event.create(...)</code> → set cliente e organizzatore → <code>notifyEventCreated(e)</code> → <b>loop</b> sui receiver: <code>updateEventCreated(e)</code> → ritorna e.<span class='ex'>La persistenza è dentro EventPersistence e non si mostra nel DSD.</span>"},
+
+ {id:"A6",cat:"Processi",q:"Cos'è il modello di sviluppo a spirale?",a:"Un modello <b>iterativo guidato dal rischio</b>: a ogni giro (spirale) si individuano e si riducono i rischi maggiori prima di proseguire, costruendo prototipi successivi.<span class='ex'><b>Esempio:</b> prima di costruire tutto, fai un prototipo della parte più rischiosa (es. l'integrazione col pagamento) per abbattere l'incertezza.</span>"},
+ {id:"A7",cat:"Processi",q:"Cos'è Scrum e cos'è uno «sprint»?",a:"<b>Scrum</b> è un metodo <b>agile</b>: lo sviluppo procede in iterazioni brevi dette <b>sprint</b>; all'inizio di ogni sprint il team pianifica il lavoro dell'iterazione corrente.<span class='ex'><b>Esempio:</b> sprint di 2 settimane → all'inizio scegli cosa fare, alla fine consegni un incremento funzionante.</span>"},
+
+ {id:"B4",cat:"Requisiti",q:"Cos'è il modello FURPS+ dei requisiti?",a:"Una classificazione dei requisiti: <b>F</b>unzionale, <b>U</b>sabilità, Affidabilità (<b>R</b>eliability), <b>P</b>restazioni, <b>S</b>ostenibilità, <b>+</b> altri vincoli (progetto, hardware, legali…).<span class='ex'><b>Memo:</b> la F = requisiti funzionali; U-R-P-S-+ = requisiti non funzionali (qualità e vincoli).</span>"},
+ {id:"B5",cat:"Requisiti",q:"A cosa servono le relazioni «include» ed «extend» tra casi d'uso?",a:"<b>include</b> = un caso d'uso ne usa <i>sempre</i> un altro come sotto-parte comune (fattorizzazione). <b>extend</b> = un caso d'uso aggiunge un comportamento <i>opzionale</i> a un altro, solo in certe condizioni.<span class='ex'><b>Esempio:</b> «Paga» <i>include</i> «Autentica»; «Acquista» è <i>esteso</i> da «Applica coupon».</span>"},
+
+ {id:"DC6",cat:"DCD",q:"Quali relazioni UML compaiono in un diagramma delle classi?",a:"<b>Associazione</b> (un oggetto conosce/usa un altro), <b>aggregazione</b> (◇ insieme «debole»), <b>composizione</b> (◆ insieme «forte»: il tutto possiede le parti), <b>generalizzazione</b> (▷ ereditarietà), <b>realizzazione</b> (▷ tratteggiata: implementa un'interfaccia), <b>dipendenza</b> (- -> usa temporaneamente).<span class='ex'><b>Esempio (tuo):</b> Event ◆— Service (composizione); Recipe ▷ KitchenProcess (realizzazione).</span>"},
+
+ {id:"AR1",cat:"Architettura",q:"Cos'è l'architettura a strati (layered)?",a:"La suddivisione di un sistema complesso in <b>strati</b> con responsabilità distinte (es. Presentazione/UI, Logica di dominio, Persistenza), dove ogni strato usa solo quello sottostante.<span class='ex'><b>Esempio (tuo):</b> UI → dominio (EventManager, Event) → persistenza (EventPersistence): la logica di business non conosce l'interfaccia grafica.</span>"},
+ {id:"AR2",cat:"Architettura",q:"Cos'è il principio di separazione Modello-Vista?",a:"Il <b>Modello</b> (logica e dati del dominio) non deve dipendere dalla <b>Vista</b> (interfaccia): il modello non conosce la UI né vi è accoppiato.<span class='ex'><b>Perché:</b> puoi cambiare o aggiungere interfacce (CLI, web) senza toccare la logica → favorisce Low Coupling. Nel tuo progetto l'Observer disaccoppia dominio e persistenza in modo analogo.</span>"},
 ];
 
 const LS="flashSAS.progress.v1";
