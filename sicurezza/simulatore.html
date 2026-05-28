@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulatore Esame Cybersecurity — 45 minuti</title>
+<style>
+  :root{--bg:#0f1115;--panel:#171a21;--card:#1d212b;--ink:#e8ebf1;--muted:#9aa3b2;--line:#2a2f3a;
+    --accent:#36c2a8;--good:#2fbf71;--bad:#ff6b6b;--shadow:0 10px 30px rgba(0,0,0,.45)}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:radial-gradient(1200px 600px at 50% -10%,#15241f,var(--bg));color:var(--ink);
+    font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  header{position:sticky;top:0;z-index:5;backdrop-filter:blur(8px);background:rgba(15,17,21,.82);
+    border-bottom:1px solid var(--line);padding:12px 18px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+  h1{font-size:17px;margin:0}
+  h1 small{color:var(--muted);font-weight:500}
+  .timer{font-variant-numeric:tabular-nums;font-size:26px;font-weight:700;letter-spacing:1px;padding:2px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+  .timer.low{color:var(--bad);border-color:var(--bad)}
+  .timer.zero{color:#fff;background:var(--bad);border-color:var(--bad)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  button,a.btn,select{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;text-decoration:none;transition:.15s}
+  button:hover,a.btn:hover,select:hover{border-color:var(--accent)}
+  button:active{transform:translateY(1px)}
+  .primary{background:#1c4d44;border-color:#2f7e6f}
+  main{max-width:880px;margin:0 auto;padding:18px 16px 70px}
+  .modebar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+  .modebar .seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .modebar .seg button{border:0;border-radius:0;background:transparent}
+  .modebar .seg button.on{background:#15302b;color:#bdeee2;font-weight:600}
+  .modebar .sp{flex:1}
+  .lead{color:var(--muted);font-size:13px;margin:6px 2px 14px}
+  .examhead{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between;margin:6px 2px 2px}
+  .examhead h2{font-size:18px;margin:0}
+  .examhead .tag{color:#b6efe2;background:#1d3f39;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700}
+  section{background:linear-gradient(160deg,var(--card),#161a23);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:16px 0;box-shadow:var(--shadow)}
+  section h3{font-size:16px;margin:0 0 4px}
+  .pts{color:var(--muted);font-size:12px;font-weight:600}
+  .opt{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:10px;margin-top:8px;cursor:pointer}
+  .opt:hover{border-color:var(--accent)}
+  .opt.sel{border-color:var(--accent);background:#15302b}
+  .opt.ok{border-color:var(--good);background:rgba(47,191,113,.12)}
+  .opt.no{border-color:var(--bad);background:rgba(255,107,107,.12)}
+  .opt input{margin-top:3px}
+  .res{font-size:13px;margin-top:8px;display:none}
+  .res.show{display:block}
+  textarea{width:100%;min-height:110px;background:#0e1a17;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;resize:vertical}
+  details{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:#0e1a17}
+  summary{cursor:pointer;padding:10px 0;color:var(--accent);font-weight:600}
+  details[open]{padding-bottom:12px}
+  .sol b{color:#fff}
+  .sol code{background:#11211d;border:1px solid var(--line);border-radius:5px;padding:0 5px}
+  .sol pre{background:#0b1714;border:1px solid var(--line);border-radius:8px;padding:10px;overflow:auto;font-size:12px;line-height:1.4}
+  .sol img{display:block;max-width:100%;background:#fff;border-radius:8px;padding:6px;margin-top:10px}
+  .scorebar{position:sticky;bottom:0;background:rgba(15,17,21,.92);border-top:1px solid var(--line);
+    padding:12px 16px;display:flex;gap:14px;align-items:center;justify-content:center;font-weight:600}
+  .scorebar .big{font-size:20px}
+  .ok{color:var(--good)} .ko{color:var(--bad)} .muted{color:var(--muted);font-weight:400;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Simulatore Esame Cybersecurity <small>— 5 domande · 45 min</small></h1>
+  <div class="controls">
+    <span class="timer" id="timer">45:00</span>
+    <button id="start">▶ Avvia</button>
+    <button id="reset">↺ Reset timer</button>
+    <button class="primary" id="correct">✔ Correggi multiple</button>
+    <a class="btn" href="index.html">↩ Home</a>
+  </div>
+</header>
+
+<main>
+  <div class="modebar">
+    <div class="seg">
+      <button id="mReal" class="on">📅 Esami reali</button>
+      <button id="mGen">🎲 Esame generato</button>
+    </div>
+    <select id="realSel" title="Scegli un appello reale"></select>
+    <button id="genBtn" style="display:none">🎲 Genera nuovo appello</button>
+    <span class="sp"></span>
+    <span class="muted" id="hint">Formato reale UniTo (Bergadano): 1 domanda a scelta multipla autocorretta + aperte con soluzione modello.</span>
+  </div>
+  <p class="lead">Le scelte multiple e le aperte degli <b>esami reali</b> sono prese dai testi d'appello; in <b>esame generato</b> 5 domande vengono pescate da una banca dati con data plausibile. Avvia il timer, rispondi, poi premi «Correggi multiple» e confronta le aperte con le soluzioni modello.</p>
+
+  <div class="examhead"><h2 id="examTitle">—</h2><span class="tag" id="examTag"></span></div>
+  <div id="exam"></div>
+</main>
+
+<div class="scorebar" id="scorebar"><span class="muted">Compila le domande a scelta multipla e premi «Correggi multiple».</span></div>
+
+<script>
+const $=id=>document.getElementById(id);
+
+/* ============ ESAMI REALI ============ */
+const REAL=[
+{date:"18 giugno 2025", q:[
+ {n:"1",t:"open",topic:"Web security",q:"Fare un esempio di codice di back end di una Web Application vulnerabile ad attacchi di Cross Site Scripting (XSS).",
+  sol:"Un back-end che stampa input dell'utente senza filtrarlo è vulnerabile. Esempio in PHP (<code>a.php</code>):<br><code>&lt;?php echo \"Buongiorno \" . $_GET['nome']; ?&gt;</code><br>Se l'utente passa <code>nome=&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code>, lo script finisce nell'HTML e viene <b>eseguito nel browser</b> della vittima (es. furto dei cookie di sessione). <b>Difesa:</b> escaping dell'output (<code>htmlspecialchars()</code>) e validazione dell'input."},
+ {n:"2a",t:"mc",q:"Una funzione di hash H non resistente alle collisioni permette di affermare che:",
+  opts:["se H(x)=H(y), allora x=y","non esistono due diversi input x,y tali che H(x)=H(y)","esiste un algoritmo lineare per trovare x,y tali che H(x)=H(y)","esiste un algoritmo polinomiale per trovare x,y tali che H(x)=H(y)","esiste un algoritmo esponenziale per trovare x,y tali che H(x)=H(y)"],
+  c:3,why:"«Non resistente alle collisioni» significa che le collisioni sono trovabili in modo efficiente, cioè in tempo polinomiale."},
+ {n:"2b",t:"mc",q:"In RSA, se il modulo è n=pq e la chiave pubblica è e, la chiave privata:",
+  opts:["è l'inverso moltiplicativo di e, mod pq","è l'inverso moltiplicativo di e, mod (p-1)(q-1)","è l'inverso moltiplicativo di e, mod n-1","non può essere calcolata da e,p,q: è random","è generata casualmente, indipendente da e,p,q"],
+  c:1,why:"d = e⁻¹ mod φ(n), con φ(n)=(p-1)(q-1), calcolato con l'algoritmo di Euclide esteso."},
+ {n:"3",t:"open",topic:"Integrità",q:"A che cosa serve un MAC (Message Authentication Code) e come può essere realizzato?",
+  sol:"Il MAC garantisce <b>integrità e autenticità</b> di un messaggio tramite una <b>chiave segreta condivisa</b>: solo chi possiede la chiave può generarlo e verificarlo (a differenza della firma non dà non ripudio, perché la chiave è condivisa). Si calcola su M e dipende dalla chiave K. Due realizzazioni: <b>MAC con DES-CBC</b> (si cifra M in CBC e si usa l'ultimo blocco cifrato come MAC) e <b>HMAC</b> (<code>HMAC = H(K1 || H(K2 || M))</code>, hash combinata con la chiave). L'attacco del compleanno non funziona: l'avversario non conosce K e non può calcolare il MAC di un messaggio arbitrario."},
+ {n:"4",t:"open",topic:"Rete",q:"Fare un esempio concreto di attacco di tipo \"Denial of Service\".",
+  sol:"Un DoS rende un servizio indisponibile saturandone le risorse. Esempio — <b>SYN flooding</b>: l'attaccante invia molti segmenti TCP SYN (spesso con IP sorgente spoofed) senza completare l'handshake a tre vie; il server alloca risorse per ogni connessione semiaperta e attende ACK che non arrivano, esaurendo la tabella delle connessioni. Altri esempi: <b>Smurf attack</b> (ICMP echo request con IP sorgente = vittima inviati in broadcast → tutti i nodi rispondono alla vittima) e abuso di <b>relay SMTP</b>. Spesso è distribuito (DDoS) tramite una botnet di zombie."},
+ {n:"5",t:"open",topic:"ISO 27001",q:"Descrivere le attività previste nella fase di \"plan\" del ciclo Plan-Do-Check-Act nello standard ISO 27001.",
+  sol:"Nel ciclo PDCA dell'ISO 27001 la fase di <b>Plan</b> pianifica l'ISMS ed è divisa in 6 sottofasi:<br>1. <b>Definire il perimetro</b> (fisico o logico; anagrafica degli asset);<br>2. <b>Scrivere la Politica dell'ISMS</b> (obiettivi, contesto, vincoli contrattuali);<br>3. <b>Analizzare e valutare il rischio</b> (minacce, vulnerabilità, impatto e probabilità per ogni asset) — è il punto fondamentale;<br>4. <b>Trattare il rischio</b> (ridurre con controlli, accettare, o trasferire es. assicurazione);<br>5. <b>Ottenere approvazione e autorizzazione</b> dalla direzione (rischio residuo, costi, tempi);<br>6. <b>Redigere lo Statement of Applicability</b> (elenco motivato dei controlli da attuare, con tempi e costi)."},
+]},
+{date:"22 luglio 2025", q:[
+ {n:"1",t:"open",topic:"Chiave pubblica",q:"Due utenti U1 e U2 vogliono condividere un segreto S con Diffie-Hellman su rete geografica. Scrivere nel caso generale i messaggi scambiati e i valori calcolati da U1 e U2.",
+  sol:"Parametri pubblici: un primo grande <code>q</code> e una radice primitiva <code>α &lt; q</code>.<br>U1 sceglie il segreto <code>Sa &lt; q</code> e invia <code>Pa = α^Sa mod q</code>.<br>U2 sceglie il segreto <code>Sb &lt; q</code> e invia <code>Pb = α^Sb mod q</code>.<br>Segreto condiviso: U1 calcola <code>K = Pb^Sa mod q</code>, U2 calcola <code>K = Pa^Sb mod q</code> → entrambi ottengono <code>S = α^(Sa·Sb) mod q</code>. Sul canale viaggiano solo Pa e Pb; Sa e Sb non si trasmettono mai."},
+ {n:"2a",t:"mc",q:"Quale asserzione è utile per la sicurezza di RSA?",
+  opts:["Esistono infiniti numeri primi","Esistono più di 100 numeri primi","Esistono più di 2^100 numeri primi","È difficile fattorizzare x, sapendo che è primo","È difficile fattorizzare x, senza vincoli sulla sua primalità"],
+  c:4,why:"RSA si regge sulla difficoltà di fattorizzare un n generico (=p·q); fattorizzare un numero noto come primo è banale (è sé stesso)."},
+ {n:"2b",t:"mc",q:"Avendo installato un firewall applicativo trasparente, full inspection:",
+  opts:["ogni utente deve configurare un proxy con l'indirizzo del firewall","non è possibile un'analisi stateful del traffico applicativo","è possibile l'analisi stateful solo installando un proxy","è possibile un'analisi stateful del traffico applicativo","il firewall non introduce ritardi né rischi di sicurezza"],
+  c:3,why:"«Trasparente» = nessun proxy da configurare lato client; «full inspection» = ispezione stateful a livello applicativo (Transparent Stateful Inspection)."},
+ {n:"3",t:"open",topic:"Integrità",q:"Perché non è più consigliabile usare la funzione di hash MD5 nella firma elettronica?",
+  sol:"MD5 non è più resistente alle collisioni: si sanno costruire due messaggi diversi M1≠M2 con lo stesso hash. Poiché la firma si calcola sull'<b>hash</b> del messaggio (digest cifrato con la chiave privata), una collisione permette di far firmare M1 e poi <b>riusare la stessa firma</b> sul messaggio malevolo M2: la verifica risulterebbe valida. È l'idea dell'attacco del compleanno (~2^(n/2) tentativi). Per questo si usano hash robuste come SHA-256."},
+ {n:"4",t:"open",topic:"Software security",q:"Discutere le difese di tipo ASLR (address randomization) per gli attacchi di memory corruption.",
+  sol:"L'<b>ASLR</b> randomizza a ogni esecuzione gli indirizzi di stack, heap e librerie. Negli attacchi di buffer overflow l'exploit deve far saltare l'EIP a un indirizzo preciso (lo shellcode o il buffer): con indirizzi casuali l'attaccante non sa più dove saltare e l'exploit fallisce. Su Linux: <code>kernel.randomize_va_space</code> (0=off, 1=on, 2=stack+heap). <b>Limite:</b> su sistemi a 32 bit lo spazio è piccolo (~2^19 posizioni), quindi un brute force ripetendo l'attacco può comunque centrare l'indirizzo; perciò si combina con NX (stack non eseguibile) e stack canary."},
+ {n:"5",t:"open",topic:"Firewall",q:"Scrivere le ACL di un packet filter che abiliti la navigazione Web (http 80, https 443), la ricezione (imap 110) e l'invio (smtp 25) verso un mail server esterno 130.192.156.5. Rete locale 130.193.111/24; black list 130.194/16 e 130.195.156.1. Gestire il bit ACK.",
+  sol:"Le <b>deny</b> (black-list) vanno per prime; per ogni servizio due regole (uscita + risposta in entrata col flag ACK).<pre>Action Source IP          Dest IP            SPort DPort ACK\ndeny   130.193.111.0/24   130.194.0.0/16      *     *     -\ndeny   130.193.111.0/24   130.195.156.1/32    *     *     -\nallow  130.193.111.0/24   0.0.0.0/0           *     80    -\nallow  0.0.0.0/0          130.193.111.0/24    80    *     ACK\nallow  130.193.111.0/24   0.0.0.0/0           *     443   -\nallow  0.0.0.0/0          130.193.111.0/24    443   *     ACK\nallow  130.193.111.0/24   130.192.156.5/32    *     25    -\nallow  130.192.156.5/32   130.193.111.0/24    25    *     ACK\nallow  130.193.111.0/24   130.192.156.5/32    *     110   -\nallow  130.192.156.5/32   130.193.111.0/24    110   *     ACK</pre>La risposta entra solo con flag <b>ACK</b> (connessione avviata dall'interno)."},
+]},
+{date:"10 settembre 2025", q:[
+ {n:"1",t:"open",topic:"Software security",q:"Con riferimento a semplici buffer overflow su stack: (1a) perché può essere utile riempire una parte dello stack con byte 0x90 (\"nop\"); (1b) perché può essere utile riempirla con l'indirizzo di ritorno desiderato (\"spraying\").",
+  sol:"<b>(1a) NOP sled (0x90):</b> una lunga sequenza di NOP prima dello shellcode. L'indirizzo esatto dello shellcode è incerto (lo stack varia, attacco da remoto): se l'indirizzo di ritorno «atterra» in un punto qualsiasi dello sled, le NOP non fanno nulla e l'esecuzione <b>scivola fino allo shellcode</b>, aumentando le probabilità di colpire.<br><b>(1b) Spraying dell'indirizzo di ritorno:</b> si riempie un'ampia porzione di stack con molte copie dell'indirizzo di ritorno desiderato, così che — qualunque sia l'allineamento della parola di ritorno — la CPU ne prelevi una e salti dove vuole l'attaccante. Spesso si combinano: si spruzza un indirizzo che punta dentro il NOP sled."},
+ {n:"2",t:"open",topic:"Chiave pubblica",q:"Come è possibile generare numeri primi molto grandi (> 512 bit)?",
+  sol:"Si genera un numero <b>casuale dispari</b> della lunghezza voluta e se ne testa la primalità con un <b>test probabilistico</b>, tipicamente <b>Miller-Rabin</b>; se fallisce si riprova. Per il teorema dei numeri primi i primi sono abbastanza densi (≈ x/ln x), quindi se ne trovano in fretta. Il test è asimmetrico: «non primo» è certo, «primo» ha una piccola probabilità d'errore (&lt;¼ per Miller-Rabin) resa trascurabile ripetendolo T volte (P ≥ 1−4⁻ᵀ). Complessità lineare nel numero di bit. Si scartano a priori i multipli di 2, 3, 5 per velocizzare."},
+ {n:"3",t:"open",topic:"Introduzione",q:"Dare una definizione di \"Cybersecurity\", indicando le differenze rispetto a \"ICT security\" e \"Information Security\".",
+  sol:"<b>Information Security</b>: protezione dell'informazione in <b>qualsiasi forma</b> (anche cartacea/analogica). <b>ICT Security</b>: sicurezza dei sistemi <b>informatici e di telecomunicazione</b> (digitale). <b>Cybersecurity</b>: sicurezza nel <b>cyberspazio</b>, cioè di informazioni e oggetti (digitali o analogici) raggiungibili da Internet/sistemi connessi. Ambito decrescente: Information ⊇ ICT ⊇ Cyber."},
+ {n:"4a",t:"mc",q:"Un certificato di chiave pubblica serve per:",
+  opts:["evitare l'uso di una password troppo corta","evitare l'uso di una password troppo semplice","evitare l'attacco meet in the middle","evitare l'attacco man in the middle","trasmettere in modo segreto la chiave pubblica di un utente"],
+  c:3,why:"Il certificato (firmato da una CA) lega la chiave pubblica all'identità del proprietario, impedendo a un MITM di spacciare la propria chiave."},
+ {n:"4b",t:"mc",q:"L'attacco noto come XSS (Cross Site Scripting):",
+  opts:["si basa su link fraudolenti che usano l'autenticazione di sessione esistente","si basa su link fraudolenti che permettono di intercettare una password","si basa su link fraudolenti che eseguono codice malevolo in un data base","si basa sull'invio di input malevolo eseguito nel Browser","si basa sull'invio di input malevolo eseguito dal Server"],
+  c:3,why:"Lo script XSS viene eseguito nel browser della vittima (la prima opzione descrive invece il CSRF)."},
+ {n:"5",t:"open",topic:"AES",q:"Descrivere il cifrario AES, utilizzando uno schema grafico.",
+  sol:"AES è un <b>cifrario simmetrico a blocchi</b> (blocchi 128 bit; chiavi 128/192/256) basato su una <b>rete a sostituzione-permutazione</b> (non Feistel). Opera su una matrice di stato 4×4 byte. <b>AddRoundKey</b> iniziale, poi <b>Nr−1 round</b> (10/12/14) con <b>SubBytes</b> (S-box non lineare → confusione), <b>ShiftRows</b> e <b>MixColumns</b> (→ diffusione), <b>AddRoundKey</b>; il <b>round finale</b> omette MixColumns. Le chiavi di round derivano dalla key expansion.<img src='img/aes.svg' alt='Schema AES'>"},
+]},
+{date:"17 dicembre 2025", q:[
+ {n:"1",t:"open",topic:"Chiave pubblica",q:"(1a) Definire lo scambio di chiavi Diffie-Hellman. (1b) Spiegare perché è sicuro.",
+  sol:"<b>1a. Scambio:</b> parametri pubblici primo <code>q</code> e radice primitiva <code>α</code>. U1: segreto <code>Sa</code>, invia <code>Pa=α^Sa mod q</code>; U2: segreto <code>Sb</code>, invia <code>Pb=α^Sb mod q</code>. Chiave comune <code>K = Pb^Sa = Pa^Sb = α^(Sa·Sb) mod q</code>.<br><b>1b. Sicurezza:</b> sul canale viaggiano solo q, α, Pa, Pb. Ricavare Sa da <code>Pa=α^Sa mod q</code> richiede di risolvere il <b>logaritmo discreto</b>, computazionalmente difficile (esponenziale nei bit) per q grande; l'avversario non può calcolare Sa, Sb né α^(Sa·Sb). (Vulnerabile però al man-in-the-middle senza autenticazione delle chiavi pubbliche.)"},
+ {n:"2a",t:"mc",q:"Nello standard ISO 27001, i vulnerability assessment / penetration test:",
+  opts:["non sono previsti","fanno parte della fase di Plan","fanno parte della fase di Do","fanno parte della fase di Check","fanno parte della fase di Act"],
+  c:3,why:"Vulnerability assessment e penetration test sono riesami proattivi del sistema in esercizio → fase di Check del PDCA."},
+ {n:"2b",t:"mc",q:"Nel cifrario AES:",
+  opts:["si genera al massimo 1 chiave pubblica e 1 privata","si generano 2 chiavi pubbliche e 1 privata","si generano 2 pubbliche e 2 private","si deve generare una chiave segreta condivisa","si generano due chiavi segrete: una per cifrare, una per decifrare"],
+  c:3,why:"AES è simmetrico: una sola chiave segreta condivisa per cifrare e decifrare (le coppie pubblica/privata sono di RSA)."},
+ {n:"3",t:"open",topic:"Dimostrazioni",q:"Dimostrare che se esistono x e y tali che x² ≡ y² (mod n) e ¬(x ≡ ±y (mod n)), allora n non è primo.",
+  sol:"Da <code>x² ≡ y² (mod n)</code> segue <code>n | (x²−y²) = (x−y)(x+y)</code>. Se n fosse primo dovrebbe dividere uno dei due fattori, cioè <code>x ≡ y</code> oppure <code>x ≡ −y (mod n)</code> — escluso per ipotesi. Quindi n è <b>composto</b>, e <code>gcd(x−y, n)</code> ne fornisce un <b>fattore non banale</b>. È la «conseguenza del principio fondamentale» usata nel test di Miller-Rabin."},
+ {n:"4",t:"open",topic:"Firewall",q:"Spiegare che cos'è un firewall \"HA\" (high availability).",
+  sol:"Un firewall in <b>HA</b> usa due (o più) firewall ridondanti per eliminare il <b>singolo punto di guasto</b>. Non è bilanciamento di carico: uno è <b>attivo</b>, l'altro in <b>stand-by</b> e lo interroga periodicamente con un ping (un'interfaccia di rete su entrambi è dedicata al collegamento reciproco). Quando lo stand-by si accorge (mancata risposta al ping) che l'attivo è guasto, fa <b>failover</b> dirottando su di sé tutto il traffico (es. riscrivendo le tabelle ARP, una sorta di ARP poisoning voluto), senza interrompere il servizio."},
+ {n:"5",t:"open",topic:"Web security",q:"Discutere le vulnerabilità di questo codice e fare un esempio concreto di come sfruttarle. pagina.html: form (method=get, action=a.php) con campi nome e cognome. a.php: <?php echo \"Buongiorno \"; echo $_GET['nome']; ?>",
+  sol:"Il codice è vulnerabile a <b>XSS reflected</b>: <code>a.php</code> stampa <code>$_GET['nome']</code> senza filtrarlo. Inviando nel campo «nome» <code>&lt;script&gt;...&lt;/script&gt;</code> (la form usa method=get e il campo è largo 800px proprio per payload lunghi), lo script entra nell'HTML restituito ed è <b>eseguito nel browser</b> della vittima: si possono rubare i cookie di sessione (<code>document.cookie</code>), reindirizzare a siti di phishing, ecc. <b>Difese:</b> escaping dell'output (<code>htmlspecialchars()</code>), validazione dell'input, Content-Security-Policy."},
+]},
+{date:"29 gennaio 2026", q:[
+ {n:"1",t:"open",topic:"Introduzione",q:"Definire \"CIA\" (Confidentiality, Integrity, Availability) nell'ambito della Cybersecurity.",
+  sol:"<b>CIA</b> = i tre obiettivi fondamentali della sicurezza:<br><b>Confidentiality</b> (Riservatezza): le informazioni sono accessibili solo ai soggetti autorizzati (es. cifratura).<br><b>Integrity</b> (Integrità): dati e comportamento del sistema non vengono modificati senza autorizzazione (es. hash/firma).<br><b>Availability</b> (Disponibilità): i servizi sono disponibili agli utenti autorizzati con le prestazioni attese (es. difesa da DDoS)."},
+ {n:"2a",t:"mc",q:"In un Web Application Firewall (WAF):",
+  opts:["si filtra solo in base allo header IP","si filtra solo in base allo header TCP","si filtra solo in base allo header HTTP","è possibile rilevare tentativi di Cross Site Scripting","è possibile rilevare tentativi di Buffer Overflow"],
+  c:3,why:"Il WAF (reverse proxy lato server) ispeziona il livello applicativo HTTP e rileva attacchi web (XSS/SQLi); il buffer overflow è un attacco al software locale, non al traffico HTTP."},
+ {n:"2b",t:"mc",q:"Nel cifrario RSA:",
+  opts:["si genera al massimo una chiave condivisa","si generano 2 pubbliche per ogni privata","si generano 2 private per ogni pubblica","si deve generare una coppia: una pubblica e una privata","si generano due chiavi segrete: una per cifrare, una per decifrare"],
+  c:3,why:"RSA è asimmetrico: una coppia (chiave pubblica, chiave privata) legata matematicamente."},
+ {n:"3",t:"open",topic:"AES",q:"Spiegare lo scopo e il funzionamento delle S-box nel cifrario AES.",
+  sol:"Le <b>S-box</b> realizzano il passo <b>SubBytes</b>: una <b>sostituzione non lineare</b> byte-per-byte. In AES la S-box è una matrice 16×16 (permutazione dei 256 valori a 8 bit) calcolata tramite l'<b>inverso moltiplicativo in GF(2⁸)</b> più una trasformazione affine; i primi 4 bit del byte indicano la riga, gli altri 4 la colonna, selezionando il byte di output. <b>Scopo:</b> introdurre <b>confusione</b> (relazione complessa e non lineare tra chiave e cifrato), rendendo AES resistente alla crittanalisi <b>lineare e differenziale</b>. È l'operazione matematicamente più importante; ShiftRows e MixColumns danno invece la diffusione."},
+ {n:"4",t:"open",topic:"VPN / IPSEC",q:"A che cosa serve una VPN (Virtual Private Network)?",
+  sol:"Una <b>VPN</b> collega sedi/utenti fisicamente separati come se fossero un'unica LAN privata, su una rete pubblica (Internet). Etichetta il traffico geografico come «interno» e lo protegge con <b>cifratura e autenticazione</b> (riservatezza + integrità), mantenendo lo stesso livello di sicurezza di una rete locale, senza ritardi significativi e in modo trasparente per l'utente (in tunnel mode). Lo standard di riferimento è <b>IPSEC</b>."},
+ {n:"5",t:"open",topic:"Rete",q:"Utilizzando uno schema grafico, illustrare il funzionamento dell'attacco noto come \"ARP poisoning\".",
+  sol:"L'attaccante invia <b>risposte ARP falsificate</b> (i messaggi ARP non sono autenticati) che associano il <b>proprio MAC</b> all'IP del gateway e/o della vittima. La cache ARP della vittima viene «avvelenata»: il traffico destinato al gateway viene inviato al MAC dell'attaccante, che si pone come <b>man-in-the-middle</b> (legge/modifica e poi inoltra al destinatario reale per non farsi scoprire). Consente lo sniffing logico anche su LAN switchata.<img src='img/arp.svg' alt='Schema ARP poisoning'>"},
+]},
+];
+
+/* ============ BANCA DATI PER ESAMI GENERATI ============ */
+const MCBANK=[
+ {q:"Una funzione di hash H non resistente alle collisioni permette di affermare che:",
+  opts:["se H(x)=H(y), allora x=y","non esistono due input diversi x,y con H(x)=H(y)","esiste un algoritmo lineare per trovare x,y con H(x)=H(y)","esiste un algoritmo polinomiale per trovare x,y con H(x)=H(y)","esiste un algoritmo esponenziale per trovare x,y con H(x)=H(y)"],
+  c:3,why:"«Non resistente» = collisioni trovabili in tempo polinomiale."},
+ {q:"In RSA, se il modulo è n=pq e la chiave pubblica è e, la chiave privata:",
+  opts:["è l'inverso moltiplicativo di e, mod pq","è l'inverso moltiplicativo di e, mod (p-1)(q-1)","è l'inverso moltiplicativo di e, mod n-1","non può essere calcolata da e,p,q: è random","è generata casualmente, indipendente da e,p,q"],
+  c:1,why:"d = e⁻¹ mod φ(n), φ(n)=(p-1)(q-1) (Euclide esteso)."},
+ {q:"Quale asserzione è utile per la sicurezza di RSA?",
+  opts:["Esistono infiniti numeri primi","Esistono più di 100 numeri primi","Esistono più di 2^100 numeri primi","È difficile fattorizzare x, sapendo che è primo","È difficile fattorizzare x, senza vincoli sulla sua primalità"],
+  c:4,why:"RSA si regge sulla difficoltà di fattorizzare n=p·q generico."},
+ {q:"Avendo installato un firewall applicativo trasparente, full inspection:",
+  opts:["ogni utente deve configurare un proxy con l'indirizzo del firewall","non è possibile un'analisi stateful del traffico applicativo","è possibile l'analisi stateful solo installando un proxy","è possibile un'analisi stateful del traffico applicativo","il firewall non introduce ritardi né rischi di sicurezza"],
+  c:3,why:"Trasparente = nessun proxy lato client; full inspection = ispezione stateful applicativa."},
+ {q:"Un certificato di chiave pubblica serve per:",
+  opts:["evitare l'uso di una password troppo corta","evitare l'uso di una password troppo semplice","evitare l'attacco meet in the middle","evitare l'attacco man in the middle","trasmettere in modo segreto la chiave pubblica"],
+  c:3,why:"Lega (firma CA) la chiave pubblica all'identità, impedendo il MITM."},
+ {q:"L'attacco XSS (Cross Site Scripting):",
+  opts:["sfrutta l'autenticazione di sessione tramite link fraudolenti","usa link fraudolenti per intercettare una password","permette di eseguire codice malevolo in un database","si basa su input malevolo eseguito nel Browser","si basa su input malevolo eseguito dal Server"],
+  c:3,why:"Lo script XSS è eseguito nel browser della vittima (la prima descrive il CSRF)."},
+ {q:"Nel cifrario AES:",
+  opts:["si genera al massimo 1 chiave pubblica e 1 privata","si generano 2 chiavi pubbliche e 1 privata","si generano 2 pubbliche e 2 private","si deve generare una chiave segreta condivisa","si generano due chiavi segrete: una per cifrare, una per decifrare"],
+  c:3,why:"AES è simmetrico: una sola chiave segreta condivisa."},
+ {q:"In un Web Application Firewall (WAF):",
+  opts:["si filtra solo in base allo header IP","si filtra solo in base allo header TCP","si filtra solo in base allo header HTTP","è possibile rilevare tentativi di Cross Site Scripting","è possibile rilevare tentativi di Buffer Overflow"],
+  c:3,why:"Il WAF ispeziona l'HTTP e rileva attacchi web; non ferma il buffer overflow."},
+ {q:"Nel cifrario RSA:",
+  opts:["si genera al massimo una chiave condivisa","si generano 2 pubbliche per ogni privata","si generano 2 private per ogni pubblica","si deve generare una coppia: una pubblica e una privata","si generano due chiavi segrete: una per cifrare, una per decifrare"],
+  c:3,why:"RSA è asimmetrico: una coppia (pubblica, privata)."},
+ {q:"Nello standard ISO 27001, i vulnerability assessment / penetration test:",
+  opts:["non sono previsti","fanno parte della fase di Plan","fanno parte della fase di Do","fanno parte della fase di Check","fanno parte della fase di Act"],
+  c:3,why:"Sono riesami proattivi del sistema in esercizio → fase di Check del PDCA."},
+ {q:"La modalità Tunnel di IPSEC:",
+  opts:["cifra solo il payload lasciando in chiaro l'header IP originale","incapsula l'intero pacchetto IP in uno nuovo, gateway-to-gateway","richiede software IPSEC su ogni host finale","non fornisce riservatezza, solo autenticazione","è usata solo per traffico da postazione mobile"],
+  c:1,why:"Tunnel mode incapsula tutto il pacchetto IP originale tra due gateway/terminatori VPN (tipica delle VPN site-to-site)."},
+ {q:"Il protocollo AH di IPSEC:",
+  opts:["fornisce riservatezza cifrando il payload","fornisce autenticazione e integrità ma non riservatezza","fornisce solo riservatezza","è più usato di ESP","nasconde gli indirizzi IP di mittente e destinatario"],
+  c:1,why:"AH (Authentication Header) dà autenticazione + integrità senza cifratura; ESP aggiunge la riservatezza ed è più usato."},
+ {q:"In un cifrario a 2 fasi (doppia cifratura), l'attacco meet-in-the-middle:",
+  opts:["è impossibile, la chiave è di fatto raddoppiata","riduce la complessità a circa 2^(N+1) invece di 2^(2N)","funziona solo se le due chiavi sono uguali","richiede di fattorizzare il modulo","sfrutta il paradosso del compleanno"],
+  c:1,why:"Conoscendo coppie testo-chiaro/cifrato, si cifra con tutte le K1 e si decifra con tutte le K2 cercando un match: ~2^N+2^N tentativi, non 2^(2N)."},
+ {q:"Lo Smurf attack è un caso particolare di:",
+  opts:["SQL injection","ICMP echo request con IP sorgente spoofed verso un indirizzo broadcast","SYN flooding","ARP poisoning","buffer overflow"],
+  c:1,why:"Le ICMP echo request con IP sorgente = vittima sono inviate in broadcast: tutti i nodi rispondono alla vittima, amplificando il DoS."},
+ {q:"Una funzione di hash crittografica resistente alle collisioni è necessariamente:",
+  opts:["invertibile","fortemente non invertibile (quindi anche non invertibile)","lineare","priva di effetto valanga","più corta del digest di MD5"],
+  c:1,why:"Resistente alle collisioni ⇒ fortemente non invertibile ⇒ non invertibile (catena di implicazioni)."},
+];
+
+const OPENBANK=[
+ {topic:"Chiave pubblica",q:"Scrivere i messaggi scambiati e i valori calcolati in Diffie-Hellman tra U1 e U2.",
+  sol:"Parametri pubblici: primo <code>q</code>, radice primitiva <code>α</code>. U1: segreto <code>Sa</code>, invia <code>Pa=α^Sa mod q</code>; U2: segreto <code>Sb</code>, invia <code>Pb=α^Sb mod q</code>. Chiave comune <code>K=Pb^Sa=Pa^Sb=α^(Sa·Sb) mod q</code>. Sicurezza basata sul logaritmo discreto."},
+ {topic:"Chiave pubblica",q:"Come si generano le chiavi RSA?",
+  sol:"Scegli due primi grandi p,q (test di Miller-Rabin); <code>n=p·q</code>; <code>φ(n)=(p-1)(q-1)</code>; scegli e coprimo con φ(n); calcola <code>d=e⁻¹ mod φ(n)</code> con Euclide esteso. Pubblica <code>&lt;e,n&gt;</code>, privata <code>&lt;d,n&gt;</code>. Cifra <code>c=m^e mod n</code>, decifra <code>m=c^d mod n</code>."},
+ {topic:"Dimostrazioni",q:"Dimostrare la correttezza di RSA: perché (m^e)^d ≡ m (mod n)?",
+  sol:"Per costruzione <code>e·d ≡ 1 (mod φ(n))</code>, cioè <code>ed = 1 + kφ(n)</code>. Allora <code>m^(ed) = m·(m^φ(n))^k</code>. Se gcd(m,n)=1, per il teorema di Eulero <code>m^φ(n) ≡ 1</code> → <code>m^(ed) ≡ m (mod n)</code>. Se gcd(m,n)≠1 si dimostra separatamente mod p e mod q e si ricompone con il Teorema Cinese del Resto."},
+ {topic:"AES",q:"Descrivere la struttura di AES (round e operazioni), con schema grafico.",
+  sol:"Cifrario simmetrico a blocchi (128 bit; chiavi 128/192/256), rete a sostituzione-permutazione su matrice 4×4 byte. AddRoundKey iniziale, poi Nr−1 round con SubBytes (S-box) → ShiftRows → MixColumns → AddRoundKey; il round finale omette MixColumns. Chiavi di round dalla key expansion.<img src='img/aes.svg' alt='Schema AES'>"},
+ {topic:"AES",q:"Spiegare lo scopo e il funzionamento delle S-box nel cifrario AES.",
+  sol:"SubBytes: sostituzione non lineare byte-per-byte tramite una S-box 16×16 calcolata con l'inverso moltiplicativo in GF(2⁸) + trasformazione affine. Introduce <b>confusione</b> e resistenza alla crittanalisi lineare/differenziale. ShiftRows e MixColumns danno la diffusione."},
+ {topic:"Software security",q:"In un buffer overflow, a cosa servono il NOP sled (0x90) e lo spraying dell'indirizzo di ritorno?",
+  sol:"<b>NOP sled:</b> NOP prima dello shellcode; se l'indirizzo di ritorno atterra nello sled, l'esecuzione scivola fino allo shellcode (utile con indirizzo incerto). <b>Spraying:</b> molte copie dell'indirizzo di ritorno sullo stack, così la CPU ne preleva una qualunque e salta dove vuole l'attaccante. Spesso combinati."},
+ {topic:"Software security",q:"Discutere le difese di tipo ASLR per gli attacchi di memory corruption.",
+  sol:"ASLR randomizza a ogni esecuzione gli indirizzi di stack/heap/librerie: l'exploit non sa più a quale indirizzo far saltare l'EIP. <code>kernel.randomize_va_space</code> (0/1/2). Limite: su 32 bit lo spazio è piccolo, brute force possibile; si combina con NX e stack canary."},
+ {topic:"Software security",q:"Cos'è la protezione NX (No-eXecute) e come si aggira?",
+  sol:"NX/W^X marca stack e dati come <b>non eseguibili</b> (Data Space ≠ Program Space): la CPU rifiuta di eseguire lo shellcode iniettato. Si aggira col <b>code reuse</b>: return-to-libc (salto a funzioni libc come system(\"/bin/sh\")) o ROP (catene di gadget già presenti nel Program Space)."},
+ {topic:"Software security",q:"Cos'è la privilege escalation tramite bit setuid?",
+  sol:"Un eseguibile con bit <b>setuid</b> gira con i privilegi dell'owner (es. root), non dell'utente che lo lancia. Se contiene una funzione vulnerabile (gets/sprintf/strcpy) si può sfruttare un buffer overflow per ottenere una <b>shell di root</b>: privilege escalation da utente normale ad amministratore."},
+ {topic:"Integrità",q:"A che cosa serve un MAC e come può essere realizzato?",
+  sol:"Integrità + autenticità con chiave segreta condivisa (no non ripudio). Realizzazioni: MAC con DES-CBC (ultimo blocco cifrato) oppure HMAC <code>H(K1||H(K2||M))</code>. L'attacco del compleanno non funziona perché l'avversario non conosce K."},
+ {topic:"Integrità",q:"Perché non è più consigliabile usare MD5 nella firma elettronica?",
+  sol:"MD5 non è più resistente alle collisioni: si costruiscono M1≠M2 con stesso hash. La firma è sul digest, quindi una collisione permette di riusare la firma sul messaggio malevolo. Si usa SHA-256."},
+ {topic:"Integrità",q:"Come funziona la firma elettronica con RSA e SHA-256?",
+  sol:"Mittente: calcola <code>digest=H(M)</code> (SHA-256) e lo cifra con la propria chiave <b>privata</b> → firma allegata a M. Ricevente: ricalcola H(M), decifra la firma con la chiave <b>pubblica</b> del mittente e confronta i due digest. Dà integrità, autenticità e <b>non ripudio</b> (solo il mittente ha la privata)."},
+ {topic:"Integrità",q:"Cos'è il paradosso del compleanno e perché conta per le funzioni di hash?",
+  sol:"In un gruppo di 23 persone la probabilità che due abbiano lo stesso compleanno è &gt;½, perché il giorno non è fissato. Per le hash: trovare una collisione richiede solo ~2^(n/2) tentativi (non 2^n). Conseguenza: per 128 bit di sicurezza contro collisioni serve un digest di 256 bit."},
+ {topic:"Rete",q:"Fare un esempio concreto di attacco Denial of Service.",
+  sol:"SYN flooding: molti SYN TCP (IP spoofed) senza completare l'handshake; il server esaurisce le risorse per le connessioni semiaperte. Altri: Smurf attack (ICMP broadcast con IP vittima), relay SMTP. Spesso DDoS via botnet di zombie."},
+ {topic:"Rete",q:"Utilizzando uno schema grafico, illustrare l'attacco ARP poisoning.",
+  sol:"Risposte ARP falsificate (ARP non è autenticato) associano il MAC dell'attaccante all'IP del gateway/vittima: la cache ARP è avvelenata, il traffico passa dall'attaccante (man-in-the-middle) che poi inoltra al destinatario reale. Sniffing logico anche su switch.<img src='img/arp.svg' alt='Schema ARP poisoning'>"},
+ {topic:"Rete",q:"Perché lo sniffing è facile con un hub ma richiede un attacco attivo con uno switch?",
+  sol:"L'hub ripete ogni pacchetto a tutte le porte (broadcast fisico) → con scheda in modalità promiscua si vede tutto. Lo switch instrada il frame solo verso la porta del MAC destinatario; per sniffare serve dirottare il traffico (ARP poisoning)."},
+ {topic:"Introduzione",q:"Definire \"Cybersecurity\" e le differenze con ICT Security e Information Security.",
+  sol:"Information Security: informazione in qualsiasi forma (anche analogica). ICT Security: sistemi informatici/telecomunicazioni (digitale). Cybersecurity: sicurezza nel cyberspazio (sistemi connessi/Internet). Ambito decrescente: Information ⊇ ICT ⊇ Cyber."},
+ {topic:"Introduzione",q:"Definire la triade CIA nell'ambito della Cybersecurity.",
+  sol:"Confidentiality (riservatezza, solo gli autorizzati accedono), Integrity (integrità, niente modifiche non autorizzate), Availability (disponibilità, servizio accessibile con prestazioni garantite)."},
+ {topic:"Chiave pubblica",q:"Come è possibile generare numeri primi molto grandi (> 512 bit)?",
+  sol:"Numero casuale dispari + test di primalità probabilistico (Miller-Rabin); se fallisce si riprova. Primi densi (teorema dei numeri primi ≈ x/ln x). Test asimmetrico: «non primo» certo, «primo» con errore &lt;¼ reso trascurabile ripetendolo T volte. Lineare nei bit."},
+ {topic:"Firewall",q:"Spiegare che cos'è un firewall \"HA\" (high availability).",
+  sol:"Due firewall ridondanti: uno attivo, uno in stand-by che lo interroga con ping. Al guasto dell'attivo lo stand-by fa failover dirottando il traffico (riscrivendo le ARP). Elimina il singolo punto di guasto; non è bilanciamento di carico."},
+ {topic:"Firewall",q:"Descrivere le topologie firewall screened subnet / DMZ.",
+  sol:"La DMZ è una sottorete isolata tra rete interna e rete esterna, che ospita i servizi pubblici (web, mail, FTP) accessibili dall'esterno con regole meno restrittive, mentre la rete interna resta protetta dalle regole classiche. Versioni single-homed (1 scheda) o dual-homed (2 schede); con più interfacce si aggiunge l'extranet."},
+ {topic:"Firewall",q:"Perché un packet filter stateless ha problemi con FTP, e come si risolve?",
+  sol:"FTP separa controllo (porta 21, aperto dal client) e dati (porta 20, aperto dal server verso una porta effimera del client). Il packet filter stateless non ricorda la porta effimera e, con la regola ACK per le connessioni entranti, scarta la connessione dati. Soluzione: firewall <b>stateful/application-aware</b> (con memoria) o FTP modificato."},
+ {topic:"VPN / IPSEC",q:"Differenza tra modalità Transport e Tunnel di IPSEC.",
+  sol:"Transport: cifra/autentica solo il payload, header IP in chiaro, host-to-host, richiede IPSEC su ogni host (non trasparente), usato da postazioni mobili. Tunnel: incapsula l'intero pacchetto IP in uno nuovo, gateway-to-gateway, trasparente per l'utente, tipico delle VPN site-to-site."},
+ {topic:"VPN / IPSEC",q:"Differenza tra i protocolli AH ed ESP di IPSEC e a cosa serve l'anti-replay.",
+  sol:"AH: autenticazione + integrità (header IP incluso nel MAC) senza riservatezza. ESP: autenticazione + integrità + riservatezza (cifra il payload, non l'header IP), il più usato. <b>Anti-replay:</b> il campo Sequence Number (crescente) con una <b>sliding window</b> permette di scartare i pacchetti duplicati/ritrasmessi (replay attack)."},
+ {topic:"ISO 27001",q:"Descrivere le attività della fase di \"plan\" del ciclo PDCA in ISO 27001.",
+  sol:"Plan in 6 sottofasi: definire il perimetro; scrivere la Politica dell'ISMS; analizzare e valutare il rischio; trattare il rischio (ridurre/accettare/trasferire); ottenere approvazione dalla direzione; redigere lo Statement of Applicability."},
+ {topic:"ISO 27001",q:"Cos'è il rischio informatico e come se ne calcola la gravità?",
+  sol:"È il possibile verificarsi (con una probabilità) di eventi rilevanti per un perimetro ICT, con impatto negativo sul business. Gravità = F(probabilità dell'evento, impatto); spesso <code>Probabilità × Peso(impatto)</code>. Probabilità qualitativa (alta/media/bassa), impatto solitamente economico."},
+ {topic:"Web security",q:"Fare un esempio di codice back-end vulnerabile a XSS.",
+  sol:"<code>&lt;?php echo \"Ciao \" . $_GET['nome']; ?&gt;</code> stampa l'input senza filtro. Con <code>nome=&lt;script&gt;...&lt;/script&gt;</code> lo script è eseguito nel browser della vittima (furto cookie). Difesa: escaping (<code>htmlspecialchars()</code>), validazione."},
+ {topic:"Crittanalisi",q:"Cosa afferma il principio di Kerckhoffs e perché i cifrari aperti sono preferiti?",
+  sol:"Kerckhoffs: metodi e algoritmi segreti prima o poi vengono scoperti, quindi il segreto deve stare solo nelle <b>chiavi</b>. I cifrari aperti beneficiano dello studio dell'intera comunità scientifica; si evita la «security through obscurity». DES e AES sono pubblici."},
+ {topic:"Crittanalisi",q:"Cosa sono confusione e diffusione (Shannon)?",
+  sol:"<b>Confusione:</b> rendere la relazione tra chiave e testo cifrato il più complessa possibile (si ottiene con la sostituzione / S-box). <b>Diffusione:</b> spargere le correlazioni statistiche del testo su tutto il cifrato, così che un bit d'ingresso influenzi ~metà dei bit d'uscita (permutazioni/combinazioni lineari)."},
+];
+
+/* ============ MOTORE ============ */
+let mode="real";        // "real" | "gen"
+let current=null;       // exam attualmente mostrato
+
+function buildRealSelect(){
+  $("realSel").innerHTML=REAL.map((e,i)=>`<option value="${i}">${e.date}</option>`).join("");
+}
+
+function shuffle(a){a=a.slice();for(let j=a.length-1;j>0;j--){const r=Math.floor(Math.random()*(j+1));[a[j],a[r]]=[a[r],a[j]];}return a;}
+
+const GMESI=["gennaio","febbraio","giugno","luglio","settembre","dicembre"];
+function genDate(){
+  const g=1+Math.floor(Math.random()*28), m=GMESI[Math.floor(Math.random()*GMESI.length)], a=2026+Math.floor(Math.random()*2);
+  return `${g} ${m} ${a}`;
+}
+function genExam(){
+  const mc=shuffle(MCBANK).slice(0,2);
+  const op=shuffle(OPENBANK).slice(0,3);
+  // struttura realistica: aperta, multipla, multipla, aperta, aperta
+  const items=[op[0],mc[0],mc[1],op[1],op[2]];
+  return {date:"Appello generato — "+genDate(), gen:true,
+    q:items.map((it,i)=>Object.assign({n:String(i+1)},it))};
+}
+
+function renderExam(exam){
+  current=exam;
+  $("examTitle").textContent=exam.gen?exam.date:("Esame di Sicurezza — "+exam.date);
+  $("examTag").textContent=exam.gen?"generato":"appello reale";
+  const wrap=$("exam"); wrap.innerHTML="";
+  exam.q.forEach((it,idx)=>{
+    const sec=document.createElement("section");
+    if(it.t==="mc"){
+      sec.innerHTML=`<h3>${it.n}. Scelta multipla <span class="pts">· autocorretta</span></h3><p>${it.q}</p><div class="opts"></div><div class="res"></div>`;
+      const box=sec.querySelector(".opts");
+      it.opts.forEach((o,i)=>{
+        const d=document.createElement("label"); d.className="opt"; d.dataset.i=i;
+        d.innerHTML='<input type="radio" name="mc'+idx+'"> <span>'+o+'</span>';
+        d.onclick=()=>{it._sel=i;[...box.children].forEach(c=>c.classList.remove("sel"));d.classList.add("sel");d.querySelector("input").checked=true;};
+        box.appendChild(d);
+      });
+    } else {
+      const tag=it.topic?` <span class="pts">· ${it.topic}</span>`:"";
+      sec.innerHTML=`<h3>${it.n}. Domanda aperta${tag}</h3><p>${it.q}</p>`+
+        `<textarea placeholder="Scrivi qui..."></textarea>`+
+        `<details><summary>Mostra soluzione modello</summary><div class="sol">${it.sol}</div></details>`;
+    }
+    wrap.appendChild(sec);
+  });
+  resetScore();
+}
+function resetScore(){ $("scorebar").innerHTML='<span class="muted">Compila le domande a scelta multipla e premi «Correggi multiple».</span>'; }
+
+function correctMC(){
+  if(!current) return;
+  const secs=$("exam").querySelectorAll("section");
+  let tot=0, ok=0;
+  current.q.forEach((it,idx)=>{
+    if(it.t!=="mc") return;
+    tot++;
+    const sec=secs[idx], box=sec.querySelector(".opts"), res=sec.querySelector(".res");
+    [...box.children].forEach(c=>{c.classList.remove("ok","no");
+      const i=+c.dataset.i; if(i===it.c)c.classList.add("ok"); else if(i===it._sel)c.classList.add("no");});
+    res.className="res show";
+    if(it._sel==null) res.innerHTML="<span class='ko'>Nessuna risposta.</span> Corretta: <b>"+it.opts[it.c]+"</b>. "+it.why;
+    else if(it._sel===it.c){res.innerHTML="<span class='ok'>✔ Corretto!</span> "+it.why; ok++;}
+    else res.innerHTML="<span class='ko'>✗ Sbagliato.</span> Corretta: <b>"+it.opts[it.c]+"</b>. "+it.why;
+  });
+  $("scorebar").innerHTML='<span class="big '+(ok===tot?"ok":"ko")+'">'+ok+' / '+tot+'</span>'+
+    '<span class="muted">scelte multiple · valuta le aperte con le soluzioni modello</span>';
+}
+
+/* timer */
+let total=45*60,left=total,tick=null;
+function fmt(s){const m=Math.floor(s/60),x=s%60;return (m<10?"0":"")+m+":"+(x<10?"0":"")+x;}
+function render(){const t=$("timer");t.textContent=fmt(left);
+  t.classList.toggle("low",left<=300&&left>0);t.classList.toggle("zero",left===0);}
+function start(){
+  if(tick){clearInterval(tick);tick=null;$("start").textContent="▶ Riprendi";return;}
+  $("start").textContent="⏸ Pausa";
+  tick=setInterval(()=>{if(left>0){left--;render();}if(left===0){clearInterval(tick);tick=null;$("start").textContent="▶ Avvia";render();
+    $("scorebar").innerHTML='<span class="big ko">⏰ Tempo scaduto!</span>';}},1000);
+}
+function resetTimer(){if(tick){clearInterval(tick);tick=null;}left=total;$("start").textContent="▶ Avvia";render();}
+
+function setMode(m){
+  mode=m;
+  $("mReal").classList.toggle("on",m==="real");
+  $("mGen").classList.toggle("on",m==="gen");
+  $("realSel").style.display=m==="real"?"":"none";
+  $("genBtn").style.display=m==="gen"?"":"none";
+  if(m==="real") renderExam(REAL[+$("realSel").value||0]);
+  else renderExam(genExam());
+}
+
+$("start").onclick=start;
+$("reset").onclick=resetTimer;
+$("correct").onclick=correctMC;
+$("mReal").onclick=()=>setMode("real");
+$("mGen").onclick=()=>setMode("gen");
+$("realSel").onchange=()=>renderExam(REAL[+$("realSel").value]);
+$("genBtn").onclick=()=>{renderExam(genExam());};
+
+buildRealSelect();
+setMode("real");
+render();
+</script>
+</body>
+</html>
