@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulazione random — Esami SISINT</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .timer-bar { position:sticky; top:65px; z-index:50; background:var(--c-card); border-bottom:1px solid var(--c-border);
+    padding:.75rem 1rem; display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; justify-content:space-between;
+    box-shadow:var(--shadow-sm); }
+  .timer { font-variant-numeric:tabular-nums; font-size:1.6rem; font-weight:700; letter-spacing:1px;
+    padding:.2rem .9rem; border:1px solid var(--c-border); border-radius:var(--radius-sm); background:var(--c-bg); color:var(--c-text); }
+  .timer.low { color:var(--c-warn); border-color:var(--c-warn); }
+  .timer.zero { color:#fff; background:var(--c-wrong); border-color:var(--c-wrong); }
+  .controls { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+  .controls button { padding:.45rem .9rem; font-size:.9rem; border-radius:var(--radius-sm); cursor:pointer;
+    border:1px solid var(--c-border); background:var(--c-card); color:var(--c-text); transition:all .2s; }
+  .controls button:hover { border-color:var(--c-primary); }
+  .controls button.primary { background:var(--c-primary); color:#fff; border-color:var(--c-primary); }
+  .controls button.primary:hover { background:var(--c-primary-hover); }
+  .ex-section { background:var(--c-card); border:1px solid var(--c-border); border-radius:var(--radius);
+    padding:1.5rem 1.75rem; margin-bottom:1.25rem; box-shadow:var(--shadow-sm); }
+  .ex-section h3 { margin:0 0 .25rem; font-size:1.05rem; color:var(--c-text); }
+  .ex-section .pts { color:var(--c-muted); font-size:.85rem; font-weight:600; }
+  .ex-q { margin:.75rem 0 1rem; font-size:1rem; line-height:1.5; }
+  .ex-q b { color:var(--c-text); }
+  .mc-opts { display:flex; flex-direction:column; gap:.5rem; margin-top:.5rem; }
+  .mc-opt { display:flex; gap:.6rem; padding:.7rem .9rem; border:1px solid var(--c-border);
+    border-radius:var(--radius-sm); cursor:pointer; align-items:flex-start; background:var(--c-bg); transition:all .15s; }
+  .mc-opt:hover { border-color:var(--c-primary); }
+  .mc-opt.sel { border-color:var(--c-primary); background:var(--c-opt-selected-bg); border-width:2px; padding:calc(.7rem - 1px) calc(.9rem - 1px); }
+  .mc-opt.ok { background:var(--c-correct-bg); border-color:var(--c-correct); border-width:2px; padding:calc(.7rem - 1px) calc(.9rem - 1px); }
+  .mc-opt.no { background:var(--c-wrong-bg); border-color:var(--c-wrong); border-width:2px; padding:calc(.7rem - 1px) calc(.9rem - 1px); }
+  .res { margin-top:.75rem; padding:.75rem 1rem; border-radius:var(--radius-sm); font-size:.9rem; display:none; }
+  .res.show { display:block; }
+  .res.ok { background:var(--c-correct-bg); color:var(--c-correct); border:1px solid var(--c-correct); }
+  .res.ko { background:var(--c-wrong-bg); color:var(--c-wrong); border:1px solid var(--c-wrong); }
+  .match-table { width:100%; border-collapse:separate; border-spacing:0 .4rem; margin-top:.5rem; }
+  .match-table td { padding:.5rem .75rem; vertical-align:middle; }
+  .match-table tr { background:var(--c-bg); }
+  .match-table tr.ok { background:var(--c-correct-bg); }
+  .match-table tr.no { background:var(--c-wrong-bg); }
+  .match-table td:first-child { border-radius:var(--radius-sm) 0 0 var(--radius-sm); border:1px solid var(--c-border); border-right:none; }
+  .match-table td:last-child  { border-radius:0 var(--radius-sm) var(--radius-sm) 0; border:1px solid var(--c-border); border-left:none; }
+  .match-table tr.ok td { border-color:var(--c-correct); }
+  .match-table tr.no td { border-color:var(--c-wrong); }
+  .match-table select { width:100%; min-width:120px; }
+  .labels-bar { background:var(--c-primary-light); border-left:4px solid var(--c-primary);
+    padding:.75rem 1rem; border-radius:0 var(--radius-sm) var(--radius-sm) 0; margin-bottom:.75rem; font-size:.85rem; color:var(--c-text); }
+  [data-theme="dark"] .labels-bar { background:rgba(59,130,246,0.1); }
+  .labels-bar code { background:var(--c-card); border:1px solid var(--c-border); padding:.05rem .4rem;
+    border-radius:4px; font-weight:700; color:var(--c-primary); margin-right:.3rem; }
+  .scorebox { position:sticky; bottom:0; background:var(--c-card); border-top:1px solid var(--c-border);
+    padding:1rem 1.25rem; text-align:center; font-weight:600; box-shadow:0 -4px 12px rgba(0,0,0,.05); }
+  .scorebox .big { font-size:1.6rem; margin-right:.5rem; }
+  .scorebox .ok { color:var(--c-correct); } .scorebox .ko { color:var(--c-wrong); } .scorebox .neutral { color:var(--c-text); }
+  .formula-block { font-family:ui-monospace,SF Mono,Consolas,monospace; background:var(--c-bg);
+    padding:.75rem 1rem; border-radius:var(--radius-sm); border:1px solid var(--c-border); margin:.5rem 0 1rem; font-size:.95rem; }
+  .formula-block div { margin:.2rem 0; }
+  .reroll-btn { float:right; padding:.3rem .75rem; font-size:.8rem; border-radius:var(--radius-sm); background:var(--c-bg);
+    border:1px solid var(--c-border); cursor:pointer; color:var(--c-muted); }
+  .reroll-btn:hover { border-color:var(--c-primary); color:var(--c-primary); }
+</style>
+</head>
+<body>
+  <header>
+    <div style="flex:1">
+      <a href="esami.html" class="back-btn" style="margin:0;font-size:.85rem;">&larr; Esami</a>
+    </div>
+    <div style="flex:2; text-align:center;">
+      <h1 style="margin:0;font-size:1.3rem;letter-spacing:-0.5px;">Simulazione random</h1>
+      <p style="margin:0.2rem 0 0;font-size:0.8rem;opacity:0.7">max 23 pt · 18 min · pool reale</p>
+    </div>
+    <div style="flex:1; text-align:right;">
+      <button id="theme-btn" class="theme-toggle">
+        <span class="icon">🌙</span> Dark
+      </button>
+    </div>
+  </header>
+
+  <div class="timer-bar">
+    <span class="timer" id="timer">18:00</span>
+    <div class="controls">
+      <button id="start">▶ Avvia</button>
+      <button id="reset">↺ Reset</button>
+      <button id="newexam">🎲 Nuovo</button>
+      <button id="correct" class="primary">✔ Correggi</button>
+    </div>
+  </div>
+
+  <main style="max-width:820px;">
+    <p style="color:var(--c-muted);font-size:.9rem;margin-bottom:1rem;">
+      5 MCQ + 1 esercizio associazione + 1 esercizio di inferenza pescati a caso dal bank di domande reali (file <i>SoluzioniEsamiVecchi</i>).
+      Premi <b>🎲 Nuovo</b> per ripescare.
+    </p>
+
+    <h2 style="font-size:1.3rem;margin:1.5rem 0 .75rem;">Parte 1 — competenze mnemoniche <span style="font-size:.85rem;color:var(--c-muted);font-weight:500;">(max 15 pt)</span></h2>
+    <div id="parte1"></div>
+
+    <h2 style="font-size:1.3rem;margin:2rem 0 .75rem;">Parte 2 — competenze associative, calcolo, inferenza <span style="font-size:.85rem;color:var(--c-muted);font-weight:500;">(max 8 pt)</span></h2>
+    <div id="parte2"></div>
+  </main>
+
+  <div class="scorebox" id="scorebox">
+    <span class="neutral">Compila e premi «Correggi» per il punteggio.</span>
+  </div>
+
+  <footer>
+    <p>chris1sflaggin — Pool generato da <i>SoluzioniEsamiVecchi.pdf</i> · domande reali SISINT.</p>
+  </footer>
+
+<script>
+// ===== Theme =====
+const tbtn = document.getElementById('theme-btn'); const root = document.documentElement;
+if (localStorage.getItem('sisint-theme') === 'dark') { root.setAttribute('data-theme','dark'); tbtn.querySelector('.icon').textContent='☀️'; tbtn.lastChild.textContent=' Light'; }
+tbtn.onclick = () => {
+  const dark = root.getAttribute('data-theme') === 'dark';
+  if (dark) { root.removeAttribute('data-theme'); tbtn.querySelector('.icon').textContent='🌙'; tbtn.lastChild.textContent=' Dark'; localStorage.setItem('sisint-theme','light'); }
+  else { root.setAttribute('data-theme','dark'); tbtn.querySelector('.icon').textContent='☀️'; tbtn.lastChild.textContent=' Light'; localStorage.setItem('sisint-theme','dark'); }
+};
+
+// ===== MCQ Bank (from SoluzioniEsamiVecchi.pdf) =====
+const MCQ_BANK = [
+  {topic:"Ricerca", q:"Considerando un problema di ricerca di soluzione in uno spazio degli stati, che cosa differenzia un algoritmo informato da uno non informato?",
+   opts:["L'utilizzo di una funzione costo","L'utilizzo di un modello","L'utilizzo di una funzione euristica"], c:2,
+   why:"Informato = usa <b>conoscenza specifica</b> del problema (euristica). Non informato (blind) = solo descrizione."},
+  {topic:"CSP", q:"Quale fra i seguenti algoritmi è il più efficiente in termini di tempo per risolvere CSP?",
+   opts:["Ricerca con backtracking che sfrutta la commutatività","Back-jumping","Backward chaining","test and set"], c:1,
+   why:"Back-jumping salta direttamente al nodo responsabile del conflitto, evitando backtrack inutili."},
+  {topic:"CSP", q:"Quale fra i seguenti algoritmi è il meno efficiente in termini di tempo per risolvere CSP?",
+   opts:["Ricerca con backtracking che sfrutta la commutatività","Backjumping","Generate and test"], c:2,
+   why:"Generate-and-test genera assegnamenti completi e poi verifica → esplora tutto lo spazio cartesiano dei valori."},
+  {topic:"CSP", q:"Quale delle seguenti è la definizione di soluzione in un CSP?",
+   opts:["Un assegnamento di costo minimo che porta dal nodo iniziale a un nodo target","Un assegnamento di un valore variabile definita nel problema","Un assegnamento completo che rispetta i vincoli"], c:2,
+   why:"CSP: assegna un valore a <b>tutte</b> le variabili (completo) tale che ogni vincolo sia soddisfatto."},
+  {topic:"CSP", q:"Cos'è la soluzione di un CSP (problema soddisfacimento vincoli)?",
+   opts:["Un assegnamento consistente","Una sequenza di passi che permette di raggiungere il goal minimizzando il costo","Un assegnamento di tutte le variabili che soddisfa i vincoli"], c:2,
+   why:"Stessa definizione: completo + consistente. «Consistente» da solo basta solo per assegnamenti parziali."},
+  {topic:"Turing", q:"Il test di Turing dice che un computer è intelligente se:",
+   opts:["Comprende le domande che gli vengono poste","Imita il comportamento umano nel rispondere alle domande","Risponde correttamente alle domande che gli vengono poste","È in grado di manifestare emozioni"], c:1,
+   why:"Imitation game: un giudice non distingue le risposte della macchina da quelle di un umano."},
+  {topic:"Confusion Matrix", q:"Considerando una matrice di confusione, quale delle seguenti distribuzioni dei valori al suo interno denota una prestazione ottimale?",
+   opts:["Distribuzione uniforme su tutte le celle","Ogni cella contiene il numero di istanze diviso l'entropia della classe","Diagonale principale somma al numero totale, 0 nelle altre celle"], c:2,
+   why:"Diagonale piena = tutte le predizioni corrispondono alle classi vere → accuratezza 100%."},
+  {topic:"Confusion Matrix", q:"In quale parte di una matrice di confusione vorremmo veder concentrati i valori?",
+   opts:["Prima colonna","Diagonale principale","Distribuzione uniforme su ciascuna riga"], c:1,
+   why:"Diagonale = predetto coincide con vero."},
+  {topic:"Confusion Matrix", q:"Quale tipo di errore non può essere calcolato tramite una matrice di confusione?",
+   opts:["Numero dei falsi positivi","Overfitting","Error rate"], c:1,
+   why:"L'overfitting riguarda la <b>generalizzazione</b> (gap train/test), non è una metrica derivabile da TP/FP/TN/FN su un singolo set."},
+  {topic:"Confusion Matrix", q:"Quale delle seguenti misure non può essere calcolata tramite una matrice di confusione?",
+   opts:["Accuratezza","Entropia","Error rate"], c:1,
+   why:"L'entropia richiede distribuzioni di probabilità, non bastano i conteggi della matrice."},
+  {topic:"Confusion Matrix", q:"Quale delle seguenti misure viene calcolata tramite una matrice di confusione?",
+   opts:["Information gain","Accuratezza","Error rate"], c:1,
+   why:"Accuratezza = (TP+TN)/totale. IG richiede entropie su distribuzioni."},
+  {topic:"Euristiche", q:"Date due euristiche ammissibili h1 e h2, quando h1 è dominante su h2?",
+   opts:["Per ogni nodo n, h1(n) ≥ h2(n)","Per almeno un nodo n, h1(n) ≥ h2(n)","Per almeno un nodo n, h1(n) ≤ h2(n)"], c:0,
+   why:"Dominanza richiede h1 ≥ h2 <b>ovunque</b> (rimanendo ammissibile). A* con h dominante espande meno nodi."},
+  {topic:"Euristiche", q:"Cosa significa che un'euristica è ammissibile?",
+   opts:["Approssima h*(n) in maniera ottimale","È sempre minore o uguale a h*(n)","Fa stime conservative"], c:1,
+   why:"Ammissibile = non sovrastima mai il costo reale h*(n). Garantisce ottimalità di A* su alberi."},
+  {topic:"Euristiche", q:"Quale delle seguenti euristiche non guida l'algoritmo di ricerca a identificare una soluzione?",
+   opts:["A distanza in linea d'aria","Funzione costante zero","Distanza di Manhattan"], c:1,
+   why:"h(n) = 0 trasforma A* in ricerca a costo uniforme: nessuna guida verso il goal."},
+  {topic:"FOL", q:"Indicare la definizione di unificatore di due formule in logica del prim'ordine:",
+   opts:["Associazione fra concetti affini di due KB","Sostituzione delle variabili che rende identiche le due formule","Regola di inferenza che, date due clausole, restituisce il loro risolvente"], c:1,
+   why:"Unificatore = sostituzione θ tale che A·θ = B·θ. È pre-requisito della risoluzione FOL."},
+  {topic:"Frame", q:"Cosa si intende per frame problem?",
+   opts:["Solo alcuni concetti di un'ontologia hanno corrispondenti in un'altra","L'impossibilità di sapere quali proprietà di una situazione si preservano dopo l'azione","L'imposizione di un orizzonte alla ricerca"], c:1,
+   why:"Il frame problem: come specificare in modo efficiente cosa NON cambia dopo un'azione."},
+  {topic:"Frame", q:"Il frame è:",
+   opts:["Un dominio applicativo del back-jumping","Il problema di non riuscire a inferire i fluenti che non cambiano dopo un'azione","Un errore di generalizzazione nel ragionamento per induzione"], c:1,
+   why:"Stesso frame problem espresso in altra forma: gestire i fluenti persistenti."},
+  {topic:"Frame", q:"Per frame si intende:",
+   opts:["Un problema che ha posto in luce i limiti dei perceptron","L'incapacità di sapere quali proprietà si preservano dopo l'applicazione di un'azione","L'imposizione di un orizzonte alla ricerca"], c:1,
+   why:"Variante: definizione standard del frame problem nel situation calculus."},
+  {topic:"K-NN", q:"Sulla base di cosa l'algoritmo K Nearest Neighbour restituisce la classe di un'istanza?",
+   opts:["Combinazione lineare dei pesi delle connessioni","Soddisfacimento dell'antecedente di una regola","Somiglianza dell'istanza a k istanze memorizzate"], c:2,
+   why:"K-NN: voto di maggioranza tra i k vicini più simili (lazy learning, niente modello esplicito)."},
+  {topic:"Minimax", q:"I valori dei nodi interni di un albero minimax con alpha-beta pruning vengono calcolati:",
+   opts:["Risalendo verso la radice","Quando viene creato il nodo, con la funzione utilità","Discendendo verso le foglie"], c:0,
+   why:"Backup bottom-up: utilità ai foglia, poi min/max risalendo. Alpha-beta pota rami inutili."},
+  {topic:"Minimax", q:"In minimax con alpha-beta pruning per quale tipo di nodi l'algoritmo calcola l'utilità?",
+   opts:["Per i nodi foglia","Per i nodi interni dell'albero","Per la radice dell'albero"], c:0,
+   why:"L'utilità è definita sugli stati terminali (foglie). I nodi interni ricevono min/max delle utilità."},
+  {topic:"Minimax", q:"In minimax con alpha-beta pruning l'utilità viene calcolata:",
+   opts:["Per la radice","Per le foglie","Per i nodi interni"], c:1,
+   why:"Stesso concetto: l'utilità è una proprietà degli stati terminali."},
+  {topic:"Minimax", q:"L'algoritmo minimax:",
+   opts:["Costruisce un percorso che porta Max a vincere","Sceglie la prossima mossa che Max dovrebbe eseguire","Costruisce un percorso che porta Min a perdere"], c:1,
+   why:"Minimax sceglie la mossa migliore <b>al turno corrente</b> assumendo gioco perfetto dell'avversario."},
+  {topic:"Minimax", q:"I valori dei nodi di un albero costituito dall'algoritmo minimax vengono calcolati:",
+   opts:["Non si calcolano, sono dati della funzione di valutazione","Risalendo dalle foglie verso la radice","Discendendo dalla radice verso le foglie"], c:1,
+   why:"Backup bottom-up dall'utilità delle foglie."},
+  {topic:"Decision Tree", q:"Nella costruzione di alberi di decisione con pre-pruning, quale criterio decide che un nodo sarà una foglia?",
+   opts:["Il numero di istanze propagate al nodo è minore di una soglia","La funzione di valutazione restituisce un valore maggiore di una soglia","L'entropia restituisce 1"], c:0,
+   why:"Pre-pruning ferma la crescita quando i dati al nodo sono troppo pochi (rischio overfit). Entropia=1 indica max disordine, non purezza."},
+  {topic:"Decision Tree", q:"Quale criterio può essere usato come terminazione nella costruzione di alberi di decisione?",
+   opts:["La funzione di valutazione > soglia","Il nodo presenta overfitting","Il numero di istanze associate al nodo è minore di una soglia"], c:2,
+   why:"Stesso principio di pre-pruning: stop se pochi esempi."},
+  {topic:"Ricerca", q:"Quale fra i seguenti algoritmi è il più efficiente in termini di spazio?",
+   opts:["Ricerca a costo minore","Ricerca a costo uniforme","Ricerca in ampiezza","Ricerca in profondità"], c:3,
+   why:"DFS occupa O(bd) (solo un cammino). BFS e uniform-cost occupano O(b^d)."},
+  {topic:"Ricerca", q:"Un algoritmo di ricerca di una soluzione in uno spazio è ottimo quando:",
+   opts:["Restituisce sempre una soluzione che minimizza h","Restituisce sempre una soluzione nel minor numero di passi","Restituisce sempre una soluzione a costo minimo"], c:2,
+   why:"Ottimalità = costo minimo (non num. passi, salvo costi uniformi)."},
+  {topic:"Decision Tree", q:"Cosa misura l'information gain?",
+   opts:["Il grado di purezza di un insieme di dati","La riduzione di overfitting comportata dal pruning","La riduzione di entropia prodotta da uno split"], c:2,
+   why:"IG(S,A) = H(S) − Σ |Sv|/|S| · H(Sv): riduzione di entropia dopo lo split su attributo A."},
+  {topic:"Decision Tree", q:"Cosa misura l'entropia?",
+   opts:["Il grado di disordine (impurità) di un learning set","La stima del costo per raggiungere un nodo target","Il grado di somiglianza di due ontologie"], c:0,
+   why:"Entropia = H(S) = −Σ p·log₂(p): impurità del set. Più disordine = più entropia."},
+  {topic:"Situation Calculus", q:"Quale dei seguenti elementi non fa parte della definizione di un'azione nel situation calculus?",
+   opts:["Proprietà che devono valere per applicare l'azione (precondizioni)","Proprietà atemporali","Proprietà che l'applicazione dell'azione modifica (effetti)"], c:1,
+   why:"Un'azione è definita da <b>precondizioni</b> + <b>effetti</b> (che modificano i fluenti). Le proprietà atemporali (sempre vere) non fanno parte della definizione di azione."},
+  {topic:"Logica", q:"Quale dei seguenti potrebbe essere un modello nella logica proposizionale?",
+   opts:["X vale true, Y vale False","X vale Giovanni, Y vale Riccardo","X vale 4, Y vale 2"], c:0,
+   why:"Logica proposizionale: variabili sono booleane → solo {true, false}."},
+  {topic:"Apprendimento regole", q:"Quale dei seguenti meccanismi non serve per indurre regole di classificazione?",
+   opts:["K nearest neighbour","Specific to general","General to specific"], c:0,
+   why:"K-NN non produce regole esplicite (lazy learning). Specific/general-to-specific sono strategie di rule induction."},
+  {topic:"Refutazione", q:"Quale regola di inferenza permette di implementare la dimostrazione per refutazione?",
+   opts:["Eliminazione del doppio negato","Risoluzione","Modus ponens"], c:1,
+   why:"Refutazione: si nega la tesi, si converte in CNF, si applica risoluzione fino alla clausola vuota."},
+  {topic:"Ontologie", q:"In quale contesto abbiamo parlato di relazione 'is-a'?",
+   opts:["Logica del prim'ordine","Ontologie","Situation calculus"], c:1,
+   why:"is-a = relazione di sottoclasse, fondamentale nelle gerarchie ontologiche/tassonomiche."},
+  {topic:"Perceptron", q:"Quale dei seguenti problemi è stato rilevante nello studio del perceptron?",
+   opts:["Problema dell'or esclusivo (XOR)","Colorazione della mappa dell'Australia","Anomalia di Sussman"], c:0,
+   why:"XOR non è linearmente separabile: limite storico del perceptron a singolo strato (Minsky-Papert)."},
+  {topic:"Ontologie", q:"Considerando RDF (Resource Description Framework) quale affermazione è vera?",
+   opts:["La conoscenza è costituita da triple ⟨soggetto, predicato, oggetto⟩","La conoscenza è costituita da relazioni IS-A e Member","La conoscenza è costituita da clausole di Horn"], c:0,
+   why:"RDF rappresenta tutto come triple SPO. Il web semantico si basa su questo modello."},
+  {topic:"CSP", q:"Il back-jumping è:",
+   opts:["Un algoritmo di ricerca informato","Un algoritmo per la soluzione di problemi con vincoli","Un'euristica ottimale"], c:1,
+   why:"Back-jumping è una variante intelligente del backtracking per CSP."},
+  {topic:"Decision Tree", q:"In quale contesto abbiamo parlato di post-pruning?",
+   opts:["Soddisfacimento dei vincoli","Apprendimento automatico","Problemi con avversario"], c:1,
+   why:"Post-pruning si applica agli alberi di decisione (apprendimento) per ridurre overfitting."},
+  {topic:"Ontologie", q:"Quale affermazione è corretta quando si parla di tassonomia?",
+   opts:["L'insieme di tutte le categorie è una partizione","Le sottocategorie di una categoria costituiscono una partizione","Le sottocategorie di ciascuna categoria costituiscono una partizione"], c:2,
+   why:"Una tassonomia richiede che <b>per ogni</b> categoria le sue sottocategorie siano disgiunte ed esaustive."}
+];
+
+// ===== Matching Bank (Parte 2 ex1) =====
+const MATCH_BANK = [
+  {
+    title:"Meccanismi logici → tipo di ragionamento",
+    labels:["A","B","C","D","E"],
+    legend:["conseguenza logica","forward chaining FOL","traduzione di una KB FOL in Logica proposizionale","forward chaining CSP","ragionamento per refutazione in FOL"],
+    items:[
+      ["model checking", 0],
+      ["modus ponens generalizzato", 1],
+      ["proposizionalizzazione", 2],
+      ["modus ponens", 3],
+      ["binary resolution / risoluzione", 4]
+    ]
+  },
+  {
+    title:"Algoritmi → compito (set 1)",
+    labels:["A","B","C","D"],
+    legend:["ricerca di una soluzione per un CSP","apprendimento regole","inferenza da una KB in clausole di Horn","ricerca di una soluzione in uno spazio degli stati"],
+    items:[
+      ["forward checking", 0],
+      ["general-to-specific", 1],
+      ["forward chaining", 2],
+      ["ricerca bidirezionale", 3]
+    ]
+  },
+  {
+    title:"Algoritmi → compito (set 2)",
+    labels:["A","B","C","D","E","F"],
+    legend:["costruzione di alberi di decisione","classificazione senza un modello","risoluzione in CSP","ricerca in uno spazio degli stati","apprendimento di regole","riduzione spazio di ricerca in gioco con avversario","suggerimento prossima mossa in problema con avversario"],
+    items:[
+      ["algoritmo di Hunt", 0],
+      ["K-NN", 1],
+      ["back-jumping", 2],
+      ["RBFS", 3],
+      ["specific-to-general", 4],
+      ["alpha-beta pruning", 5],
+      ["minimax", 6]
+    ]
+  },
+  {
+    title:"Algoritmi → compito (set 3)",
+    labels:["A","B","C","D","E"],
+    legend:["apprendimento supervisionato","trova una soluzione per il CSP","trova una soluzione in uno spazio degli stati","verifica se una formula è derivabile da una KB","verifica se un goal è derivabile da una KB e certi fatti"],
+    items:[
+      ["K-NN", 0],
+      ["back-jumping", 1],
+      ["ricerca bidirezionale", 2],
+      ["risoluzione", 3],
+      ["backward chaining", 4]
+    ]
+  },
+  {
+    title:"Ontologia autoveicoli (CT456XY = targa)",
+    labels:["A","B","C","D","E"],
+    legend:["relazione errata","relazione di istanza","proprietà di classe","una categoria è componente di un'altra","decomposizione esaustiva rispetto a veicolo"],
+    items:[
+      ["CT456XY is a automobile", 0],
+      ["CT456XY member automobile", 1],
+      ["member(X, automobile) ⇒ velocitàMax(50)", 2],
+      ["carrozzeria part-of automobile", 3],
+      ["{mezziDaLavoro, mezziPersonali}", 4]
+    ]
+  },
+  {
+    title:"Ontologia astronomia",
+    labels:["A","B","C","D","E"],
+    legend:["relazione di istanza","proprietà di classe","relazione di sottoclasse","partizione","relazione di composizione"],
+    items:[
+      ["Mercurio member pianeta", 0],
+      ["member(X, pianeta) ⇒ sferoidale", 1],
+      ["astrometria isa astronomia", 2],
+      ["{solare, extrasolare, interstellare} rispetto a pianeta", 3],
+      ["magnetosfera part-of pianeta", 4]
+    ]
+  },
+  {
+    title:"Ontologia musicale",
+    labels:["A","B","C","D","E"],
+    legend:["relazione di istanza","proprietà di classe","relazione di sottoclasse","insieme disgiunto","una categoria è componente di un'altra"],
+    items:[
+      ["timpano member percussione", 0],
+      ["haPlettro(Y) ⇒ cordofono(Y)", 1],
+      ["timpano isa percussione", 2],
+      ["{archi, legni, percussioni}", 3],
+      ["ottone part-of orchestra", 4]
+    ]
+  },
+  {
+    title:"Tipologie di euristiche",
+    labels:["A","B","C","D","E"],
+    legend:["approssima meglio h*(n)","è ottimistica","garantisce l'ottimalità nella ricerca su grafo","identifica una variabile coinvolta in molti vincoli","facilita il fallimento precoce"],
+    items:[
+      ["un'euristica dominante", 0],
+      ["un'euristica ammissibile", 1],
+      ["minimum remaining values", 2],
+      ["euristica di grado", 3],
+      ["un'euristica monotona", 4]
+    ]
+  }
+];
+
+// ===== Formula T/F Bank (Parte 2 ex2) =====
+const FORMULA_BANK = [
+  {
+    title:"Inferenza su due formule (predicati generici)",
+    formulas:["¬ Predicato1(x) ∨ Predicato2(x) ∨ ¬ Predicato3(x)","Predicato1(ID0)"],
+    items:[
+      ["la formula A è una clausola", true, "Disgiunzione di letterali → clausola."],
+      ["il forward chaining è applicabile", false, "Mancano i fatti per attivare tutti gli antecedenti."],
+      ["la formula A è una clausola di Horn", true, "Un solo letterale positivo (Predicato2)."],
+      ["la risoluzione è applicabile", true, "Si unifica Predicato1(x) con Predicato1(ID0): risolvente = Predicato2(ID0) ∨ ¬ Predicato3(ID0)."],
+      ["il modus ponens è applicabile", false, "Per MP servirebbero anche Predicato3(ID0) come fatto."]
+    ]
+  },
+  {
+    title:"Modus ponens generalizzato (cane Asso)",
+    formulas:["Cane(Asso)","Custode(Proprietario(z), z)","Cane(x) ∧ Custode(y, x) ⇒ Responsabile(y)"],
+    items:[
+      ["A) Cane(Asso) è una clausola", true, "Letterale positivo singolo = clausola unitaria di Horn."],
+      ["il modus ponens generalizzato è applicabile", true, "Con sostituzione x/Asso, z/Asso, y/Proprietario(Asso) si attiva la regola."],
+      ["la sostituzione corretta è x/Asso, z/Asso, y/Proprietario(Asso)", true, "z deve unificarsi con Asso per legare Custode(Proprietario(Asso), Asso) all'antecedente."],
+      ["il risultato dell'inferenza è Responsabile(Proprietario(Asso))", true, "Applicando la sostituzione al conseguente della regola."],
+      ["la sostituzione x/Asso, z/z, y/Proprietario(Asso) è corretta", false, "Lasciare z libera non unifica Custode con il secondo antecedente."]
+    ]
+  },
+  {
+    title:"Risoluzione con strumenti (ottone)",
+    formulas:["¬ Ottone(x) ∨ Percussione(x) ∨ ¬ Arco(x)","Ottone(ID0)"],
+    items:[
+      ["la risoluzione è applicabile", true, "Unifica Ottone(x) con Ottone(ID0), sostituzione x/ID0."],
+      ["il risolvente è Ottone(ID0)", false, "L'unificazione elimina Ottone, non lo riproduce."],
+      ["il risolvente è Percussione(ID0) ∨ ¬ Arco(ID0)", true, "Dopo l'unificazione x/ID0 e l'eliminazione del letterale complementare."],
+      ["il risolvente è Percussione(x) ∨ ¬ Arco(x)", false, "Dopo la risoluzione x è già sostituito con ID0."],
+      ["A è una clausola di Horn", true, "Un solo letterale positivo (Percussione)."]
+    ]
+  },
+  {
+    title:"Tre formule (Alfa/Beta/Gamma, non Horn)",
+    formulas:["Alfa(ID1) ∨ ¬ Beta(x) ∨ Gamma(x)","Alfa(ID0)","Beta(ID1)"],
+    items:[
+      ["A è una clausola di Horn", false, "Due letterali positivi (Alfa e Gamma) → non Horn."],
+      ["A è una clausola", true, "Comunque disgiunzione di letterali."],
+      ["il forward chaining è applicabile", false, "FC richiede Horn definite; A non è Horn."],
+      ["si può derivare Gamma(ID1)", false, "Da B (Alfa(ID0)) e C (Beta(ID1)) non si ottiene Gamma — l'unificazione fallisce sulla x."],
+      ["il modus ponens generalizzato è applicabile", false, "Richiede clausole Horn definite."]
+    ]
+  },
+  {
+    title:"Tre formule (Alfa/Beta/Gamma, Horn)",
+    formulas:["¬ Alfa(x) ∨ Beta(x) ∨ ¬ Gamma(x)","Alfa(ID0)","Gamma(ID0)"],
+    items:[
+      ["A è una clausola di Horn", true, "Un solo letterale positivo (Beta)."],
+      ["il forward chaining è applicabile", true, "Tutti gli antecedenti sono fatti noti: Alfa(ID0) e Gamma(ID0) attivano la regola → Beta(ID0)."],
+      ["A è una clausola", true, "Disgiunzione di letterali in FOL."],
+      ["la risoluzione è applicabile", true, "Si può risolvere prima con B (x/ID0) e poi con C."],
+      ["il modus ponens generalizzato è applicabile", true, "Equivalente a FC con sostituzione x/ID0."]
+    ]
+  }
+];
+
+// ===== State =====
+let selectedMCQ = []; let pickedMCQ = []; let pickedMatch = null; let pickedFormula = null;
+
+// ===== Render =====
+function shuffle(a) { const r = a.slice(); for (let i=r.length-1;i>0;i--) { const j = Math.floor(Math.random()*(i+1)); [r[i],r[j]]=[r[j],r[i]]; } return r; }
+function pick(n, arr) { return shuffle(arr).slice(0,n); }
+
+function buildExam() {
+  pickedMCQ = pick(5, MCQ_BANK);
+  pickedMatch = MATCH_BANK[Math.floor(Math.random()*MATCH_BANK.length)];
+  pickedFormula = FORMULA_BANK[Math.floor(Math.random()*FORMULA_BANK.length)];
+  selectedMCQ = [];
+  renderParte1();
+  renderParte2();
+  document.getElementById('scorebox').innerHTML = '<span class="neutral">Compila e premi «Correggi» per il punteggio.</span>';
+}
+
+function renderParte1() {
+  const c = document.getElementById('parte1'); c.innerHTML = '';
+  pickedMCQ.forEach((mc, idx) => {
+    const sec = document.createElement('div');
+    sec.className = 'ex-section'; sec.dataset.mc = idx;
+    sec.innerHTML = '<h3>'+(idx+1)+'. '+mc.topic+' <span class="pts">· 3 pt</span></h3>' +
+      '<p class="ex-q">'+mc.q+'</p>' +
+      '<div class="mc-opts"></div><div class="res"></div>';
+    c.appendChild(sec);
+    const box = sec.querySelector('.mc-opts');
+    mc.opts.forEach((o,i) => {
+      const lbl = document.createElement('label'); lbl.className = 'mc-opt';
+      lbl.innerHTML = '<input type="checkbox" data-opt="'+i+'"> <span>'+o+'</span>';
+      box.appendChild(lbl);
+      lbl.querySelector('input').addEventListener('change', () => {
+        const checked = [...box.querySelectorAll('input:checked')].map(c => +c.dataset.opt);
+        [...box.querySelectorAll('.mc-opt')].forEach(o => o.classList.remove('sel'));
+        checked.forEach(c => box.querySelectorAll('.mc-opt')[c].classList.add('sel'));
+        if (checked.length === 1) selectedMCQ[idx] = checked[0];
+        else if (checked.length > 1) selectedMCQ[idx] = 'invalid';
+        else selectedMCQ[idx] = undefined;
+      });
+    });
+  });
+}
+
+function renderParte2() {
+  const c = document.getElementById('parte2'); c.innerHTML = '';
+
+  // ex1: matching
+  const m = pickedMatch;
+  const ex1 = document.createElement('div'); ex1.className = 'ex-section'; ex1.id = 'ex2-match';
+  let legendHTML = '';
+  m.legend.forEach((l, i) => { legendHTML += '<code>'+m.labels[i]+'</code>'+l+' '; });
+  let rowsHTML = '';
+  m.items.forEach((it, i) => {
+    let optsHTML = '<option value="">—</option>';
+    m.labels.forEach(l => { optsHTML += '<option value="'+l+'">'+l+'</option>'; });
+    rowsHTML += '<tr><td>'+(i+1)+'. '+it[0]+'</td><td><select data-i="'+i+'">'+optsHTML+'</select></td></tr>';
+  });
+  ex1.innerHTML = '<h3>1. '+m.title+' <span class="pts">· 4 pt</span><button class="reroll-btn" id="reroll-match">🎲</button></h3>' +
+    '<div class="labels-bar">'+legendHTML+'</div>' +
+    '<table class="match-table" id="match-tbl">'+rowsHTML+'</table>' +
+    '<div class="res" id="match-res"></div>';
+  c.appendChild(ex1);
+  document.getElementById('reroll-match').onclick = () => {
+    pickedMatch = MATCH_BANK[Math.floor(Math.random()*MATCH_BANK.length)];
+    renderParte2();
+  };
+
+  // ex2: formula T/F
+  const f = pickedFormula;
+  const ex2 = document.createElement('div'); ex2.className = 'ex-section'; ex2.id = 'ex2-formula';
+  let formHTML = '<div class="formula-block">';
+  f.formulas.forEach((fl, i) => { formHTML += '<div>'+String.fromCharCode(65+i)+') '+fl+'</div>'; });
+  formHTML += '</div>';
+  let frowsHTML = '';
+  f.items.forEach((it, i) => {
+    frowsHTML += '<tr><td>'+(i+1)+'. '+it[0]+'</td><td><select data-i="'+i+'"><option value="">—</option><option value="T">T (vero)</option><option value="F">F (falso)</option></select></td></tr>';
+  });
+  ex2.innerHTML = '<h3>2. '+f.title+' <span class="pts">· 4 pt</span><button class="reroll-btn" id="reroll-form">🎲</button></h3>' +
+    formHTML +
+    '<div class="labels-bar"><code>T</code>true (vero) <code>F</code>false (falso)</div>' +
+    '<table class="match-table" id="form-tbl">'+frowsHTML+'</table>' +
+    '<div class="res" id="form-res"></div>';
+  c.appendChild(ex2);
+  document.getElementById('reroll-form').onclick = () => {
+    pickedFormula = FORMULA_BANK[Math.floor(Math.random()*FORMULA_BANK.length)];
+    renderParte2();
+  };
+}
+
+// ===== Correction =====
+function correct() {
+  let mcScore = 0;
+  document.querySelectorAll('[data-mc]').forEach(sec => {
+    const idx = +sec.dataset.mc; const mc = pickedMCQ[idx];
+    const opts = [...sec.querySelectorAll('.mc-opt')];
+    const ans = selectedMCQ[idx];
+    opts.forEach((o,i) => {
+      o.classList.remove('ok','no','sel');
+      if (i === mc.c) o.classList.add('ok');
+      else if (ans === i) o.classList.add('no');
+    });
+    const r = sec.querySelector('.res'); r.className = 'res show';
+    if (ans === undefined) { r.classList.add('ko'); r.innerHTML = '<b>0 / 3</b> · Nessuna risposta. Corretta: <b>'+mc.opts[mc.c]+'</b>. '+mc.why; }
+    else if (ans === 'invalid') { r.classList.add('ko'); r.innerHTML = '<b>0 / 3</b> · Più voci selezionate → invalida. Corretta: <b>'+mc.opts[mc.c]+'</b>. '+mc.why; }
+    else if (ans === mc.c) { r.classList.add('ok'); r.innerHTML = '<b>✔ 3 / 3</b> · '+mc.why; mcScore += 3; }
+    else { r.classList.add('ko'); r.innerHTML = '<b>✗ 0 / 3</b> · Corretta: <b>'+mc.opts[mc.c]+'</b>. '+mc.why; }
+  });
+
+  // matching
+  let m1Score = 0;
+  const m = pickedMatch; const ppi1 = 4 / m.items.length;
+  const m1tbl = document.getElementById('match-tbl');
+  [...m1tbl.querySelectorAll('select')].forEach((s, i) => {
+    const tr = s.closest('tr'); tr.classList.remove('ok','no');
+    const expected = m.labels[m.items[i][1]];
+    if (s.value === expected) { tr.classList.add('ok'); m1Score += ppi1; }
+    else if (s.value) tr.classList.add('no');
+  });
+  const m1r = document.getElementById('match-res');
+  m1r.className = 'res show '+(m1Score >= 3.2 ? 'ok' : 'ko');
+  let m1key = '';
+  m.items.forEach((it, i) => { m1key += '<li><b>'+it[0]+'</b> → '+m.labels[it[1]]+' ('+m.legend[it[1]]+')</li>'; });
+  m1r.innerHTML = '<b>'+m1Score.toFixed(1)+' / 4</b> pt · soluzione:<ul style="margin:.5rem 0 0 1rem;padding:0;font-size:.85rem;">'+m1key+'</ul>';
+
+  // formula
+  let m2Score = 0;
+  const f = pickedFormula; const ppi2 = 4 / f.items.length;
+  const m2tbl = document.getElementById('form-tbl');
+  [...m2tbl.querySelectorAll('select')].forEach((s, i) => {
+    const tr = s.closest('tr'); tr.classList.remove('ok','no');
+    const expected = f.items[i][1] ? 'T' : 'F';
+    if (s.value === expected) { tr.classList.add('ok'); m2Score += ppi2; }
+    else if (s.value) tr.classList.add('no');
+  });
+  const m2r = document.getElementById('form-res');
+  m2r.className = 'res show '+(m2Score >= 3.2 ? 'ok' : 'ko');
+  let m2key = '';
+  f.items.forEach((it, i) => { m2key += '<li><b>'+(it[1]?'T':'F')+'</b> — '+it[0]+': <span style="color:var(--c-muted)">'+it[2]+'</span></li>'; });
+  m2r.innerHTML = '<b>'+m2Score.toFixed(1)+' / 4</b> pt · soluzione:<ul style="margin:.5rem 0 0 1rem;padding:0;font-size:.85rem;">'+m2key+'</ul>';
+
+  const tot = mcScore + m1Score + m2Score;
+  const cls = tot >= 18 ? 'ok' : (tot >= 12 ? 'neutral' : 'ko');
+  document.getElementById('scorebox').innerHTML = '<span class="big '+cls+'">'+tot.toFixed(1)+' / 23</span>' +
+    '<span style="color:var(--c-muted);font-weight:400;"> · MCQ '+mcScore+'/15 · Ex1 '+m1Score.toFixed(1)+'/4 · Ex2 '+m2Score.toFixed(1)+'/4</span>';
+}
+
+// ===== Timer =====
+const total = 18*60; let left = total, tick = null;
+const tEl = document.getElementById('timer');
+function fmt(s) { const m = Math.floor(s/60), x = s%60; return (m<10?'0':'')+m+':'+(x<10?'0':'')+x; }
+function render() { tEl.textContent = fmt(left); tEl.classList.toggle('low', left <= 180 && left > 0); tEl.classList.toggle('zero', left === 0); }
+function startStop() {
+  const b = document.getElementById('start');
+  if (tick) { clearInterval(tick); tick = null; b.textContent = '▶ Riprendi'; return; }
+  b.textContent = '⏸ Pausa';
+  tick = setInterval(() => {
+    if (left > 0) { left--; render(); }
+    if (left === 0) {
+      clearInterval(tick); tick = null; b.textContent = '▶ Avvia'; render();
+      document.getElementById('scorebox').innerHTML = '<span class="big ko">⏰ Tempo scaduto!</span>';
+    }
+  }, 1000);
+}
+function resetTimer() { if (tick) { clearInterval(tick); tick = null; } left = total; document.getElementById('start').textContent = '▶ Avvia'; render(); }
+document.getElementById('start').onclick = startStop;
+document.getElementById('reset').onclick = resetTimer;
+document.getElementById('newexam').onclick = () => { buildExam(); resetTimer(); };
+document.getElementById('correct').onclick = correct;
+
+buildExam();
+render();
+</script>
+</body>
+</html>

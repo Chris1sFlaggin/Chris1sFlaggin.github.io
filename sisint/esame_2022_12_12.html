@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esame SISINT 12/12/2022 — versione A</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .timer-bar {
+    position:sticky; top:65px; z-index:50;
+    background:var(--c-card); border-bottom:1px solid var(--c-border);
+    padding:.75rem 1rem; display:flex; flex-wrap:wrap; gap:.75rem;
+    align-items:center; justify-content:space-between;
+    box-shadow:var(--shadow-sm);
+  }
+  .timer {
+    font-variant-numeric:tabular-nums; font-size:1.6rem; font-weight:700;
+    letter-spacing:1px; padding:.2rem .9rem; border:1px solid var(--c-border);
+    border-radius:var(--radius-sm); background:var(--c-bg); color:var(--c-text);
+  }
+  .timer.low { color:var(--c-warn); border-color:var(--c-warn); }
+  .timer.zero { color:#fff; background:var(--c-wrong); border-color:var(--c-wrong); }
+  .controls { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+  .controls button { padding:.45rem .9rem; font-size:.9rem; border-radius:var(--radius-sm); cursor:pointer;
+    border:1px solid var(--c-border); background:var(--c-card); color:var(--c-text); transition:all .2s; }
+  .controls button:hover { border-color:var(--c-primary); }
+  .controls button.primary { background:var(--c-primary); color:#fff; border-color:var(--c-primary); }
+  .controls button.primary:hover { background:var(--c-primary-hover); }
+  .ex-section { background:var(--c-card); border:1px solid var(--c-border); border-radius:var(--radius);
+    padding:1.5rem 1.75rem; margin-bottom:1.25rem; box-shadow:var(--shadow-sm); }
+  .ex-section h3 { margin:0 0 .25rem; font-size:1.05rem; color:var(--c-text); }
+  .ex-section .pts { color:var(--c-muted); font-size:.85rem; font-weight:600; }
+  .ex-q { margin:.75rem 0 1rem; font-size:1rem; line-height:1.5; }
+  .ex-q b { color:var(--c-text); }
+  .mc-opts { display:flex; flex-direction:column; gap:.5rem; margin-top:.5rem; }
+  .mc-opt {
+    display:flex; gap:.6rem; padding:.7rem .9rem; border:1px solid var(--c-border);
+    border-radius:var(--radius-sm); cursor:pointer; align-items:flex-start;
+    background:var(--c-bg); transition:all .15s;
+  }
+  .mc-opt:hover { border-color:var(--c-primary); }
+  .mc-opt.sel { border-color:var(--c-primary); background:var(--c-opt-selected-bg); border-width:2px; padding:calc(.7rem - 1px) calc(.9rem - 1px); }
+  .mc-opt.ok { background:var(--c-correct-bg); border-color:var(--c-correct); border-width:2px; padding:calc(.7rem - 1px) calc(.9rem - 1px); }
+  .mc-opt.no { background:var(--c-wrong-bg); border-color:var(--c-wrong); border-width:2px; padding:calc(.7rem - 1px) calc(.9rem - 1px); }
+  .mc-opt input { margin-top:.2rem; }
+  .res {
+    margin-top:.75rem; padding:.75rem 1rem; border-radius:var(--radius-sm);
+    font-size:.9rem; display:none;
+  }
+  .res.show { display:block; }
+  .res.ok { background:var(--c-correct-bg); color:var(--c-correct); border:1px solid var(--c-correct); }
+  .res.ko { background:var(--c-wrong-bg); color:var(--c-wrong); border:1px solid var(--c-wrong); }
+  .res b, .res strong { color:inherit; }
+  .match-table {
+    width:100%; border-collapse:separate; border-spacing:0 .4rem; margin-top:.5rem;
+  }
+  .match-table td { padding:.5rem .75rem; vertical-align:middle; }
+  .match-table tr { background:var(--c-bg); }
+  .match-table tr.ok { background:var(--c-correct-bg); }
+  .match-table tr.no { background:var(--c-wrong-bg); }
+  .match-table td:first-child { border-radius:var(--radius-sm) 0 0 var(--radius-sm); border:1px solid var(--c-border); border-right:none; }
+  .match-table td:last-child  { border-radius:0 var(--radius-sm) var(--radius-sm) 0; border:1px solid var(--c-border); border-left:none; }
+  .match-table tr.ok td { border-color:var(--c-correct); }
+  .match-table tr.no td { border-color:var(--c-wrong); }
+  .match-table select { width:100%; min-width:120px; }
+  .labels-bar {
+    background:var(--c-primary-light); border-left:4px solid var(--c-primary);
+    padding:.75rem 1rem; border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+    margin-bottom:.75rem; font-size:.85rem; color:var(--c-text);
+  }
+  [data-theme="dark"] .labels-bar { background:rgba(59,130,246,0.1); }
+  .labels-bar code {
+    background:var(--c-card); border:1px solid var(--c-border); padding:.05rem .4rem;
+    border-radius:4px; font-weight:700; color:var(--c-primary); margin-right:.3rem;
+  }
+  .scorebox {
+    position:sticky; bottom:0; background:var(--c-card); border-top:1px solid var(--c-border);
+    padding:1rem 1.25rem; text-align:center; font-weight:600;
+    box-shadow:0 -4px 12px rgba(0,0,0,.05);
+  }
+  .scorebox .big { font-size:1.6rem; margin-right:.5rem; }
+  .scorebox .ok { color:var(--c-correct); }
+  .scorebox .ko { color:var(--c-wrong); }
+  .scorebox .neutral { color:var(--c-text); }
+  details.sol { margin-top:.75rem; border:1px solid var(--c-border); border-radius:var(--radius-sm);
+    background:var(--c-bg); padding:0 .9rem; }
+  details.sol summary { cursor:pointer; padding:.6rem 0; color:var(--c-primary); font-weight:600; font-size:.9rem; }
+  details.sol[open] { padding-bottom:.75rem; }
+  details.sol .sol-body { font-size:.9rem; color:var(--c-text); line-height:1.5; }
+  details.sol code { background:var(--c-card); border:1px solid var(--c-border); padding:.05rem .35rem; border-radius:4px; font-size:.85em; }
+</style>
+</head>
+<body>
+  <header>
+    <div style="flex:1">
+      <a href="esami.html" class="back-btn" style="margin:0;font-size:.85rem;">&larr; Esami</a>
+    </div>
+    <div style="flex:2; text-align:center;">
+      <h1 style="margin:0;font-size:1.3rem;letter-spacing:-0.5px;">Esame SISINT 12/12/2022 — A</h1>
+      <p style="margin:0.2rem 0 0;font-size:0.8rem;opacity:0.7">max 23 pt · 18 min · testo originale</p>
+    </div>
+    <div style="flex:1; text-align:right;">
+      <button id="theme-btn" class="theme-toggle">
+        <span class="icon">🌙</span> Dark
+      </button>
+    </div>
+  </header>
+
+  <div class="timer-bar">
+    <span class="timer" id="timer">18:00</span>
+    <div class="controls">
+      <button id="start">▶ Avvia</button>
+      <button id="reset">↺ Reset</button>
+      <button id="correct" class="primary">✔ Correggi</button>
+    </div>
+  </div>
+
+  <main style="max-width:820px;">
+    <p style="color:var(--c-muted);font-size:.9rem;margin-bottom:1rem;">
+      <b>Parte 1</b> (max 15 pt, 8 minuti): 5 MCQ × 3 pt. Indicare più voci invalida la risposta.<br>
+      <b>Parte 2</b> (max 8 pt, 10 minuti): 2 esercizi di associazione.
+    </p>
+
+    <h2 style="font-size:1.3rem;margin:1.5rem 0 .75rem;">Parte 1 — competenze mnemoniche</h2>
+
+    <div class="ex-section" data-mc="0">
+      <h3>1. Soluzione nella risoluzione automatica di problemi <span class="pts">· 3 pt</span></h3>
+      <p class="ex-q">Cos'è una <b>SOLUZIONE</b> nella risoluzione automatica di problemi?</p>
+      <div class="mc-opts"></div>
+      <div class="res"></div>
+    </div>
+
+    <div class="ex-section" data-mc="1">
+      <h3>2. Algoritmo di ricerca BLIND <span class="pts">· 3 pt</span></h3>
+      <p class="ex-q">Un <b>ALGORITMO DI RICERCA</b> è detto <b>BLIND</b> quando:</p>
+      <div class="mc-opts"></div>
+      <div class="res"></div>
+    </div>
+
+    <div class="ex-section" data-mc="2">
+      <h3>3. Euristica DOMINANTE <span class="pts">· 3 pt</span></h3>
+      <p class="ex-q">Un'<b>EURISTICA</b> è detta <b>DOMINANTE</b> quando:</p>
+      <div class="mc-opts"></div>
+      <div class="res"></div>
+    </div>
+
+    <div class="ex-section" data-mc="3">
+      <h3>4. Matrice di confusione <span class="pts">· 3 pt</span></h3>
+      <p class="ex-q">Soltanto una delle seguenti <b>MISURE</b> può essere calcolata tramite una <b>MATRICE DI CONFUSIONE</b>, quale?</p>
+      <div class="mc-opts"></div>
+      <div class="res"></div>
+    </div>
+
+    <div class="ex-section" data-mc="4">
+      <h3>5. Apprendimento SUPERVISIONATO <span class="pts">· 3 pt</span></h3>
+      <p class="ex-q">Un <b>ALGORITMO DI APPRENDIMENTO</b> è <b>SUPERVISIONATO</b> quando:</p>
+      <div class="mc-opts"></div>
+      <div class="res"></div>
+    </div>
+
+    <h2 style="font-size:1.3rem;margin:2rem 0 .75rem;">Parte 2 — competenze associative, calcolo, inferenza</h2>
+
+    <div class="ex-section" id="ex2-1">
+      <h3>1. Associa ciascuna formula alla propria tipologia <span class="pts">· 4 pt · Fuffi costante, x variabile</span></h3>
+      <div class="labels-bar">
+        <code>A</code>tautologia
+        <code>B</code>formula ground
+        <code>C</code>clausola
+        <code>D</code>formula in FOL
+      </div>
+      <table class="match-table" id="m1-table">
+        <tr><td>1. <code>Cane(Fuffi) ⇒ ¬ Gatto(Fuffi)</code></td><td><select data-i="0"></select></td></tr>
+        <tr><td>2. <code>¬ Piove ∨ Piove</code></td><td><select data-i="1"></select></td></tr>
+        <tr><td>3. <code>Blu(x) ∨ Sopra(x,y) ∧ ¬ Sopra(x,z)</code></td><td><select data-i="2"></select></td></tr>
+        <tr><td>4. <code>A ∨ ¬B ∨ C</code></td><td><select data-i="3"></select></td></tr>
+        <tr><td>5. <code>¬ Caldo(x) ∧ Caldo(x)</code></td><td><select data-i="4"></select></td></tr>
+      </table>
+      <div class="res" id="m1-res"></div>
+      <details class="sol"><summary>Mostra spiegazione</summary><div class="sol-body">
+        <b>1=B</b> (ground): nessuna variabile, solo costante <code>Fuffi</code>. È anche una formula FOL, ma «ground» è la categoria più specifica.<br>
+        <b>2=A</b> (tautologia): <code>¬P ∨ P</code> è sempre vera (terzo escluso).<br>
+        <b>3=D</b> (formula FOL): contiene <code>∧</code> all'interno → non è una clausola (richiede solo <code>∨</code> di letterali); ha variabili.<br>
+        <b>4=C</b> (clausola): disgiunzione di letterali proposizionali.<br>
+        <b>5=D</b> (formula FOL): contiene <code>∧</code> (non clausola), ha variabili (non ground), è insoddisfacibile ma non è una «tautologia». Resta la categoria più generale FOL.
+      </div></details>
+    </div>
+
+    <div class="ex-section" id="ex2-2">
+      <h3>2. Inferenza su due formule <span class="pts">· 4 pt · x variabile, COST costante</span></h3>
+      <p class="ex-q" style="font-family:ui-monospace,monospace;background:var(--c-bg);padding:.75rem;border-radius:var(--radius-sm);border:1px solid var(--c-border);">
+        ¬ Alfa(x) ∨ Beta(x) ∨ ¬ Gamma(x)<br>
+        Alfa(COST)
+      </p>
+      <div class="labels-bar">
+        <code>T</code>true (vero)
+        <code>F</code>false (falso)
+      </div>
+      <table class="match-table" id="m2-table">
+        <tr><td>1. la formula più lunga è una clausola di Horn</td><td><select data-i="0"></select></td></tr>
+        <tr><td>2. la formula più lunga è una clausola</td><td><select data-i="1"></select></td></tr>
+        <tr><td>3. il modus ponens è applicabile</td><td><select data-i="2"></select></td></tr>
+        <tr><td>4. la risoluzione è applicabile</td><td><select data-i="3"></select></td></tr>
+        <tr><td>5. il forward chaining è applicabile</td><td><select data-i="4"></select></td></tr>
+      </table>
+      <div class="res" id="m2-res"></div>
+      <details class="sol"><summary>Mostra spiegazione</summary><div class="sol-body">
+        <b>1=T</b>: la clausola ha un solo letterale positivo (<code>Beta(x)</code>) → è una Horn definita.<br>
+        <b>2=T</b>: è una disgiunzione di letterali (in FOL).<br>
+        <b>3=F</b>: MP equivale a applicare la regola <code>(Alfa(x) ∧ Gamma(x)) → Beta(x)</code>; manca <code>Gamma(COST)</code> tra i fatti.<br>
+        <b>4=T</b>: si unifica <code>Alfa(x)</code> con <code>Alfa(COST)</code> (<code>x/COST</code>) e si ottiene il risolvente <code>Beta(COST) ∨ ¬ Gamma(COST)</code>.<br>
+        <b>5=F</b>: FC su Horn definite richiede che tutti gli antecedenti siano fatti noti; senza <code>Gamma(COST)</code> nessuna regola si attiva.
+      </div></details>
+    </div>
+  </main>
+
+  <div class="scorebox" id="scorebox">
+    <span class="neutral">Compila e premi «Correggi» per il punteggio.</span>
+  </div>
+
+  <footer>
+    <p>chris1sflaggin — Testo originale esame SISINT 12/12/2022 versione A · Prof. Pozzato.</p>
+  </footer>
+
+<script>
+// ===== Theme toggle =====
+const tbtn = document.getElementById('theme-btn');
+const root = document.documentElement;
+if (localStorage.getItem('sisint-theme') === 'dark') { root.setAttribute('data-theme','dark'); tbtn.querySelector('.icon').textContent='☀️'; tbtn.lastChild.textContent=' Light'; }
+tbtn.onclick = () => {
+  const dark = root.getAttribute('data-theme') === 'dark';
+  if (dark) { root.removeAttribute('data-theme'); tbtn.querySelector('.icon').textContent='🌙'; tbtn.lastChild.textContent=' Dark'; localStorage.setItem('sisint-theme','light'); }
+  else { root.setAttribute('data-theme','dark'); tbtn.querySelector('.icon').textContent='☀️'; tbtn.lastChild.textContent=' Light'; localStorage.setItem('sisint-theme','dark'); }
+};
+
+// ===== MCQ data (Parte 1) =====
+const MC = [
+  {
+    opts:[
+      "un percorso, nell'albero o grafo di ricerca, che conduce dal nodo iniziale a un nodo target",
+      "un qualsiasi stato dell'albero o grafo di ricerca che rende vero il test obiettivo",
+      "un assegnamento di valori alle variabili che definiscono il problema di ricerca"
+    ], c:0,
+    why:"Una soluzione è il <b>cammino</b> dallo stato iniziale a uno stato che soddisfa il test obiettivo (non solo lo stato finale, e non un assegnamento — quello è la soluzione di un CSP)."
+  },
+  {
+    opts:[
+      "ha un orizzonte di ricerca limitato",
+      "utilizza solo la descrizione del problema per trovare una soluzione",
+      "utilizza una funzione euristica che non è ammissibile"
+    ], c:1,
+    why:"«Blind» (non informato) = nessuna conoscenza specifica oltre la definizione del problema. Esempi: BFS, DFS, ricerca a costo uniforme."
+  },
+  {
+    opts:[
+      "restituisce sempre stime per difetto del costo per raggiungere un nodo preferito da quello considerato",
+      "rispetta la disuguaglianza triangolare",
+      "per qualsiasi stato assume valori maggiori a quelli restituiti da un'altra euristica"
+    ], c:2,
+    why:"h1 domina h2 se <code>h1(n) ≥ h2(n)</code> per ogni nodo n (entrambe ammissibili). Domina = stima sempre più stretta → A* espande meno nodi."
+  },
+  {
+    opts:["accuratezza","livello di confidenza","entropia"], c:0,
+    why:"Dalla matrice di confusione si calcolano accuratezza, error rate, precision, recall, F1, FPR/FNR. L'entropia e i livelli di confidenza richiedono distribuzioni di probabilità, non bastano TP/FP/TN/FN."
+  },
+  {
+    opts:[
+      "Il learning set contiene tutte istanze che hanno associata la classe di appartenenza",
+      "Durante l'apprendimento è monitorato da un supervisore umano",
+      "L'apprendimento è guidato dalla misura dell'entropia"
+    ], c:0,
+    why:"«Supervisionato» = ogni esempio del training set è già etichettato con la classe target. Il «supervisore» è la label, non una persona."
+  }
+];
+
+// ===== Matching data (Parte 2) =====
+const M1 = {
+  labels: ['A','B','C','D'],
+  correct: [1,0,3,2,3], // indices in labels[]
+  pointsPerItem: 0.8 // 5 items × 0.8 = 4 pt
+};
+const M2 = {
+  labels: ['T','F'],
+  correct: [0,0,1,0,1], // T,T,F,T,F
+  pointsPerItem: 0.8 // 5 × 0.8 = 4 pt
+};
+
+// ===== Build MCQ options =====
+let selected = {}; // mcIdx -> optIdx (single) or 'invalid' if multiple
+let mcCorrected = false;
+document.querySelectorAll('[data-mc]').forEach(sec => {
+  const idx = +sec.dataset.mc;
+  const box = sec.querySelector('.mc-opts');
+  MC[idx].opts.forEach((o,i) => {
+    const lbl = document.createElement('label');
+    lbl.className = 'mc-opt';
+    lbl.innerHTML = `<input type="checkbox" data-opt="${i}"> <span>${o}</span>`;
+    box.appendChild(lbl);
+    lbl.querySelector('input').addEventListener('change', () => {
+      const checked = [...box.querySelectorAll('input:checked')].map(c => +c.dataset.opt);
+      [...box.querySelectorAll('.mc-opt')].forEach(o => o.classList.remove('sel'));
+      checked.forEach(c => box.querySelectorAll('.mc-opt')[c].classList.add('sel'));
+      if (checked.length === 1) selected[idx] = checked[0];
+      else if (checked.length > 1) selected[idx] = 'invalid';
+      else delete selected[idx];
+    });
+  });
+});
+
+// ===== Build matching selects =====
+function fillSelects(tableId, labels) {
+  document.querySelectorAll('#'+tableId+' select').forEach(sel => {
+    sel.innerHTML = '<option value="">—</option>';
+    labels.forEach(l => {
+      const o = document.createElement('option');
+      o.value = l; o.textContent = l;
+      sel.appendChild(o);
+    });
+  });
+}
+fillSelects('m1-table', M1.labels);
+fillSelects('m2-table', M2.labels);
+
+// ===== Correction =====
+function correct() {
+  mcCorrected = true;
+  let mcScore = 0;
+  document.querySelectorAll('[data-mc]').forEach(sec => {
+    const idx = +sec.dataset.mc;
+    const opts = [...sec.querySelectorAll('.mc-opt')];
+    const ans = selected[idx];
+    opts.forEach((o,i) => {
+      o.classList.remove('ok','no','sel');
+      if (i === MC[idx].c) o.classList.add('ok');
+      else if (ans === i) o.classList.add('no');
+    });
+    const r = sec.querySelector('.res');
+    r.className = 'res show';
+    if (ans === undefined) {
+      r.classList.add('ko');
+      r.innerHTML = '<b>0 / 3</b> · Nessuna risposta. Corretta: <b>'+MC[idx].opts[MC[idx].c]+'</b>. '+MC[idx].why;
+    } else if (ans === 'invalid') {
+      r.classList.add('ko');
+      r.innerHTML = '<b>0 / 3</b> · Più voci selezionate → risposta invalida. Corretta: <b>'+MC[idx].opts[MC[idx].c]+'</b>. '+MC[idx].why;
+    } else if (ans === MC[idx].c) {
+      r.classList.add('ok');
+      r.innerHTML = '<b>✔ 3 / 3</b> · '+MC[idx].why;
+      mcScore += 3;
+    } else {
+      r.classList.add('ko');
+      r.innerHTML = '<b>✗ 0 / 3</b> · Corretta: <b>'+MC[idx].opts[MC[idx].c]+'</b>. '+MC[idx].why;
+    }
+  });
+
+  // matching 1
+  let m1Score = 0;
+  const m1sel = document.querySelectorAll('#m1-table select');
+  m1sel.forEach((s,i) => {
+    const tr = s.closest('tr');
+    tr.classList.remove('ok','no');
+    const chosen = s.value;
+    const expected = M1.labels[M1.correct[i]];
+    if (chosen === expected) { tr.classList.add('ok'); m1Score += M1.pointsPerItem; }
+    else if (chosen) tr.classList.add('no');
+  });
+  const m1r = document.getElementById('m1-res');
+  m1r.className = 'res show '+(m1Score >= 3.2 ? 'ok' : 'ko');
+  m1r.innerHTML = '<b>'+m1Score.toFixed(1)+' / 4</b> pt · '+
+    (m1Score === 4 ? 'Perfetto!' : 'Vedi spiegazione sotto.');
+
+  // matching 2
+  let m2Score = 0;
+  const m2sel = document.querySelectorAll('#m2-table select');
+  m2sel.forEach((s,i) => {
+    const tr = s.closest('tr');
+    tr.classList.remove('ok','no');
+    const chosen = s.value;
+    const expected = M2.labels[M2.correct[i]];
+    if (chosen === expected) { tr.classList.add('ok'); m2Score += M2.pointsPerItem; }
+    else if (chosen) tr.classList.add('no');
+  });
+  const m2r = document.getElementById('m2-res');
+  m2r.className = 'res show '+(m2Score >= 3.2 ? 'ok' : 'ko');
+  m2r.innerHTML = '<b>'+m2Score.toFixed(1)+' / 4</b> pt · '+
+    (m2Score === 4 ? 'Perfetto!' : 'Vedi spiegazione sotto.');
+
+  const tot = mcScore + m1Score + m2Score;
+  const sb = document.getElementById('scorebox');
+  const cls = tot >= 18 ? 'ok' : (tot >= 12 ? 'neutral' : 'ko');
+  sb.innerHTML = '<span class="big '+cls+'">'+tot.toFixed(1)+' / 23</span>' +
+    '<span style="color:var(--c-muted);font-weight:400;">' +
+    ' · MCQ '+mcScore+'/15 · Ex1 '+m1Score.toFixed(1)+'/4 · Ex2 '+m2Score.toFixed(1)+'/4</span>';
+}
+
+// ===== Timer =====
+const total = 18 * 60;
+let left = total, tick = null;
+const tEl = document.getElementById('timer');
+function fmt(s) { const m = Math.floor(s/60), x = s%60; return (m<10?'0':'')+m+':'+(x<10?'0':'')+x; }
+function render() {
+  tEl.textContent = fmt(left);
+  tEl.classList.toggle('low', left <= 180 && left > 0);
+  tEl.classList.toggle('zero', left === 0);
+}
+function startStop() {
+  const b = document.getElementById('start');
+  if (tick) { clearInterval(tick); tick=null; b.textContent='▶ Riprendi'; return; }
+  b.textContent='⏸ Pausa';
+  tick = setInterval(() => {
+    if (left > 0) { left--; render(); }
+    if (left === 0) {
+      clearInterval(tick); tick=null; b.textContent='▶ Avvia'; render();
+      document.getElementById('scorebox').innerHTML = '<span class="big ko">⏰ Tempo scaduto!</span>';
+    }
+  }, 1000);
+}
+function resetTimer() { if (tick) { clearInterval(tick); tick=null; } left=total; document.getElementById('start').textContent='▶ Avvia'; render(); }
+document.getElementById('start').onclick = startStop;
+document.getElementById('reset').onclick = resetTimer;
+document.getElementById('correct').onclick = correct;
+render();
+</script>
+</body>
+</html>

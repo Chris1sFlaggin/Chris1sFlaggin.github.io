@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulazioni esami reali — SISINT</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .exam-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1.5rem; margin:2rem 0; }
+  @media(max-width:700px){ .exam-grid{ grid-template-columns:1fr; } }
+  a.exam-tile {
+    display:flex; flex-direction:column; gap:.6rem;
+    background:var(--c-card); border:1px solid var(--c-border); border-radius:var(--radius);
+    padding:1.75rem; text-decoration:none; color:inherit;
+    box-shadow:var(--shadow); transition:all .2s;
+  }
+  a.exam-tile:hover { transform:translateY(-3px); border-color:var(--c-primary); box-shadow:var(--shadow-md); }
+  .exam-tile h3 { margin:0; font-size:1.2rem; color:var(--c-text); }
+  .exam-tile .desc { margin:0; color:var(--c-muted); font-size:.9rem; line-height:1.5; }
+  .exam-tile .tags { display:flex; gap:.4rem; flex-wrap:wrap; margin-top:.5rem; }
+  .info-card {
+    background:var(--c-card); border:1px solid var(--c-border); border-radius:var(--radius);
+    padding:1.5rem; margin-top:1rem;
+  }
+  .info-card h3 { margin:0 0 .75rem; font-size:1rem; color:var(--c-text); }
+  .info-card ul { margin:0; padding-left:1.25rem; color:var(--c-muted); }
+  .info-card li { margin-bottom:.4rem; }
+  .info-card b { color:var(--c-text); }
+</style>
+</head>
+<body>
+  <header>
+    <div style="flex:1">
+      <a href="index.html" class="back-btn" style="margin:0;font-size:.85rem;">&larr; Home</a>
+    </div>
+    <div style="flex:2; text-align:center;">
+      <h1 style="margin:0;font-size:1.4rem;letter-spacing:-0.5px;">Esami reali</h1>
+      <p style="margin:0.2rem 0 0;font-size:0.85rem;opacity:0.7">Simulazioni cronometrate con autocorrezione</p>
+    </div>
+    <div style="flex:1; text-align:right;">
+      <button id="theme-btn" class="theme-toggle">
+        <span class="icon">🌙</span> Dark
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <p style="color:var(--c-muted);max-width:680px;">
+      Simulazioni costruite sui <b>testi reali</b> degli esami SISINT — Prof. Pozzato/Esposito, UniTO.
+      Stesso formato dell'esame: <b>Parte 1</b> (5 MCQ × 3 pt = 15 pt, 8 minuti) + <b>Parte 2</b> (2 esercizi associazione, 8 pt, 10 minuti).
+      Totale <b>23 punti</b> in <b>18 minuti</b>.
+    </p>
+
+    <div class="exam-grid">
+      <a class="exam-tile" href="esame_2022_12_12.html">
+        <h3>📋 Esame 12/12/2022 — versione A</h3>
+        <p class="desc">Testo identico al compito reale: 5 MCQ + 2 associazioni (formule + inferenza). Soluzioni dal docente.</p>
+        <div class="tags">
+          <span class="badge badge-parte">testo esatto</span>
+          <span class="badge badge-cfu">23 pt</span>
+          <span class="badge badge-topic">⏱ 18 min</span>
+        </div>
+      </a>
+
+      <a class="exam-tile" href="esame_random.html">
+        <h3>🎲 Simulazione random</h3>
+        <p class="desc">5 MCQ + 2 associazioni pescate a caso dal bank di domande reali (Soluzioni Esami Vecchi). Ogni partita diversa.</p>
+        <div class="tags">
+          <span class="badge badge-parte">pool reale</span>
+          <span class="badge badge-cfu">23 pt</span>
+          <span class="badge badge-topic">⏱ 18 min</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="info-card">
+      <h3>Come funziona</h3>
+      <ul>
+        <li>Avvia il timer e rispondi a tutte le voci. Le scelte multiple invalidano se selezioni più di una opzione.</li>
+        <li>A fine prova clicca <b>«Correggi»</b>: punteggio automatico per MCQ e associazioni.</li>
+        <li>Soluzioni ufficiali e spiegazioni mostrate dopo la correzione.</li>
+        <li>Per studiare per argomento o senza timer usa il <a href="index.html">quiz standard</a> dalla home.</li>
+      </ul>
+    </div>
+  </main>
+
+  <footer>
+    <p>chris1sflaggin — Simulazioni esami SISINT. Materiale derivato da prove ufficiali, kit personale di studio.</p>
+  </footer>
+
+<script>
+  // theme toggle (uguale a app.js, standalone)
+  const btn = document.getElementById('theme-btn');
+  const root = document.documentElement;
+  const saved = localStorage.getItem('sisint-theme');
+  if (saved === 'dark') { root.setAttribute('data-theme','dark'); btn.querySelector('.icon').textContent='☀️'; btn.lastChild.textContent=' Light'; }
+  btn.onclick = () => {
+    const dark = root.getAttribute('data-theme') === 'dark';
+    if (dark) { root.removeAttribute('data-theme'); btn.querySelector('.icon').textContent='🌙'; btn.lastChild.textContent=' Dark'; localStorage.setItem('sisint-theme','light'); }
+    else { root.setAttribute('data-theme','dark'); btn.querySelector('.icon').textContent='☀️'; btn.lastChild.textContent=' Light'; localStorage.setItem('sisint-theme','dark'); }
+  };
+</script>
+</body>
+</html>
