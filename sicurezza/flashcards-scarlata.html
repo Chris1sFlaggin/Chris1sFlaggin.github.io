@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flashcard Cybersecurity — Appunti Scarlata / koraynilay</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --card:#1d212b; --card2:#232838;
+    --ink:#e8ebf1; --muted:#9aa3b2; --line:#2a2f3a;
+    --accent:#7aa2f7; --good:#2fbf71; --again:#ff6b6b; --chip:#1f2f3a;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:radial-gradient(1200px 600px at 50% -10%,#15202f,var(--bg));
+    color:var(--ink);
+    font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    display:flex;flex-direction:column;min-height:100vh;
+  }
+  header{
+    padding:18px 20px 10px;border-bottom:1px solid var(--line);
+    display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+  }
+  h1{font-size:18px;margin:0;letter-spacing:.3px}
+  h1 small{color:var(--muted);font-weight:500}
+  .credit{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:10px 14px;color:var(--muted);font-size:13px;margin:12px 20px 0;
+  }
+  .credit b{color:var(--ink)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  select,button{
+    font:inherit;color:var(--ink);background:var(--panel);
+    border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;
+    transition:.15s border-color,.15s background,.15s transform;
+  }
+  button:hover,select:hover{border-color:var(--accent)}
+  button:active{transform:translateY(1px)}
+  a.back{color:var(--muted);text-decoration:none;font-size:13px;align-self:center}
+  a.back:hover{color:var(--accent)}
+  .progress{height:6px;background:var(--panel);border-bottom:1px solid var(--line)}
+  .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#a3c0ff);transition:width .25s}
+  main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px 16px}
+  .meta{color:var(--muted);font-size:13px;display:flex;gap:14px;align-items:center}
+  .scene{width:min(820px,94vw);height:min(58vh,560px);perspective:1400px}
+  .card{
+    position:relative;width:100%;height:100%;cursor:pointer;
+    transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.7,.2,1);
+  }
+  .card.flip{transform:rotateY(180deg)}
+  .face{
+    position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;
+    border:1px solid var(--line);box-shadow:var(--shadow);
+    padding:28px 30px;display:flex;flex-direction:column;
+  }
+  .front{background:linear-gradient(160deg,var(--card),#161a23)}
+  .back{background:linear-gradient(160deg,var(--card2),#1a1f2c);transform:rotateY(180deg);overflow:auto}
+  .back .body{align-items:flex-start}
+  .chip{
+    align-self:flex-start;font-size:12px;letter-spacing:.4px;text-transform:uppercase;
+    color:#cfddff;background:var(--chip);border:1px solid var(--line);
+    padding:4px 10px;border-radius:999px;margin-bottom:14px;
+  }
+  .qid{color:var(--muted);font-size:12px;margin-bottom:6px}
+  .body{flex:1;display:flex;align-items:center}
+  .q{font-size:clamp(18px,2.6vw,24px);font-weight:600}
+  .a{font-size:clamp(15px,2.1vw,19px)}
+  .a b{color:#fff}
+  .a code{background:#0e1623;border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:.92em}
+  .a .ex{display:block;margin-top:8px;color:#a9c4ee}
+  .a .ex b{color:#7aa2f7}
+  .a img{display:block;max-width:100%;max-height:280px;margin:12px auto 0;background:#fff;border-radius:8px;padding:6px}
+  .hint{color:var(--muted);font-size:12px;text-align:center;margin-top:14px}
+  .markstate{position:absolute;top:14px;right:16px;font-size:12px;font-weight:700}
+  .markstate.known{color:var(--good)}
+  .markstate.again{color:var(--again)}
+  .nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
+  .nav .big{padding:10px 18px;font-weight:600}
+  .btn-good{border-color:#235; color:var(--good)}
+  .btn-good:hover{border-color:var(--good);background:rgba(47,191,113,.08)}
+  .btn-again{color:var(--again)}
+  .btn-again:hover{border-color:var(--again);background:rgba(255,107,107,.08)}
+  .stats{color:var(--muted);font-size:13px}
+  .stats b{color:var(--ink)}
+  footer{padding:10px 16px;color:var(--muted);font-size:12px;text-align:center;border-top:1px solid var(--line)}
+  kbd{background:var(--panel);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px;font-size:11px}
+  .empty{color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <h1>Flashcard Cybersecurity <small>— Appunti Scarlata / koraynilay</small></h1>
+  <div class="controls">
+    <select id="cat" title="Filtra per categoria"></select>
+    <button id="shuffle" title="Mescola">🔀 Mescola</button>
+    <button id="onlyAgain" title="Mostra solo le card da rivedere">↻ Solo da rivedere</button>
+    <button id="reset" title="Azzera progressi">🗑 Reset</button>
+    <a class="back" href="index.html">↩ Home</a>
+  </div>
+</header>
+<div class="credit">
+  📚 Card derivate dagli appunti di <b>Michele Scarlata</b> (parte <b>crittografia</b>) e <b>koraynilay</b> (parte <b>rete</b>). Diagrammi estratti dal PDF originale del corso UniTo — Prof. Bergadano.
+</div>
+<div class="progress"><i id="bar"></i></div>
+
+<main>
+  <div class="meta">
+    <span id="counter">–</span>
+    <span class="stats">✔ <b id="nKnown">0</b> &nbsp; ↻ <b id="nAgain">0</b></span>
+  </div>
+
+  <div class="scene">
+    <div class="card" id="card">
+      <div class="face front">
+        <span class="chip" id="catChip">—</span>
+        <span class="markstate" id="markFront"></span>
+        <div class="qid" id="qid"></div>
+        <div class="body"><div class="q" id="q">—</div></div>
+        <div class="hint">clicca o premi <kbd>Spazio</kbd> per girare</div>
+      </div>
+      <div class="face back">
+        <span class="chip">Risposta</span>
+        <span class="markstate" id="markBack"></span>
+        <div class="body"><div class="a" id="a">—</div></div>
+        <div class="hint">↻ <kbd>←</kbd> indietro &nbsp;·&nbsp; <kbd>→</kbd> avanti</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="big" id="prev">← Indietro</button>
+    <button class="big" id="flip">Gira</button>
+    <button class="big" id="next">Avanti →</button>
+  </div>
+  <div class="nav">
+    <button class="btn-good" id="markKnown" title="Sapevo (G)">✔ Sapevo</button>
+    <button class="btn-again" id="markAgain" title="Da rivedere (A)">↻ Da rivedere</button>
+  </div>
+</main>
+
+<footer>
+  Card basate sugli appunti <b>UniTo Cybersecurity</b> di Michele Scarlata (crypto) e koraynilay (network) · scorciatoie: <kbd>←</kbd>/<kbd>→</kbd> · <kbd>Spazio</kbd> gira · <kbd>G</kbd> sapevo · <kbd>A</kbd> rivedere · <kbd>S</kbd> mescola
+</footer>
+
+<script>
+const CARDS = [
+ // ===== INTRODUZIONE =====
+ {id:"SC-I1",cat:"Introduzione",q:"Definizione di ICT Security.",a:"Insieme di <b>misure tecniche e organizzative</b> per garantire la triade <b>CIA</b> (Confidentiality, Integrity, Availability) sui <b>digital assets</b>: endpoint, infrastruttura di rete e comunicazioni.<span class='ex'><b>Memo:</b> ICT Security = sicurezza degli asset digitali, non solo del singolo PC.</span>"},
+ {id:"SC-I2",cat:"Introduzione",q:"Confidentiality vs Privacy.",a:"<b>Confidentiality:</b> l'informazione è accessibile solo a entità <b>autenticate e autorizzate</b>. <b>Privacy:</b> l'individuo deve poter controllare <b>come</b> i suoi dati sono raccolti, conservati e pubblicati.<span class='ex'>Confidentiality è una proprietà del sistema; Privacy è un diritto del soggetto.</span>"},
+ {id:"SC-I3",cat:"Introduzione",q:"Integrity in senso stretto e «System Integrity»?",a:"<b>Integrity:</b> i dati non possono essere alterati senza rilevamento o autorizzazione. <b>System Integrity:</b> i sistemi ICT si comportano come specificato, senza modifiche che ne compromettano il funzionamento corretto.<span class='ex'>Integrity copre sia i dati sia il comportamento del sistema.</span>"},
+ {id:"SC-I4",cat:"Introduzione",q:"Computer Security vs Communications Security?",a:"<b>Computer Security:</b> difendere endpoint e infrastruttura (intrusioni, malware, accesso non autorizzato, hardware compromesso). <b>Communications Security:</b> difendere i messaggi che attraversano la rete (interception, modification, fabrication, interruption).<span class='ex'>Software attacks possono colpire entrambi via LAN o WAN.</span>"},
+ {id:"SC-I5",cat:"Introduzione",q:"Cybersecurity vs ICT Security vs Information Security?",a:"<b>Information Security:</b> protezione dell'informazione in qualsiasi forma (anche cartacea). <b>ICT Security:</b> sicurezza dei sistemi informatici/telecomunicativi. <b>Cybersecurity:</b> ICT security applicata al <b>cyberspazio</b> (endpoint, internet, cloud, IoT). Si parte da CIA come obiettivi e si usano crittografia/access control/monitoring come meccanismi.<span class='ex'>Information ⊇ ICT ⊇ Cyber.</span>"},
+
+ // ===== CIFRARI CLASSICI =====
+ {id:"SC-C1",cat:"Cifrari classici",q:"Cos'è un «cipher» secondo la definizione del corso?",a:"Un sistema che comprende metodi per: <b>encryption</b>, <b>decryption</b> e <b>generazione/gestione delle chiavi crittografiche</b>. Può essere <b>open</b> (algoritmo pubblico) o <b>closed</b> (tutto classificato).<span class='ex'>Vedi anche principio di Kerckhoffs.</span>"},
+ {id:"SC-C2",cat:"Cifrari classici",q:"Principio di Kerckhoffs: enunciato e conseguenza pratica.",a:"«Metodi e algoritmi prima o poi saranno scoperti dagli avversari, quindi <b>i segreti devono concentrarsi nelle chiavi</b>». Conseguenza: si preferiscono <b>cifrari aperti</b> (open) e si evita la security through obscurity.<span class='ex'><b>Modello di sicurezza:</b> l'avversario conosce l'algoritmo ma non la chiave.</span>"},
+ {id:"SC-C3",cat:"Cifrari classici",q:"Cifrari N-letter monoalfabetici: sicurezza e vulnerabilità.",a:"Ogni N-grafo è sostituito sempre con la stessa N-upla. Numero di chiavi: <code>(26^N)!</code> (per N=2 ≈ 1.9·10^1621). Più resistenti al brute force ma ancora <b>vulnerabili all'analisi statistica su digrafi/trigrafi</b>, specialmente con cifrato lungo o con porzioni di chiaro note.<span class='ex'>Per N=2: aa→qe, ab→zi, ..., zz→kf.</span>"},
+ {id:"SC-C4",cat:"Cifrari classici",q:"Vigenère: cifratura e decifratura, e cosa lo rompe?",a:"Chiave K=k₀k₁…k_{n-1}. Cifratura: <code>C_j = (T_j + k_{j%n}) mod 26</code>. Decifratura: <code>T_j = (C_j − k_{j%n} + 26) mod 26</code>.<br><b>Vulnerabilità:</b> se n è noto si applica analisi statistica monoalfabetica alle lettere a distanza n; se n non noto si prova n=1,2,…<span class='ex'>Più lungo il testo, più facile l'attacco.</span>"},
+ {id:"SC-C5",cat:"Cifrari classici",q:"Da caratteri a bit: come si traduce la sostituzione e cos'è F₂?",a:"La sostituzione alfabetica diventa <b>XOR ⊕</b>: trasforma il bit X in Y con una chiave bit K. Su byte equivale a sostituzione ASCII con chiave a 8 bit.<br><b>F₂={0,1}:</b> campo finito a due elementi con addizione=XOR e moltiplicazione=AND, aritmetica modulo 2.<span class='ex'>F₂ è il mattone algebrico dei cifrari bit-oriented.</span>"},
+ {id:"SC-C6",cat:"Cifrari classici",q:"Vernam cipher e One-Time Pad: relazione e sicurezza perfetta.",a:"<b>Vernam:</b> XOR del bit T_j con il bit K_{j%n} della chiave (Vigenère bit-oriented). <b>OTP:</b> Vernam con chiave <b>casuale, lunga quanto il messaggio, usata una sola volta</b>. È l'unico cifrario con <b>information-theoretic security</b> (Shannon 1949).<span class='ex'>Limite pratico: scambiare la chiave costa quanto trasmettere il testo.</span>"},
+ {id:"SC-C7",cat:"Cifrari classici",q:"Permutation cipher: come funziona e perché si combina con la sostituzione?",a:"Si scrive il chiaro in colonne di N lettere, si scambiano le colonne secondo una permutazione segreta, si rilegge per righe. Vulnerabile a raffinamenti incrementali su digrafi/trigrafi.<br><b>Idea moderna:</b> combinarla con la sostituzione → <b>diffusione + confusione</b> (DES, AES).<span class='ex'>Permutazioni a cascata con chiavi diverse migliorano la sicurezza.</span>"},
+
+ // ===== FEISTEL & DES =====
+ {id:"SC-F1",cat:"Feistel & DES",q:"Struttura di un round di Feistel e prova di correttezza.",a:"Blocco diviso in L₀, R₀. A ogni round: <code>L_i = R_{i-1}</code>, <code>R_i = L_{i-1} ⊕ F(K_i, R_{i-1})</code>. La F è <b>non invertibile</b>, ma il cifrario sì.<br><b>Prova (1 round):</b> D(E(L₀,R₀)) = ((L₀⊕F(K₁,R₀))⊕F(K₁,R₀), R₀) = (L₀,R₀): i due XOR identici si cancellano <b>indipendentemente da F</b>.<img src='img/scarlata/p-026.png' alt='Schema Feistel'>"},
+ {id:"SC-F2",cat:"Feistel & DES",q:"Parametri di DES e suo unico attacco noto.",a:"<b>Data Encryption Standard</b> (1977): cifrario simmetrico a blocchi <b>Feistel</b>, blocco <b>64 bit</b>, chiave <b>56 bit</b>, <b>16 round</b>. Efficiente. Usato fino al 2001 (AES). Unici attacchi pratici noti: <b>brute force</b>, ma 2⁵⁶ è oggi insufficiente.<img src='img/scarlata/p-029.png' alt='DES box'>"},
+ {id:"SC-F3",cat:"Feistel & DES",q:"Effetto valanga (avalanche) in DES: cos'è e da cosa nasce?",a:"Un singolo bit flip in input causa l'inversione di <b>molti bit</b> in output. Nasce dai <b>16 round</b> di Feistel combinati con le <b>S-box</b> (sostituzione non lineare).<span class='ex'>Cifrati di messaggi quasi identici risultano completamente diversi.</span>"},
+
+ // ===== AES =====
+ {id:"SC-A1",cat:"AES",q:"AES vs DES: parametri principali.",a:"<b>AES</b> (Advanced Encryption Standard): rete <b>sostituzione-permutazione</b> (non Feistel), blocco <b>128 bit</b>, chiave 128/192/256, round 10/12/14. Più robusto di DES contro attacchi lineari e differenziali. Hardware native su CPU 64-bit (istruzioni AES-NI).<img src='img/scarlata/p-032.png' alt='AES box'>"},
+ {id:"SC-A2",cat:"AES",q:"Come è rappresentato un blocco AES e che algebra si usa?",a:"Il blocco da 128 bit si vede come <b>matrice 4×4 di byte</b> riempita in column-major (b1..b16). Ogni byte è un elemento di <b>GF(2⁸)</b> (Galois Field): addizione = XOR, moltiplicazione chiusa sui byte, ogni byte ≠ 0 ha inverso moltiplicativo, identità = 0x01.<img src='img/scarlata/p-035.png' alt='AES byte matrix'>"},
+ {id:"SC-A3",cat:"AES",q:"Schema di un round AES (encrypt e decrypt).",a:"Encrypt: <b>AddRoundKey</b> iniziale, poi N−1 round <b>SubBytes → ShiftRows → MixColumns → AddRoundKey</b>, round finale senza MixColumns.<br>Decrypt: ordine inverso con operazioni inverse (InvShiftRows, InvSubBytes, InvMixColumns).<img src='img/scarlata/p-038.png' alt='AES rounds encrypt/decrypt'>"},
+ {id:"SC-A4",cat:"AES",q:"Use risks di AES anche se l'algoritmo è solido?",a:"L'algoritmo non ha attacchi pratici noti (2026) se ben deployato. Restano rischi <b>implementativi</b>: side-channel, gestione errata di <b>IV</b>, <b>nonce reuse</b>, <b>timing attack</b>, <b>weak randomness</b>, <b>oracle attacks</b> (es. bit flipping).<span class='ex'>La sicurezza di AES dipende dal deploy, non dall'algoritmo.</span>"},
+
+ // ===== MODI A BLOCCHI =====
+ {id:"SC-M1",cat:"Modi a blocchi",q:"Block cipher vs Stream cipher: caratteristiche e use case.",a:"<b>Block cipher</b> (AES, DES): cifra blocchi di dimensione fissa (128 bit). Ideale per <b>file, dischi, dati stored</b>. <b>Stream cipher</b> (ChaCha20): cifra bit/byte alla volta combinando con un keystream pseudo-random. Più veloce, adatto al <b>real-time</b> e a flussi continui.<span class='ex'>CFB/OFB/CTR trasformano un block cipher in stream cipher.</span>"},
+ {id:"SC-M2",cat:"Modi a blocchi",q:"ECB e perché è considerato insicuro.",a:"<b>Electronic Codebook:</b> cifra ogni blocco M_i in modo indipendente con la stessa chiave. Blocchi uguali → cifrati uguali → l'analisi statistica recupera pattern. Adatto solo a messaggi cortissimi.<span class='ex'>Esempio classico: cifrando un'immagine in ECB la figura resta riconoscibile.</span>"},
+ {id:"SC-M3",cat:"Modi a blocchi",q:"CBC: pregi e «difetti».",a:"<b>Cipher Block Chaining:</b> ogni blocco va in XOR col cifrato precedente, primo blocco con <b>IV</b> (lungo come un blocco). Non vulnerabile all'analisi statistica come ECB, stessa efficienza. Usato con 3DES-EDE-CBC e AES.<br><b>Flaws:</b> 1 bit errato in trasmissione rovina il suo blocco <b>e</b> il successivo; il chiaro deve essere disponibile prima di iniziare (problema per real-time).<span class='ex'>Modalità più comune per i block cipher.</span>"},
+ {id:"SC-M4",cat:"Modi a blocchi",q:"CFB: caratteristica chiave e propagazione errori.",a:"<b>Cipher FeedBack:</b> usa <b>solo la funzione di cifratura</b> anche in decifratura. Trasforma un block cipher in <b>stream cipher</b>. Meno efficiente di CBC.<br><b>Errori:</b> un bit errato si <b>propaga su più blocchi successivi</b>, che non saranno decifrabili.<span class='ex'>Memo: CFB → propagazione lunga; OFB → errore locale.</span>"},
+ {id:"SC-M5",cat:"Modi a blocchi",q:"OFB e OFB-i: vantaggi per real-time.",a:"<b>Output FeedBack:</b> la generazione del cipher block pseudo-random <b>non dipende dal plaintext</b> → il keystream è <b>pre-calcolabile</b> e va in XOR col chiaro quando arriva. Perfetto per real-time.<br><b>OFB-i:</b> usa solo i primi i bit di ogni output. i=1 → stream bit-based, i=8 → byte-based. Un bit errato affligge solo il gruppo di i bit corrispondente.<span class='ex'>Memo: OFB ↔ stream cipher tollerante agli errori.</span>"},
+
+ // ===== MULTI-FASE & 3DES =====
+ {id:"SC-X1",cat:"Multi-fase / 3DES",q:"2-phase encryption: perché non è davvero più forte di una singola?",a:"Si cifra due volte con K1 poi K2 (sembra 2^(2N)). Vulnerabile al <b>meet-in-the-middle</b>: con almeno due coppie <P,C> note, l'attaccante cifra il chiaro con tutte le K1' possibili e decifra il cifrato con tutte le K2', cercando un match sul valore intermedio. Riduce la complessità da 2^(2N) a ~<b>2^(N+1)</b>.<img src='img/scarlata/p-041.png' alt='2-phase encryption'>"},
+ {id:"SC-X2",cat:"Multi-fase / 3DES",q:"Meet-in-the-middle: procedura operativa.",a:"<b>Fase 1:</b> cifra P1 con tutte le K1' → stop quando C1'=C1'' (dove C1'' = decifratura di C1 con K2'). <b>Verifica:</b> con DES M=64 < 2n=112 quindi ci sono più coppie chiave che blocchi → si usa la <b>seconda coppia</b> (P2,C2) per validare la coppia (K1',K2') trovata.<img src='img/scarlata/p-050.png' alt='MITM phase 2 verifica'>"},
+ {id:"SC-X3",cat:"Multi-fase / 3DES",q:"3-phase encryption e 3DES-EDE.",a:"<b>3-phase:</b> cifra con K1, K2, K3 → non vulnerabile al MITM (servirebbero 2^(3N) operazioni). Applicato a DES dà il <b>3DES</b>. Tipicamente con <b>K1=K3</b> e fase centrale in modalità <b>decryption</b>: <b>3DES-EDE</b> (Encrypt-Decrypt-Encrypt). Con K1=K2=K3 → si ricade nel DES singolo (compatibilità HW/SW). Ancora usato nei browser.<img src='img/scarlata/p-056.png' alt='Triple DES EDE'>"},
+
+ // ===== ASIMMETRICI + DH =====
+ {id:"SC-K1",cat:"Asimmetrici / DH",q:"Proprietà fondamentali dei cifrari asimmetrici (K1,K2).",a:"1) <b>Non</b> è possibile ottenere K2 da K1 né viceversa. 2) Non è possibile decifrare anche conoscendo K1 (la chiave usata per cifrare).<br>Più costosi di quelli simmetrici → entrambi convivono. Pubblici dal 1978.<span class='ex'>Notazione del corso: K(Alice)⁺ pubblica, K(Alice)⁻ privata.</span>"},
+ {id:"SC-K2",cat:"Asimmetrici / DH",q:"Digital envelope: cos'è e perché si usa?",a:"Trasmissione cifrata che combina:<br>• cifratura <b>simmetrica</b> del messaggio (veloce);<br>• cifratura <b>asimmetrica</b> della <b>chiave simmetrica</b>.<br>Si supera il limite di efficienza degli asimmetrici e il problema della distribuzione della chiave dei simmetrici.<span class='ex'>Per la firma si usa lo stesso principio, cifrando con la chiave privata solo l'hash del messaggio.</span>"},
+ {id:"SC-DH1",cat:"Diffie-Hellman",q:"Proprietà del modulo usata in DH (e fast exponentiation).",a:"<b>Modulo del prodotto:</b> <code>(A·B) mod M = ((A mod M)·(B mod M)) mod M</code>. Poiché l'esponenziazione è una serie di prodotti: <code>A^B mod M = (A mod M)^B mod M</code>. Si applica mod a ogni passo per tenere piccoli i numeri intermedi.<span class='ex'>Notazione: X|Y significa «X divide Y», ossia ∃k: Y=kX.</span>"},
+ {id:"SC-DH2",cat:"Diffie-Hellman",q:"Generatore α su un campo finito Z_q*: definizione.",a:"Dato un primo q, α è <b>generatore</b> di Z_q* se per ogni intero tra 1 e q−1 esiste n tale che <code>α^n mod q</code> lo produce (α «genera» tutto il gruppo). Serve in DH perché le chiavi pubbliche spaziano su tutto Z_q*.<span class='ex'>Con una α non primitiva l'avversario avrebbe meno tentativi per scoprire la chiave privata.</span>"},
+ {id:"SC-DH3",cat:"Diffie-Hellman",q:"Protocollo DH passo passo.",a:"Parametri pubblici: <code>q, α</code>. Ogni utente sceglie un segreto <b>r</b> con 1&lt;r&lt;q−1 e calcola <b>PK = α^r mod q</b> (pubblica). Chiave condivisa:<br><code>K = PK_b^{SK_a} mod q = (α^{SK_b})^{SK_a} = (α^{SK_a})^{SK_b} = PK_a^{SK_b} mod q</code>.<br>Funziona perché l'esponenziazione è <b>commutativa</b>.<span class='ex'>Sul canale viaggiano solo PK_a e PK_b in chiaro.</span>"},
+ {id:"SC-DH4",cat:"Diffie-Hellman",q:"Esponente modulare vs logaritmo discreto: complessità.",a:"<b>Esponente modulare</b> α^SK mod q: polinomiale O(log SK) con square-and-multiply → fattibile. <b>Logaritmo discreto</b> (ricavare SK da α^SK mod q): nessun algoritmo polinomiale noto → <b>esponenziale</b> nei bit.<span class='ex'>Su questa asimmetria si basa la sicurezza di DH.</span>"},
+ {id:"SC-DH5",cat:"Diffie-Hellman",q:"Fast exponentiation (square-and-multiply): pseudocodice.",a:"<pre style='margin:6px 0;color:#dfeaff'>def mod_pow(a, n, m):\n    result = 1; base = a % m\n    while n &gt; 0:\n        if n % 2 == 1: result = (result*base) % m\n        base = (base*base) % m\n        n //= 2\n    return result</pre><span class='ex'>Costo: O(log n) prodotti invece di O(n). Mod a ogni step per non far esplodere i numeri.</span>"},
+ {id:"SC-DH6",cat:"Diffie-Hellman",q:"Teorema dei numeri primi e numero atteso di tentativi.",a:"<code>π(x) ∼ x/ln(x)</code>: la densità dei primi è circa 1/ln(x). Quindi per un primo a k bit servono in media <b>k·ln 2</b> tentativi. Es: 1024 bit ≈ 710 trial, 2048 bit ≈ 1420 trial (lineare).<span class='ex'>Il vero collo di bottiglia non è la generazione ma il test di primalità.</span>"},
+ {id:"SC-DH7",cat:"Diffie-Hellman",q:"Miller-Rabin: su quali due risultati si fonda?",a:"<b>1) Piccolo teorema di Fermat:</b> se M primo e a&lt;M, allora <code>a^{M-1} mod M = 1</code>. <b>2) Principio fondamentale:</b> se M primo e <code>x² mod M = 1</code> allora x=1 o x=M−1.<br>Idea: scrivere M−1 = 2^k·q (q dispari) e analizzare la sequenza dei quadrati di a^q.<img src='img/scarlata/p-066.png' alt='Miller-Rabin algoritmo'>"},
+ {id:"SC-DH8",cat:"Diffie-Hellman",q:"Miller-Rabin: esempi di successo e fallimento.",a:"Test ripetuto T volte: <code>P(M primo) ≥ 1 − 4⁻ᵀ</code>. Il test può <b>sbagliare</b> dicendo «probabilmente primo» quando non lo è (es. M=25, a=7 supera il test) → si ripete con più valori di a.<img src='img/scarlata/p-072.png' alt='Miller-Rabin fallimento M=25'>"},
+ {id:"SC-DH9",cat:"Diffie-Hellman",q:"Test efficiente per verificare se g è generatore mod q.",a:"1) Fattorizza q−1 nei suoi primi p₁,p₂,…<br>2) Per ogni p_i verifica <code>g^((q−1)/p_i) ≢ 1 (mod q)</code>.<br>Se tutti i check passano, g è generatore.<br><b>Pratica:</b> si usa un <b>safe prime</b> q=2p+1 (p primo) → q−1=2p, test rapidissimo.<span class='ex'>Es: g=5, q=23 → 5¹¹ mod 23=22, 5² mod 23=2: 5 è generatore.</span>"},
+ {id:"SC-DH10",cat:"Diffie-Hellman",q:"Due problemi di DH (non risolti dal protocollo).",a:"1) Protegge solo da letture passive, <b>non</b> da attacchi attivi (Man-in-the-middle). 2) Fornisce solo uno scambio di chiavi, <b>non</b> cifratura, autenticazione o firma. Vanno combinati con cifrari simmetrici e canali autenticati.<img src='img/scarlata/p-075.png' alt='MITM su DH'>"},
+
+ // ===== RSA =====
+ {id:"SC-R1",cat:"RSA",q:"Generazione delle chiavi RSA passo passo.",a:"1) Scegli p, q primi grandi. 2) <code>N = p·q</code>. 3) <code>φ(N) = (p−1)(q−1)</code>. 4) Scegli <b>e</b> con <code>gcd(e, φ(N)) = 1</code>. 5) Calcola <b>d = e⁻¹ mod φ(N)</b> con Euclide esteso.<br>Chiave pubblica: <code>K⁺ = {e, N}</code>. Chiave privata: <code>K⁻ = {d}</code>.<span class='ex'>Cifratura: c = pt^e mod N. Decifratura: pt = c^d mod N.</span>"},
+ {id:"SC-R2",cat:"RSA",q:"Su quale problema si basa la sicurezza di RSA?",a:"Sulla difficoltà di <b>fattorizzare N</b> (ottenere p, q da N=p·q) quando p, q sono primi grandi. Con la tecnologia classica attuale è considerato computazionalmente <b>infattibile</b>, se N è generato correttamente.<span class='ex'>Quantistico: Shor lo romperebbe (vedi PQC).</span>"},
+ {id:"SC-R3",cat:"RSA",q:"Prova di correttezza di RSA (schema).",a:"Da <code>e·d ≡ 1 (mod φ(N))</code> segue <code>ed = 1 + k·φ(N)</code>. Per Eulero (con gcd(m,N)=1): <code>m^φ(N) ≡ 1 mod N</code>, quindi <code>m^{ed} = m·(m^{φ(N)})^k ≡ m·1 ≡ m (mod N)</code>.<img src='img/scarlata/p-078.png' alt='RSA correctness proof'>"},
+ {id:"SC-R4",cat:"RSA",q:"Inefficienze di RSA e impatto su HW limitato.",a:"Cifratura/decifratura sono polinomiali nei bit di N ma <b>più lente</b> dei simmetrici. La <b>key generation</b> (Euclide esteso + ricerca primi) è polinomiale ma costosa: problema su HW limitato (IoT, smartcard, token). Per questo si usa il <b>digital envelope</b>.<span class='ex'>Per la firma si cifra solo l'hash (128/256 bit).</span>"},
+ {id:"SC-R5",cat:"RSA",q:"Euclide esteso e identità di Bézout: a cosa servono in RSA?",a:"Servono a calcolare l'<b>inverso moltiplicativo d</b> di e mod φ(N). Bézout: ∃ x,y con <code>ax + by = gcd(a,b)</code>. Se gcd(e,φ)=1 l'algoritmo restituisce x,y con <code>e·x + φ·y = 1</code>, quindi <code>d = x mod φ</code>.<span class='ex'>Esempio: gcd(30,18)=6, identità: 6 = (−1)·30 + 2·18.</span>"},
+
+ // ===== HASH =====
+ {id:"SC-H1",cat:"Hash",q:"Proprietà richieste a una hash «strong».",a:"<b>One-way</b> (non invertibile): dato c, difficile risalire alle preimmagini. <b>Strongly one-way</b> (resistente alla seconda preimmagine): dato m₁, difficile trovare m₂ con H(m₁)=H(m₂). <b>Collision resistant</b>: difficile trovare una qualsiasi coppia m₁,m₂ con stesso digest.<span class='ex'>Se H⁻¹ è facile, lo è anche trovare collisioni.</span>"},
+ {id:"SC-H2",cat:"Hash",q:"Birthday paradox applicato alle hash.",a:"In un gruppo di 23 persone P(stessa data) ≈ 0.5073. Generale: <code>P(n,k) > 0.5</code> per <code>k > 1.18·√n</code>. Su digest a c bit (n=2^c) basta provare <code>k > 2^(c/2)</code> messaggi per avere una collisione probabile.<span class='ex'>Per 64-bit hash: ~2³² messaggi; per resistenza 128 bit alle collisioni servono digest da 256 bit.</span>"},
+ {id:"SC-H3",cat:"Hash",q:"Tre tipi di attacco a una hash function.",a:"<b>CMA (Chosen Message Attack):</b> l'attaccante sceglie M_i e ottiene gli output (libertà piena). <b>KMA (Known Message Attack):</b> ha solo coppie M_i→O_i già esistenti, no controllo sugli input. <b>COA (Ciphertext-Only Attack):</b> vede solo cifrati, lavora alla cieca con pattern/statistiche.<span class='ex'>Ordine di potenza: CMA &gt; KMA &gt; COA.</span>"},
+ {id:"SC-H4",cat:"Hash",q:"Schema di Merkle-Damgård e teorema.",a:"Il messaggio è diviso in blocchi m_i (k bit, k>256). Una funzione di compressione F combina ogni blocco col valore precedente, primo blocco con IV: <code>H(m) = F(...F(F(IV,m₁),m₂)...,m_n)</code>.<br><b>Teorema (Damgård 1989):</b> se F è collision-resistant su input a lunghezza fissa, allora H è collision-resistant su input di lunghezza arbitraria.<img src='img/scarlata/p-085.png' alt='Merkle-Damgård'>"},
+ {id:"SC-H5",cat:"Hash",q:"MD5, SHA-1, SHA-256: dimensioni del digest e stato sicurezza.",a:"Schema generale Merkle-Damgård con blocchi da <b>512 bit</b>. Digest: <b>MD5 128 bit, SHA-1 160 bit, SHA-256 256 bit</b>.<br><b>MD5 e SHA-1 NON sono più sicuri</b>: esistono metodi per generare collisioni. SHA-1 è più resistente a brute force/birthday di MD5 grazie al digest più lungo.<br><b>SHA-256:</b> ancora one-way e collision resistant; preimage 2²⁵⁶, birthday 2¹²⁸.<img src='img/scarlata/p-088.png' alt='MD5/SHA Merkle-Damgård'>"},
+ {id:"SC-H6",cat:"Hash",q:"SHA-256: usi attuali principali.",a:"<b>MAC</b> (HMAC), <b>firme digitali</b>, <b>TLS/HTTPS</b>, <b>file integrity & software distribution</b>, <b>blockchain e criptovalute</b>.<span class='ex'>Le rotazioni/AND/XOR/addizioni mod 2³² su 64 round producono un mixing forte: anche operazioni semplici, iterate, danno effetto valanga.</span>"},
+
+ // ===== PQC =====
+ {id:"SC-PQ1",cat:"Post-Quantum",q:"Obiettivo della Post-Quantum Cryptography (PQC).",a:"Progettare sistemi <b>sicuri sia contro computer classici sia quantistici</b>. La crittografia pubblica attuale (RSA, DH) si basa su problemi (fattorizzazione, log discreto) che i quantum risolverebbero in tempo polinomiale.<span class='ex'>Caso concreto: algoritmo di Shor.</span>"},
+ {id:"SC-PQ2",cat:"Post-Quantum",q:"Algoritmo di Shor: come fattorizza?",a:"1) Per fattorizzare n, scegli a&lt;n casuale.<br>2) Considera <code>f(k) = a^k mod n</code>, periodica con periodo r.<br>3) Il quantum trova r efficientemente con la Quantum Fourier Transform.<br>4) Da r si ricavano i fattori p, q classicamente.<img src='img/scarlata/p-091.png' alt='Shor period to factor'>"},
+ {id:"SC-PQ3",cat:"Post-Quantum",q:"Lattici e problemi difficili usati nella PQC.",a:"Un <b>lattice</b> è l'insieme di tutte le combinazioni intere di vettori base v_i in R^n. Proprietà: ammette molte basi, una «corta» (≈ chiave privata) e una «lunga» (≈ chiave pubblica) generano lo stesso lattice. Problemi hard: <b>SVP</b> (Shortest Vector Problem) e <b>CVP</b> (Closest Vector Problem) in alte dimensioni.<span class='ex'>Su questi si costruiscono schemi PQC.</span>"},
+ {id:"SC-PQ4",cat:"Post-Quantum",q:"NIST PQC: due algoritmi standardizzati selezionati.",a:"Competizione globale dal 2016. Selezionati:<br>• <b>ML-KEM</b> (derivato da CRYSTALS-Kyber) per <b>key encapsulation</b>;<br>• <b>ML-DSA</b> (derivato da CRYSTALS-Dilithium) per <b>firme digitali</b>.<span class='ex'>«CRYSTALS» = famiglia di schemi lattice-based.</span>"},
+ {id:"SC-PQ5",cat:"Post-Quantum",q:"Raccomandazione UE per la transizione PQC.",a:"<b>European Commission Recommendation EU 2024/1101</b>: prepararsi alla transizione PQC. Focus su <b>protezione a lungo termine</b> e infrastrutture critiche, resistere a «harvest now, decrypt later». Le organizzazioni devono fare inventario, adottare <b>crypto-agility</b>, pianificare migrazione su scala decennale.<span class='ex'>Crypto-agility = capacità di cambiare algoritmo quando serve.</span>"},
+
+ // ===== MAC & SIGNATURE =====
+ {id:"SC-MS1",cat:"MAC & Firme",q:"MAC: cos'è e quali proprietà garantisce / non garantisce?",a:"<b>Message Authentication Code:</b> piccolo gruppo di byte appeso al messaggio, generato con una <b>chiave simmetrica condivisa</b>. Garantisce <b>integrità + autenticazione</b>. <b>NON</b> garantisce <b>non ripudio</b>: il MAC potrebbe essere stato prodotto anche dal ricevente.<span class='ex'>Implementazioni: HMAC, CMAC.</span>"},
+ {id:"SC-MS2",cat:"MAC & Firme",q:"MAC con AES-CBC: come si costruisce e perché funziona?",a:"Si cifra il messaggio in <b>CBC</b> e si usa l'<b>ultimo blocco cifrato</b> come MAC. Grazie all'avalanche, modificare anche un bit del messaggio cambia il blocco finale. Sicuro perché l'attaccante non conosce la chiave simmetrica.<span class='ex'>Però è più lento di HMAC.</span>"},
+ {id:"SC-MS3",cat:"MAC & Firme",q:"HMAC: formula e perché non basta H(key||message).",a:"<code>HMAC(key, message) = hash((key ⊕ opad) || hash((key ⊕ ipad) || message))</code><br>con <code>ipad=00110110</code> e <code>opad=01011010</code> ripetuti j/8 volte. La key è zero-padded (o hashed se più lunga di j bit).<br>Senza doppio hash si è vulnerabili al <b>length extension attack</b>. Più efficiente del MAC-CBC perché l'outer hash opera su input cortissimi.<span class='ex'>Protegge anche da birthday e chosen-message se H è sicura.</span>"},
+ {id:"SC-MS4",cat:"MAC & Firme",q:"Firma digitale RSA: procedura completa.",a:"Mittente: calcola <b>hash</b> del messaggio (tipicamente SHA-256) e lo cifra con la <b>chiave privata</b>. Ricevente: ricalcola l'hash, decifra la firma con la <b>chiave pubblica</b> del mittente, confronta. Se coincidono: messaggio autentico, integro, <b>non ripudiabile</b>.<span class='ex'>Asimmetria + non ripudio: solo il mittente possiede la chiave privata.</span>"},
+ {id:"SC-MS5",cat:"MAC & Firme",q:"Trusted channel: che proprietà garantisce e come?",a:"Un canale considerato sicuro e affidabile, garantisce: <b>autenticità</b> (chi parla), <b>integrità</b> (no modifiche) e talvolta <b>confidenzialità</b>. Costruito tramite: identity verification (certificati), encryption, integrity check (hash), key exchange (asimmetrico), secure protocol (TLS, SSH).<span class='ex'>Previene spoofing, tampering, eavesdropping.</span>"},
+ {id:"SC-MS6",cat:"MAC & Firme",q:"Certificato X.509: campi essenziali.",a:"<b>Certificate Authority (CA) name</b> (issuer), <b>issue time</b> (not valid before), <b>expiration</b> (not valid after), <b>allowed use cases</b>, <b>signature algorithm ID</b>. La CA è una <b>Trusted Third Party</b>, agisce come «public key directory».<span class='ex'>Difende da MITM su scambio di chiavi pubbliche.</span>"},
+
+ // ===== RETE / SNIFFING =====
+ {id:"SC-N1",cat:"Rete · Sniffing",q:"Network security: definizione e principali issue.",a:"Garantire CIA per le comunicazioni in reti <b>untrusted o parzialmente trusted</b>. Issue principali: intrusioni, malware via rete, eavesdropping, sniffing, spoofing, DoS/DDoS.<span class='ex'>Difese: access control diffuso, firewall, IDS/IPS, MDM, DLP, antivirus, anti-malware filter, backup, disaster recovery.</span>"},
+ {id:"SC-N2",cat:"Rete · Sniffing",q:"Packet sniffing: usi legittimi e malevoli.",a:"<b>Legittimi:</b> network troubleshooting, security analysis, protocol debugging. <b>Malevoli:</b> eavesdropping su dati non cifrati (password), session hijacking, data theft. Tool: <b>Wireshark</b>, <b>tcpdump</b>, <b>tshark</b>, <b>Ettercap</b>.<span class='ex'>Sniffing è un'attività di per sé neutra: dipende dal contesto.</span>"},
+ {id:"SC-N3",cat:"Rete · Sniffing",q:"Come funziona lo sniffing a livello NIC?",a:"1) NIC posta in <b>promiscuous mode</b>: cattura tutti i pacchetti, non solo quelli destinati al proprio MAC.<br>2) I pacchetti vengono intercettati.<br>3) Il tool decodifica e mostra il contenuto in forma leggibile.<span class='ex'>Difese: encryption (HTTPS, VPN), evitare Wi-Fi pubblico, SSH non Telnet, firewall + IDS.</span>"},
+ {id:"SC-N4",cat:"Rete · Sniffing",q:"Bus LAN vs switched LAN: implicazioni per lo sniffing.",a:"<b>Bus LAN (vecchie):</b> tutti i byte visibili su tutti i punti della linea → sniffing banale. <b>Switched LAN:</b> i pacchetti vanno dal sender allo switch direttamente al destinatario → host della stessa LAN <b>non</b> possono intercettarsi. Punto debole: accesso diretto al router.<span class='ex'>Su switched serve un attacco attivo (es. ARP poisoning).</span>"},
+
+ // ===== ARP POISONING + DIFESE =====
+ {id:"SC-N5",cat:"Rete · ARP",q:"ARP normale vs ARP poisoning.",a:"<b>Normale:</b> i device mappano IP→MAC con richieste ARP («Who has 192.168.1.1?»).<br><b>Poisoning:</b> l'attaccante invia <b>fake ARP replies</b> facendo credere ai device che «MAC dell'attaccante = IP del router» (e viceversa). Funziona perché ARP è <b>stateless</b>. Risultato: traffico dirottato → MITM (sniff, modify, DoS, redirect).<img src='img/scarlata/p-094.png' alt='ARP packet 28 byte'>"},
+ {id:"SC-N6",cat:"Rete · ARP",q:"Difese contro ARP poisoning e sniffing in LAN.",a:"• <b>HTTPS/TLS</b> (e2e), <b>IPsec</b> (network layer).<br>• <b>Static ARP entries</b>, <b>DHCP snooping</b> (IP-MAC binding), <b>Dynamic ARP Inspection (DAI)</b>, <b>IP source guard</b>, <b>Port security</b> (MAC whitelisting).<br>• Monitor di MAC duplicati o cambiamenti improvvisi.<span class='ex'>Comando di check cache ARP (Win/Linux): <code>arp -a</code>.</span>"},
+ {id:"SC-N7",cat:"Rete · ARP",q:"DHCP snooping e DAI: cosa fanno?",a:"<b>DHCP snooping:</b> 1) marca porte come trusted (DHCP server) o untrusted (client); 2) filtra: i trusted possono inviare OFFER/ACK, gli untrusted solo DISCOVER/REQUEST.<br><b>DAI (Dynamic ARP Inspection):</b> 1) osserva i messaggi DHCP e memorizza coppie &lt;MAC, IP&gt;; 2) blocca le ARP reply non coerenti con quelle binding.<span class='ex'>I due meccanismi si combinano: DHCP snooping costruisce la tabella che DAI usa.</span>"},
+
+ // ===== SPOOFING =====
+ {id:"SC-N8",cat:"Rete · Spoofing",q:"Livelli e tipi di spoofing.",a:"<b>Hardware:</b> MAC spoofing (su broadcast segment via ARP poisoning o cambio HW config; inutile su WAN). <b>Rete:</b> IP spoofing (LAN sempre, WAN solo con UDP o non blind). <b>DNS:</b> attaccando il DNS server o via DHCP che fornisce un DNS falso. <b>URL:</b> web spoofing (URL simili, link modificati → phishing).<span class='ex'>Su WAN il MAC originale viene rimpiazzato dal router → spoofing inutile.</span>"},
+ {id:"SC-N9",cat:"Rete · Spoofing",q:"TCP header: campi rilevanti per la sicurezza.",a:"<b>sp</b>/<b>dp</b>: source/destination port. <b>seq</b>/<b>ack</b>: sequence e acknowledgment number (true-random, non predicibili). <b>hl</b>: header length. <b>w</b>: window. <b>cks</b>: checksum. <b>up</b>: urgent pointer. <b>Code bits:</b> URG, <b>ACK</b>, PSH, RST, <b>SYN</b>, FIN.<img src='img/scarlata/p-097.png' alt='TCP header format'>"},
+ {id:"SC-N10",cat:"Rete · Spoofing",q:"TCP 3-way handshake.",a:"1) Client → SYN, SN=N. 2) Server → SYN+ACK, SN=M, AN=N+1. 3) Client → ACK, AN=M+1.<br>I sequence number iniziali sono casuali → su WAN è difficile predire M, da cui la difficoltà del blind IP spoofing su TCP.<img src='img/scarlata/p-100.png' alt='TCP 3-way handshake'>"},
+ {id:"SC-N11",cat:"Rete · Spoofing",q:"Blind vs Non-Blind IP spoofing.",a:"<b>Blind:</b> l'attaccante non vede le risposte → deve indovinare M per inviare ACK con AN=M+1 (impossibile su TCP/WAN con SN random).<br><b>Non-blind:</b> l'attaccante può <b>sniffare</b> i messaggi diretti all'identità impersonata → risponde con l'ACK corretto.<img src='img/scarlata/p-103.png' alt='Non-blind IP spoofing'>"},
+
+ // ===== DoS / DDoS =====
+ {id:"SC-N12",cat:"Rete · DoS",q:"DoS direct vs reflection, e cos'è una botnet.",a:"<b>Direct:</b> l'attaccante invia traffico da risorse proprie (PC o botnet). <b>Reflection:</b> richieste con IP sorgente falsificato (= vittima) inviate a terze parti che <b>rispondono amplificando</b> verso la vittima (anonimato + amplificazione).<br><b>Botnet:</b> rete di device infetti (<b>zombie</b>) controllati da remoto → DDoS amplificato.<span class='ex'>DoS si divide in host resource exhaustion (SYN flood) e network flooding (Smurf).</span>"},
+ {id:"SC-N13",cat:"Rete · DoS",q:"SYN flood con blind IP spoofing: meccanismo.",a:"L'attaccante invia molti SYN al server con <b>IP sorgenti spoofed</b>. Il server risponde con SYN-ACK ai falsi indirizzi e <b>alloca risorse</b> (half-open). Nessun ACK arriverà mai → la coda di connessione si riempie, gli utenti legittimi non riescono più a connettersi.<span class='ex'>Vantaggi del blind: traccia difficile + IP molteplici + amplificazione delle risorse esaurite.</span>"},
+ {id:"SC-N14",cat:"Rete · DoS",q:"Smurf attack: meccanismo e difesa.",a:"Reflection con <b>ICMP echo request</b>: l'attaccante invia richieste con <b>sourceIP = vittima</b> all'<b>indirizzo broadcast</b> di una sottorete. Tutti gli host della rete rispondono con echo reply <b>verso la vittima</b>, amplificando il traffico.<br><b>Difesa:</b> i router moderni non instradano pacchetti con destinazione broadcast in ingresso.<span class='ex'>ICMP è connectionless → permette IP spoofing facilmente.</span>"},
+ {id:"SC-N15",cat:"Rete · DoS",q:"Spam con SMTP relay aperto: meccanismo e difesa.",a:"L'attaccante abusa di un mail server <b>open relay</b> (per errore o config) per inviare grandi quantità di spam attraverso le risorse di terzi.<br><b>Difesa:</b> richiedere autenticazione utente o limitare le sorgenti accettate (es. solo IP/domini interni).<span class='ex'>Caso particolare di flooding via posta.</span>"},
+];
+
+const LS="flashSEC.scarlata.progress.v1";
+let progress = JSON.parse(localStorage.getItem(LS)||"{}");
+let onlyAgain=false;
+let deck=[], i=0, flipped=false;
+
+const $=id=>document.getElementById(id);
+const card=$("card");
+
+function cats(){return ["Tutte",...[...new Set(CARDS.map(c=>c.cat))]];}
+function buildCatSelect(){ $("cat").innerHTML=cats().map(c=>`<option>${c}</option>`).join(""); }
+
+function rebuildDeck({shuffle=false}={}){
+  const sel=$("cat").value||"Tutte";
+  deck=CARDS.filter(c=>(sel==="Tutte"||c.cat===sel)&&(!onlyAgain||progress[c.id]==="again"));
+  if(shuffle){ for(let j=deck.length-1;j>0;j--){const r=Math.floor(Math.random()*(j+1));[deck[j],deck[r]]=[deck[r],deck[j]];} }
+  i=0; showCard();
+}
+function showCard(){
+  const n=deck.length; setFlip(false);
+  if(n===0){
+    $("q").innerHTML='<span class="empty">Nessuna card in questo filtro 🎉</span>';
+    $("a").innerHTML=""; $("catChip").textContent="—"; $("qid").textContent="";
+    $("counter").textContent="0 / 0"; $("bar").style.width="0%"; updateMarks(); updateStats(); return;
+  }
+  if(i<0)i=n-1; if(i>=n)i=0;
+  const c=deck[i];
+  $("catChip").textContent=c.cat; $("qid").textContent="Card "+c.id;
+  $("q").innerHTML=c.q; $("a").innerHTML=c.a;
+  $("counter").textContent=(i+1)+" / "+n; $("bar").style.width=((i+1)/n*100)+"%";
+  updateMarks(); updateStats();
+}
+function setFlip(v){flipped=v;card.classList.toggle("flip",v);}
+function toggleFlip(){setFlip(!flipped);}
+function next(){if(deck.length){i=(i+1)%deck.length;showCard();}}
+function prev(){if(deck.length){i=(i-1+deck.length)%deck.length;showCard();}}
+function mark(state){
+  if(!deck.length)return;
+  const id=deck[i].id;
+  if(progress[id]===state) delete progress[id]; else progress[id]=state;
+  localStorage.setItem(LS,JSON.stringify(progress));
+  updateMarks(); updateStats();
+  if(state==="known"){ if(onlyAgain){rebuildDeck();} else {setTimeout(next,180);} }
+}
+function updateMarks(){
+  const id=deck.length?deck[i].id:null; const st=id?progress[id]:null;
+  const label = st==="known"?"✔ sapevo":st==="again"?"↻ da rivedere":"";
+  for(const el of [$("markFront"),$("markBack")]){ el.textContent=label; el.className="markstate"+(st?(" "+st):""); }
+}
+function updateStats(){
+  let k=0,a=0; for(const v of Object.values(progress)){if(v==="known")k++;else if(v==="again")a++;}
+  $("nKnown").textContent=k; $("nAgain").textContent=a;
+}
+card.addEventListener("click",toggleFlip);
+$("flip").onclick=toggleFlip; $("next").onclick=next; $("prev").onclick=prev;
+$("markKnown").onclick=()=>mark("known"); $("markAgain").onclick=()=>mark("again");
+$("shuffle").onclick=()=>rebuildDeck({shuffle:true});
+$("cat").onchange=()=>rebuildDeck();
+$("onlyAgain").onclick=()=>{onlyAgain=!onlyAgain;$("onlyAgain").style.borderColor=onlyAgain?"var(--accent)":"";rebuildDeck();};
+$("reset").onclick=()=>{if(confirm("Azzerare tutti i progressi?")){progress={};localStorage.removeItem(LS);rebuildDeck();}};
+document.addEventListener("keydown",e=>{
+  if(e.target.tagName==="SELECT")return;
+  if(e.key==="ArrowRight")next(); else if(e.key==="ArrowLeft")prev();
+  else if(e.key===" "){e.preventDefault();toggleFlip();}
+  else if(e.key==="g"||e.key==="G")mark("known"); else if(e.key==="a"||e.key==="A")mark("again");
+  else if(e.key==="s"||e.key==="S")rebuildDeck({shuffle:true});
+});
+buildCatSelect();
+rebuildDeck();
+</script>
+</body>
+</html>
