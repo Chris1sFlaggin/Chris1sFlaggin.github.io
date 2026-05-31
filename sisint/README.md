@@ -26,9 +26,11 @@ Il pool di domande è organizzato secondo il programma del corso:
 | 1 — Risoluzione di problemi | spazi degli stati, BFS/DFS/IDS, A*/RBFS, euristiche, minimax/alfa-beta, CSP, backtracking, AC-3 | 6+9 |
 | 1 — Estensioni 9 CFU | giochi stocastici, expectiminimax, nodi di casualità | 9 |
 | 2 — Conoscenza | logica proposizionale, FOL, risoluzione, forward/backward chaining, modus ponens, clausole di Horn, planning, situation calculus, frame problem | 6+9 |
-| 2 — Estensioni 9 CFU | lifting risoluzione FOL, refutation, ontologie (T-box/A-box, Partition, Bunch-of), probabilità (cap. 12 AIMA), reti bayesiane (cap. 13 AIMA), KR (cap. 10 AIMA) | 9 |
+| 2 — Estensioni 9 CFU | lifting di risoluzione, Skolemizzazione, refutation, ontologie (RDF/OWL, allineamento ontologico, partizioni, part-of/bunch-of), probabilità e regola di Bayes, reti bayesiane (Markov blanket, naive Bayes, semantica globale/locale) | 9 |
 | 3 — Agenti e apprendimento | tipologie di agenti, classificazione, alberi di decisione, algoritmo di Hunt, entropia, overfitting, perceptron, MLP, backpropagation | 6+9 |
-| 3 — Estensioni 9 CFU | reinforcement learning, MDP, equazione di Bellman, clustering*, sistemi di regole*, IA generativa*, CNN/RNN/Transformer/LLM*, GAN*, diffusion* | 9 |
+| 3 — Estensioni 9 CFU | reinforcement learning, MDP, equazione di Bellman, attention/transformer, LLM (embeddings, tf-idf, fasi di apprendimento, bias), clustering*, sistemi di regole*, IA generativa*, CNN/RNN*, GAN*, diffusion* | 9 |
+
+> **Aggiornamento AA 2024/25:** gli appunti di Altair ora includono la parte 9 CFU; le domande sui relativi argomenti (giochi stocastici, lifting/risoluzione FOL, ontologie, incertezza e reti bayesiane, RL, attention/transformer, LLM) citano quindi `sisint1`. Le fonti esterne nella tabella sotto restano solo per le domande 6 CFU che le richiamano (`aima_ch3`, `ontologie`, `risol_FOL`, `aima_ch9`); `con_avv_9cfu` e `aima_ch10/12/13` non sono più usate.
 
 \* Argomenti **integrati** — non presenti direttamente nel materiale fornito (SISINT-1, slides Baroglio), ma menzionati esplicitamente nel programma 9 CFU del corso. Sono basati su conoscenze standard di IA. Sono marcati nel quiz con il badge arancione **«argomento integrato»**.
 
