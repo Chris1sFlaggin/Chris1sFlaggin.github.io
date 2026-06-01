@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulazione esame SAS — prova completa</title>
+<style>
+  :root{--bg:#0f1115;--panel:#171a21;--card:#1d212b;--ink:#e8ebf1;--muted:#9aa3b2;--line:#2a2f3a;
+    --accent:#5b8cff;--good:#2fbf71;--bad:#ff6b6b;--shadow:0 10px 30px rgba(0,0,0,.45)}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:radial-gradient(1200px 600px at 50% -10%,#1a1f2b,var(--bg));color:var(--ink);
+    font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  header{position:sticky;top:0;z-index:5;backdrop-filter:blur(8px);background:rgba(15,17,21,.82);
+    border-bottom:1px solid var(--line);padding:12px 18px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+  h1{font-size:17px;margin:0}
+  h1 small{color:var(--muted);font-weight:500}
+  .timer{font-variant-numeric:tabular-nums;font-size:26px;font-weight:700;letter-spacing:1px;padding:2px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+  .timer.low{color:var(--bad);border-color:var(--bad)}
+  .timer.zero{color:#fff;background:var(--bad);border-color:var(--bad)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  button,a.btn{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;text-decoration:none;transition:.15s}
+  button:hover,a.btn:hover{border-color:var(--accent)}
+  button:active{transform:translateY(1px)}
+  .primary{background:#23406e;border-color:#3a5da0}
+  main{max-width:880px;margin:0 auto;padding:22px 16px 60px}
+  .lead{color:var(--muted);font-size:14px;margin-bottom:18px}
+  section{background:linear-gradient(160deg,var(--card),#161a23);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:16px 0;box-shadow:var(--shadow)}
+  h2{font-size:16px;margin:0 0 4px}
+  .pts{color:var(--muted);font-size:12px;font-weight:600}
+  .item{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+  .item:first-of-type{border-top:none}
+  .stmt{flex:1}
+  .tg{display:inline-block;font-size:10px;letter-spacing:.4px;text-transform:uppercase;color:#bcd0ff;
+    background:#23304e;border:1px solid var(--line);border-radius:999px;padding:1px 8px;margin-right:8px;vertical-align:1px}
+  .vf{display:flex;gap:6px;flex-shrink:0}
+  .vf button{padding:5px 12px;font-weight:700;min-width:42px}
+  .vf button.sel[data-v="V"]{background:#1f5138;border-color:var(--good);color:#bdf0cf}
+  .vf button.sel[data-v="F"]{background:#5a2230;border-color:var(--bad);color:#ffc9cf}
+  .res{font-size:13px;margin-top:6px;display:none}
+  .item.correct .res{display:block;color:var(--good)}
+  .item.wrong .res{display:block;color:var(--bad)}
+  .item.correct{background:rgba(47,191,113,.06)}
+  .item.wrong{background:rgba(255,107,107,.06)}
+  select{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+  textarea{width:100%;min-height:120px;background:#12151d;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;resize:vertical}
+  details{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:#12151d}
+  summary{cursor:pointer;padding:10px 0;color:var(--accent);font-weight:600}
+  details[open]{padding-bottom:12px}
+  .sol b{color:#fff}
+  .sol img{max-width:100%;background:#fff;border-radius:8px;padding:6px;margin-top:8px}
+  .scorebar{position:sticky;bottom:0;background:rgba(15,17,21,.92);border-top:1px solid var(--line);
+    padding:12px 16px;display:flex;gap:14px;align-items:center;justify-content:center;font-weight:600;flex-wrap:wrap}
+  .scorebar .big{font-size:20px}
+  .ok{color:var(--good)} .ko{color:var(--bad)}
+  .muted{color:var(--muted);font-weight:400;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Simulazione esame SAS <small>— prova completa</small></h1>
+  <div class="controls">
+    <span class="timer" id="timer">45:00</span>
+    <button id="start">▶ Avvia</button>
+    <button id="reset">↺ Reset timer</button>
+    <button id="reshuffle" title="Nuovo campione di domande">🎲 Nuova simulazione</button>
+    <button class="primary" id="correct">✔ Correggi chiuse</button>
+    <a class="btn" href="index.html">↩ Home</a>
+  </div>
+</header>
+
+<main>
+  <div class="lead">
+    Esame completo a tempo: <b>45 minuti</b>. Le chiuse (Vero/Falso, associazioni, molteplicità) si correggono in automatico —
+    ogni prova pesca un <b>campione casuale</b> da una banca di ~100 affermazioni costruita sulle prove reali
+    <b>2021–2025</b>: premi <b>🎲 Nuova simulazione</b> per cambiarle. Le aperte si correggono da sole: scrivi la risposta e
+    apri la <b>soluzione modello</b>.
+  </div>
+
+  <div id="closed"></div>
+
+  <section>
+    <h2>Domanda aperta 1 <span class="pts">· processi · ~5 pt · (06/06/2025)</span></h2>
+    <p>Secondo C. Larman «il metodo a cascata è pratica mediocre per la maggior parte dei progetti software […]
+    caratterizzato da una minore produttività, maggiori percentuali di difetti e stime iniziali di tempi e costi
+    che variano notevolmente dai valori finali».</p>
+    <p><b>a)</b> Motiva l'affermazione (max 3 righe). <b>b)</b> Spiega la principale differenza tra cascata e
+    sviluppo incrementale rispetto alle attività di <b>specifica, sviluppo, convalida</b> e al <b>feedback</b>.</p>
+    <textarea placeholder="a) ...&#10;b) ..."></textarea>
+    <details><summary>Mostra soluzione modello</summary>
+      <div class="sol">
+        <b>a)</b> Nella cascata le fasi sono sequenziali e i requisiti vengono congelati all'inizio: i ritorni
+        indietro e il feedback del cliente arrivano tardi e sono costosi. Ne derivano minore produttività, più
+        difetti e stime iniziali di tempi/costi che divergono molto dai valori reali, perché basate su conoscenza
+        ancora incompleta.<br>
+        <b>b)</b> Nel modello <b>a cascata</b> specifica, sviluppo e convalida sono <b>fasi distinte e
+        sequenziali</b>: ciascuna termina prima della successiva e il feedback è solo a valle. Nello sviluppo
+        <b>incrementale</b> le stesse attività si <b>intrecciano e si ripetono</b> su incrementi successivi del
+        sistema, con <b>feedback continuo</b> del cliente ad ogni incremento e maggiore capacità di assorbire i
+        cambiamenti dei requisiti.
+      </div>
+    </details>
+  </section>
+
+  <section>
+    <h2>Domanda aperta 2 <span class="pts">· pattern GoF · ~5,5 pt · (06/06/2025)</span></h2>
+    <p>Descrivi il pattern GoF <b>Decorator</b> (Nome / Problema / Soluzione) e <b>disegnane</b> la struttura UML.</p>
+    <textarea placeholder="Nome:&#10;Problema:&#10;Soluzione:&#10;(UML: descrivila o disegnala su carta)"></textarea>
+    <details><summary>Mostra soluzione modello + UML</summary>
+      <div class="sol">
+        <b>Nome:</b> Decorator (Wrapper), pattern strutturale.<br>
+        <b>Problema:</b> assegnare responsabilità aggiuntive a un oggetto in modo <b>dinamico</b>, fornendo
+        un'alternativa più flessibile all'ereditarietà ed evitando un'esplosione di sottoclassi e la rigidità della
+        relazione statica.<br>
+        <b>Soluzione:</b> il Decorator implementa la <b>stessa interfaccia</b> Component, <b>contiene</b> (wrappa) un
+        Component e ne estende il comportamento aggiungendo logica prima/dopo aver delegato all'oggetto avvolto;
+        i decorator si possono comporre a catena.
+        <img src="uml/05_decorator.png" alt="Decorator UML">
+      </div>
+    </details>
+  </section>
+
+  <section>
+    <h2>Domanda aperta 3 <span class="pts">· pattern GoF · ~5,5 pt · (11/07/2025)</span></h2>
+    <p>Descrivi il pattern GoF <b>State</b> (Nome / Problema / Soluzione) e <b>disegnane</b> la struttura UML.
+    Indica anche in cosa differisce da Strategy.</p>
+    <textarea placeholder="Nome:&#10;Problema:&#10;Soluzione:&#10;Differenza con Strategy:"></textarea>
+    <details><summary>Mostra soluzione modello + UML</summary>
+      <div class="sol">
+        <b>Nome:</b> State, pattern comportamentale.<br>
+        <b>Problema:</b> il comportamento di un oggetto dipende dal suo <b>stato interno</b> e il codice si riempie
+        di <code>if</code>/<code>switch</code> sullo stato.<br>
+        <b>Soluzione:</b> si definisce un'interfaccia State con i metodi sensibili allo stato e una <b>classe
+        concreta per ogni stato</b>; il <b>Context</b> mantiene un riferimento allo stato corrente e gli <b>delega</b>
+        le operazioni, cambiando stato quando necessario.<br>
+        <b>vs Strategy:</b> struttura UML quasi identica, ma in <b>Strategy</b> è il cliente a scegliere
+        l'algoritmo, mentre in <b>State</b> è l'oggetto a cambiare comportamento da solo al variare del proprio stato.
+        <img src="uml/07_state.png" alt="State UML">
+      </div>
+    </details>
+    <p class="muted">All'esame il pattern aperto cambia: allenali tutti col <a href="puzzle.html" style="color:var(--accent)">Puzzle UML</a> e con le <a href="flashcards.html" style="color:var(--accent)">Flashcard</a>.</p>
+  </section>
+</main>
+
+<div class="scorebar" id="scorebar"><span class="muted">Premi «Correggi chiuse» per vedere il punteggio.</span></div>
+
+<script>
+// ---- Banca Vero/Falso (prove reali 2021–2025 + dispense) ----
+const BANK=[
+ // Processi e modelli di sviluppo
+ {t:"Il software comprende, oltre al codice eseguibile, anche la documentazione elettronica per utenti e sviluppatori.",c:true,topic:"Processi"},
+ {t:"Le quattro attività fondamentali di ogni processo software sono specifica, sviluppo, convalida ed evoluzione.",c:true,topic:"Processi"},
+ {t:"Un errore commesso nella fase di specifica non influenza in modo significativo le fasi successive.",c:false,why:"Gli errori di specifica si propagano e diventano costosi nelle fasi successive.",topic:"Processi"},
+ {t:"Esiste un unico modello di processo software universale, ottimo per qualsiasi progetto.",c:false,why:"Il processo va scelto in base a requisiti, ambiente e tipo di software.",topic:"Processi"},
+ {t:"Nel modello a cascata specifica, sviluppo e convalida sono fasi distinte e sequenziali.",c:true,topic:"Processi"},
+ {t:"Lo sviluppo incrementale intreccia le attività di specifica, sviluppo e convalida.",c:true,topic:"Processi"},
+ {t:"I sistemi a sicurezza critica sono tipicamente sviluppati con un modello incrementale.",c:false,why:"Per i sistemi critici si preferisce la cascata, con analisi e documentazione approfondite a monte.",topic:"Processi"},
+ {t:"Il modello a cascata è particolarmente adatto quando i requisiti cambiano di frequente.",c:false,why:"La cascata mal sopporta i cambiamenti; per requisiti instabili si usa l'approccio iterativo/incrementale.",topic:"Processi"},
+ {t:"Nello sviluppo incrementale tutti i requisiti sono definiti in dettaglio all'inizio, prima di programmare.",c:false,why:"È tipico della cascata; l'incrementale parte prima e raffina i requisiti con i feedback.",topic:"Processi"},
+ {t:"Lo sviluppo incrementale è generalmente più costoso e complesso del modello a cascata.",c:false,why:"È considerato più economico e semplice, e facilita il feedback.",topic:"Processi"},
+ {t:"Il refactoring è un meccanismo importante che supporta la tolleranza ai cambiamenti nel software.",c:true,topic:"Processi"},
+ {t:"La distinzione tra sviluppo software ed evoluzione (manutenzione) sta diventando più netta nel tempo.",c:false,why:"Sta diventando irrilevante: l'ingegneria del software è vista come un unico processo evolutivo.",topic:"Processi"},
+ {t:"In Scrum ogni iterazione (Sprint) ha durata fissa e deve produrre un incremento funzionante.",c:true,topic:"Processi"},
+ {t:"Nei metodi agili lo scopo principale della modellazione è produrre documentazione formale completa.",c:false,why:"Serve soprattutto a comprendere e comunicare, non a documentare formalmente.",topic:"Processi"},
+ {t:"Il modello a spirale è un modello iterativo guidato dal rischio.",c:true,topic:"Processi"},
+ {t:"Un processo software descrive «chi fa che cosa».",c:true,topic:"Processi"},
+ {t:"La fase di ingegneria dei requisiti è anche detta convalida del software.",c:false,why:"La convalida è l'attività di verifica/validazione; i requisiti sono un'altra attività.",topic:"Processi"},
+ // Unified Process
+ {t:"Unified Process (UP) è un processo iterativo ed evolutivo per lo sviluppo di sistemi orientati agli oggetti.",c:true,topic:"UP"},
+ {t:"UP è uno standard internazionale per lo sviluppo software.",c:false,why:"UP non è uno standard: è un processo/framework di sviluppo.",topic:"UP"},
+ {t:"Le quattro fasi di UP sono Ideazione, Elaborazione, Costruzione e Transizione.",c:true,topic:"UP"},
+ {t:"Le fasi di UP sono Ideazione, Elaborazione, Implementazione e Transizione.",c:false,why:"«Implementazione» è una DISCIPLINA, non una fase: la terza fase è Costruzione.",topic:"UP"},
+ {t:"In UP le fasi sono sequenziali, mentre le discipline si eseguono in ogni iterazione.",c:true,topic:"UP"},
+ {t:"Specifica, sviluppo, convalida ed evoluzione in UP sono separate temporalmente e non si intrecciano mai.",c:false,why:"In UP le attività/discipline si intrecciano all'interno delle iterazioni.",topic:"UP"},
+ {t:"UP organizza il ciclo di sviluppo in quattro iterazioni, e le iterazioni in diverse fasi.",c:false,why:"È il contrario: 4 FASI, ciascuna composta da più iterazioni.",topic:"UP"},
+ {t:"Lo scopo della fase di Ideazione è definire in dettaglio la maggior parte dei requisiti.",c:false,why:"L'Ideazione è una fase di fattibilità; i requisiti si scoprono e stabilizzano in Elaborazione.",topic:"UP"},
+ {t:"Durante l'Elaborazione viene programmato il nucleo rischioso dell'architettura.",c:true,topic:"UP"},
+ {t:"Durante l'Elaborazione viene scoperta e stabilizzata la maggior parte dei requisiti.",c:true,topic:"UP"},
+ {t:"Durante la fase di Elaborazione non si sviluppa codice.",c:false,why:"Si programma e si testa il nucleo rischioso dell'architettura.",topic:"UP"},
+ {t:"In UP quasi tutto è opzionale, eccetto lo sviluppo iterativo guidato dal rischio, la verifica continua della qualità e il codice.",c:true,topic:"UP"},
+ {t:"Il documento Visione serve a stabilire una visione comune del progetto tra i partecipanti.",c:true,topic:"UP"},
+ // Requisiti e casi d'uso
+ {t:"Un caso d'uso è la descrizione testuale di un modo di usare il sistema per raggiungere un obiettivo dell'utente.",c:true,topic:"Requisiti"},
+ {t:"Un caso d'uso rappresenta l'insieme di tutte le funzionalità di un sistema.",c:false,why:"È UN modo d'uso per UN obiettivo, non l'insieme delle funzioni.",topic:"Requisiti"},
+ {t:"I requisiti non funzionali sono descritti completamente dai casi d'uso.",c:false,why:"I casi d'uso catturano i requisiti funzionali; i non funzionali vanno nelle Specifiche Supplementari.",topic:"Requisiti"},
+ {t:"In UP la disciplina dei requisiti produce la lista dei requisiti, capisce il contesto del sistema e cattura requisiti funzionali e non funzionali.",c:true,topic:"Requisiti"},
+ {t:"I requisiti funzionali non catturati dai casi d'uso vengono descritti nelle Specifiche Supplementari.",c:false,why:"Per la chiave del corso è falsa: i casi d'uso catturano i requisiti funzionali, le Specifiche Supplementari raccolgono soprattutto i non funzionali e i vincoli.",topic:"Requisiti"},
+ {t:"In UP i casi d'uso sono usati principalmente per catturare i requisiti funzionali.",c:true,topic:"Requisiti"},
+ {t:"L'attore primario di un caso d'uso è quello che offre un servizio al sistema (es. un database).",c:false,why:"L'attore primario raggiunge un obiettivo usando il sistema; chi offre un servizio è l'attore di supporto.",topic:"Requisiti"},
+ {t:"Lo scenario principale di successo (happy path) di solito non include condizioni o diramazioni.",c:true,topic:"Requisiti"},
+ {t:"Le Estensioni di un caso d'uso descrivono solo gli scenari di fallimento.",c:false,why:"Descrivono tutti gli scenari alternativi, sia di successo sia di fallimento.",topic:"Requisiti"},
+ {t:"Scrivendo i casi d'uso il sistema va considerato a scatola bianca, specificando il «come» funziona.",c:false,why:"Si considera a scatola nera: conta il comportamento esterno, non il «come».",topic:"Requisiti"},
+ {t:"In UP i casi d'uso sono principalmente diagrammi UML.",c:false,why:"Sono soprattutto documenti testuali; il diagramma dei casi d'uso è solo un complemento.",topic:"Requisiti"},
+ {t:"I casi d'uso mettono in risalto gli obiettivi degli utenti.",c:true,topic:"Requisiti"},
+ {t:"I casi d'uso sono utilizzati per pianificare le iterazioni.",c:true,topic:"Requisiti"},
+ {t:"I casi d'uso sono utilizzati per la scoperta e la definizione dei requisiti non funzionali.",c:false,why:"Servono per i requisiti funzionali; i non funzionali generali stanno nelle Specifiche Supplementari.",topic:"Requisiti"},
+ // Modello di dominio
+ {t:"Il modello di dominio è un dizionario visuale delle classi concettuali.",c:true,topic:"Dominio"},
+ {t:"Il modello di dominio include la definizione di oggetti, associazioni e attributi di classi software.",c:false,why:"Mostra classi concettuali del mondo reale, non classi software.",topic:"Dominio"},
+ {t:"Il modello di dominio è una rappresentazione testuale delle classi concettuali.",c:false,why:"È visuale (UML), non testuale.",topic:"Dominio"},
+ {t:"In un modello di dominio non compaiono le firme dei metodi.",c:true,topic:"Dominio"},
+ {t:"L'analisi linguistica dei casi d'uso in formato dettagliato è una fonte d'ispirazione per costruire il modello di dominio.",c:true,topic:"Dominio"},
+ {t:"Il modello di dominio riporta i concetti significativi relativi ai casi d'uso.",c:true,topic:"Dominio"},
+ {t:"La composizione UML è un'aggregazione forte in cui la vita delle parti dipende dal composto.",c:true,topic:"Dominio"},
+ {t:"La composizione è una forma debole di aggregazione.",c:false,why:"È la forma FORTE: il tutto possiede le parti e ne governa il ciclo di vita.",topic:"Dominio"},
+ {t:"Un'associazione del modello di dominio rappresenta una relazione significativa tra classi concettuali.",c:true,topic:"Dominio"},
+ {t:"La direzione di lettura di un'associazione va sempre specificata.",c:false,why:"È opzionale: aiuta la lettura ma non è obbligatoria.",topic:"Dominio"},
+ {t:"Un'associazione del modello di dominio rappresenta un insieme di n-tuple (collegamenti) tra oggetti delle classi.",c:true,topic:"Dominio"},
+ // SSD e Contratti
+ {t:"In un SSD il sistema è modellato come una scatola nera.",c:true,topic:"SSD/Contratti"},
+ {t:"Gli SSD illustrano le interazioni tra gli oggetti software interni al sistema per realizzare un caso d'uso.",c:false,why:"Mostrano le interazioni tra attori esterni e il sistema (scatola nera), non gli oggetti interni.",topic:"SSD/Contratti"},
+ {t:"Gli SSD mostrano l'ordine degli eventi generati dagli attori esterni al sistema.",c:true,topic:"SSD/Contratti"},
+ {t:"I diagrammi di sequenza di sistema (SSD) sono costruiti a partire dai diagrammi delle classi di progetto (DCD).",c:false,why:"Gli SSD nascono dagli scenari dei casi d'uso, non dai DCD.",topic:"SSD/Contratti"},
+ {t:"Un SSD è un elaborato della disciplina dei requisiti che illustra eventi di input e output relativi al sistema.",c:true,topic:"SSD/Contratti"},
+ {t:"Un evento di sistema implica che il sistema debba definire un'operazione per gestirlo.",c:true,topic:"SSD/Contratti"},
+ {t:"Le post-condizioni di un contratto descrivono lo stato del sistema prima dell'esecuzione dell'operazione.",c:false,why:"Descrivono i cambiamenti di stato DOPO il completamento dell'operazione.",topic:"SSD/Contratti"},
+ {t:"Le post-condizioni di un contratto descrivono i passi/azioni che il sistema esegue durante l'operazione.",c:false,why:"Sono dichiarative: fotografano lo stato finale, non l'algoritmo o il «come».",topic:"SSD/Contratti"},
+ {t:"I contratti usano pre- e post-condizioni per descrivere i cambiamenti agli oggetti del modello di dominio causati da un'operazione di sistema.",c:true,topic:"SSD/Contratti"},
+ {t:"I contratti costituiscono un input per la progettazione (DSD) delle operazioni.",c:true,topic:"SSD/Contratti"},
+ // Architettura logica
+ {t:"L'architettura logica riguarda la distribuzione fisica degli elementi software su diversi computer.",c:false,why:"È la macro-organizzazione in package e strati; la distribuzione fisica è l'architettura di deployment.",topic:"Architettura"},
+ {t:"Con l'architettura logica si prendono decisioni sui namespace/package delle classi software.",c:true,topic:"Architettura"},
+ {t:"Con l'architettura logica si decide come distribuire le classi su processi e computer fisici di una rete.",c:false,why:"Quella è l'architettura fisica/di deployment, non quella logica.",topic:"Architettura"},
+ {t:"Uno strato (layer) è un gruppo di classi software con responsabilità coese e correlate.",c:true,topic:"Architettura"},
+ {t:"Le partizioni rappresentano sezioni verticali, mentre gli strati una divisione orizzontale di sottosistemi.",c:true,topic:"Architettura"},
+ {t:"In una tipica architettura a strati lo strato di dominio si poggia direttamente sullo strato UI e ne dipende.",c:false,why:"È il contrario: la UI si poggia sul dominio; il dominio non conosce la UI.",topic:"Architettura"},
+ {t:"L'architettura a strati ha l'obiettivo di rendere gli elementi software fortemente interdipendenti.",c:false,why:"Punta a basso accoppiamento e alta coesione tra strati, non all'interdipendenza.",topic:"Architettura"},
+ {t:"Il principio Separation of Concerns mira a ridurre l'accoppiamento e aumentare la coesione.",c:true,topic:"Architettura"},
+ {t:"Il principio di separazione Modello-Vista prende ispirazione dal pattern Model-View-Controller dello Smalltalk-80.",c:true,topic:"Architettura"},
+ {t:"Secondo Model-View Separation la logica applicativa va incapsulata negli oggetti dell'interfaccia utente.",c:false,why:"Va incapsulata negli oggetti del dominio (Modello); la UI delega ad essi.",topic:"Architettura"},
+ {t:"I modelli dinamici UML (es. diagrammi di sequenza) rappresentano il comportamento del sistema e la collaborazione tra oggetti.",c:true,topic:"Architettura"},
+ {t:"In un diagramma di sequenza una lifeline (linea di vita) rappresenta una richiesta che un oggetto fa a un altro.",c:false,why:"La lifeline rappresenta un partecipante/istanza; la richiesta è il messaggio.",topic:"Architettura"},
+ {t:"In un DSD le lifeline rappresentano le classi software che partecipano all'interazione.",c:false,why:"Rappresentano istanze (oggetti) delle classi, non le classi.",topic:"Architettura"},
+ // GRASP
+ {t:"Un attributo di una classe software è una responsabilità «di conoscenza» per le sue istanze.",c:true,topic:"GRASP"},
+ {t:"Un metodo di una classe software è una responsabilità «di fare» per le sue istanze.",c:true,topic:"GRASP"},
+ {t:"Un progetto orientato agli oggetti vede il sistema come una comunità di oggetti con responsabilità che collaborano.",c:true,topic:"GRASP"},
+ {t:"L'utilizzo dei pattern GRASP è finalizzato alla scoperta dei requisiti del sistema.",c:false,why:"I GRASP servono al design (assegnare responsabilità), non a scoprire i requisiti.",topic:"GRASP"},
+ {t:"I pattern GRASP sono alla base dello sviluppo guidato dalle responsabilità.",c:true,topic:"GRASP"},
+ {t:"Le responsabilità sono assegnate alle classi durante la progettazione orientata agli oggetti (OOD).",c:true,topic:"GRASP"},
+ {t:"La decisione sull'assegnazione delle responsabilità è svolta attraverso i soli diagrammi di classe.",c:false,why:"Si usano anche i diagrammi di interazione (sequenza), non solo i diagrammi di classe.",topic:"GRASP"},
+ {t:"Controller, High Cohesion e Abstract Factory sono tutti esempi di pattern GRASP.",c:false,why:"Abstract Factory è un GoF, non un GRASP.",topic:"GRASP"},
+ {t:"Information Expert assegna la responsabilità alla classe che possiede le informazioni necessarie per soddisfarla.",c:true,topic:"GRASP"},
+ {t:"Low Coupling mira ad aumentare le dipendenze tra le classi per migliorare la flessibilità.",c:false,why:"Mira a RIDURRE l'accoppiamento non necessario.",topic:"GRASP"},
+ {t:"Secondo Low Coupling il problema non è l'accoppiamento alto in sé, ma l'accoppiamento con elementi instabili dell'implementazione.",c:true,topic:"GRASP"},
+ {t:"Secondo High Cohesion una classe che fa molte cose non correlate ha una buona coesione.",c:false,why:"La coesione alta richiede responsabilità correlate e focalizzate.",topic:"GRASP"},
+ {t:"Il Controller GRASP è un oggetto dello strato UI che riceve l'operazione di sistema.",c:false,why:"È il primo oggetto OLTRE la UI, nello strato di dominio, che riceve e coordina l'operazione.",topic:"GRASP"},
+ {t:"Un oggetto Controller GRASP è di norma responsabile di eseguire gran parte della logica applicativa complessa.",c:false,why:"Il Controller coordina e delega; la logica sta negli altri oggetti del dominio.",topic:"GRASP"},
+ // GoF e riuso del codice
+ {t:"I design pattern GoF si classificano in creazionali, strutturali e comportamentali.",c:true,topic:"GoF/Riuso"},
+ {t:"I pattern GoF prediligono l'ereditarietà per ottenere il polimorfismo.",c:true,topic:"GoF/Riuso"},
+ {t:"I pattern GoF incentivano l'ereditarietà come riuso del codice, in particolare con il pattern Composite.",c:false,why:"Il Composite usa la COMPOSIZIONE, non l'ereditarietà, per il riuso.",topic:"GoF/Riuso"},
+ {t:"La composizione di oggetti è un meccanismo di riuso del codice di tipo black-box.",c:true,topic:"GoF/Riuso"},
+ {t:"Il meccanismo di delega è preferibile alla specializzazione per il riuso del codice.",c:true,topic:"GoF/Riuso"},
+ {t:"L'ereditarietà rispetta l'incapsulamento.",c:false,why:"È white-box: la sottoclasse vede i dettagli interni del padre, quindi lo viola.",topic:"GoF/Riuso"},
+ {t:"La modifica dell'interfaccia di una classe ha in generale un basso impatto sulle sottoclassi.",c:false,why:"L'ereditarietà è white-box: cambiare il padre può rompere le sottoclassi.",topic:"GoF/Riuso"},
+ {t:"Il pattern Singleton garantisce una sola istanza di una classe e un punto di accesso globale ad essa.",c:true,topic:"GoF/Riuso"},
+ {t:"Il pattern Adapter affronta il problema di fornire un'interfaccia stabile a comportamenti simili ma con interfacce diverse.",c:true,topic:"GoF/Riuso"},
+ {t:"Il pattern Composite permette di rappresentare gerarchie di oggetti tutto-parte e trattare composto e atomico allo stesso modo.",c:true,topic:"GoF/Riuso"},
+ {t:"Il pattern Decorator aggiunge dinamicamente responsabilità a un oggetto, come alternativa flessibile alla sottoclasse.",c:true,topic:"GoF/Riuso"},
+ {t:"Il pattern Adapter permette di costruire strutture ricorsive viste dal cliente come una singola entità.",c:false,why:"Quella è la descrizione di Composite, non di Adapter.",topic:"GoF/Riuso"},
+ {t:"Il pattern Decorator serve a trattare un gruppo di oggetti dello stesso tipo come un singolo oggetto atomico.",c:false,why:"Quella è la descrizione di Composite; Decorator aggiunge responsabilità dinamicamente.",topic:"GoF/Riuso"},
+ {t:"Il pattern Strategy incapsula un algoritmo e definisce una famiglia di algoritmi intercambiabili.",c:true,topic:"GoF/Riuso"},
+ {t:"Il pattern State incapsula un algoritmo scelto dinamicamente dal cliente.",c:false,why:"State incapsula il comportamento legato allo stato; gli «algoritmi intercambiabili» sono Strategy.",topic:"GoF/Riuso"},
+ {t:"Il pattern Observer definisce una dipendenza uno-a-molti: i subscriber sono notificati quando lo stato del publisher cambia.",c:true,topic:"GoF/Riuso"},
+ {t:"Il pattern Abstract Factory crea famiglie di oggetti correlati senza specificarne le classi concrete.",c:true,topic:"GoF/Riuso"},
+ {t:"I pattern strutturali GoF risolvono problematiche inerenti all'istanziazione degli oggetti.",c:false,why:"L'istanziazione è dei pattern creazionali; gli strutturali compongono classi/oggetti.",topic:"GoF/Riuso"},
+ {t:"Il pattern Expert è un pattern di valutazione che permette di comparare soluzioni.",c:false,why:"Non esiste un GoF «Expert»; Information Expert è un GRASP per assegnare responsabilità.",topic:"GoF/Riuso"},
+ // Testing
+ {t:"Il Test-Driven Development (TDD) prevede di scrivere i test prima del codice che implementa la funzionalità.",c:true,topic:"Testing"},
+ {t:"Il TDD è una pratica del modello a cascata.",c:false,why:"È una pratica di eXtreme Programming (agile), non della cascata.",topic:"Testing"},
+ {t:"I test unitari verificano il funzionamento del sistema nel suo complesso dal punto di vista dell'utente.",c:false,why:"Quelli sono i test di accettazione/sistema; l'unitario prova una singola unità isolata.",topic:"Testing"},
+ {t:"I test unitari verificano la comunicazione tra parti diverse del sistema.",c:false,why:"Quella è l'integrazione; l'unitario isola una singola unità.",topic:"Testing"},
+ {t:"Un test unitario si compone di preparazione, esecuzione, verifica e rilascio.",c:false,why:"Le fasi sono Arrange-Act-Assert; non c'è alcun «rilascio».",topic:"Testing"},
+ {t:"Il refactoring ristruttura il codice modificandone il comportamento esterno per migliorarlo.",c:false,why:"Il refactoring NON cambia il comportamento esterno: migliora solo la struttura interna.",topic:"Testing"},
+ {t:"TDD e refactoring sono pratiche promosse in particolare dall'eXtreme Programming.",c:true,topic:"Testing"},
+];
+
+// ---- Associazione soluzione → pattern (prove reali) ----
+const MATCH0={
+  options:["Strategy","Decorator","Adapter","Observer"],
+  items:[
+    {t:"Definisci un'interfaccia subscriber/listener; il publisher registra dinamicamente i subscriber interessati e li avvisa quando si verifica un evento.",a:"Observer"},
+    {t:"Converti l'interfaccia originale di un componente in un'altra interfaccia, attraverso un oggetto intermedio.",a:"Adapter"},
+    {t:"Ingloba l'oggetto all'interno di un altro che aggiunge le nuove funzionalità.",a:"Decorator"},
+    {t:"Definisci ciascuna strategia in una classe separata, con un'interfaccia comune.",a:"Strategy"},
+  ]
+};
+
+// ---- Molteplicità UML (prova reale) ----
+const MULT0={
+  intro:"Associazione UML tra A e B: <b>ogni A è collegata a esattamente 1 B</b>; <b>ogni B è collegata a esattamente 2 A</b>. Dati A={a1,a2,a3,a4} e B={b1,b2}, quali relazioni R sono valide?",
+  items:[
+    {t:"R = {(a1,b1),(a2,b1),(a3,b1),(a4,b2)}",c:false,why:"b1 avrebbe 3 A e b2 solo 1: viola «ogni B esattamente 2 A»."},
+    {t:"R = {(a1,b1),(a2,b2)}",c:false,why:"a3 e a4 restano senza B, ma ogni A deve avere 1 B."},
+    {t:"R = {(a1,b1),(a2,b2),(a3,b1),(a4,b2)}",c:true,why:"Ogni A ha 1 B; b1={a1,a3} e b2={a2,a4}: ogni B ha 2 A."},
+    {t:"R = {(a1,b1),(a2,b2),(a2,b2),(a3,b2)}",c:false,why:"Coppia (a2,b2) duplicata e a4 mancante."},
+  ]
+};
+
+const N_VF=24; // quante Vero/Falso per simulazione
+const $=id=>document.getElementById(id);
+let vfEls=[], matchEls=[];
+
+function shuffle(a){for(let j=a.length-1;j>0;j--){const r=Math.floor(Math.random()*(j+1));[a[j],a[r]]=[a[r],a[j]];}return a;}
+
+function vfRow(item){
+  const row=document.createElement("div"); row.className="item";
+  const s=document.createElement("div"); s.className="stmt";
+  s.innerHTML=(item.topic?'<span class="tg">'+item.topic+'</span>':'')+item.t+'<div class="res"></div>'; row.appendChild(s);
+  const vf=document.createElement("div"); vf.className="vf";
+  ["V","F"].forEach(v=>{
+    const b=document.createElement("button"); b.dataset.v=v; b.textContent=v;
+    b.onclick=()=>{item.user=(v==="V"); [...vf.children].forEach(c=>c.classList.remove("sel")); b.classList.add("sel");
+      row.classList.remove("correct","wrong");};
+    vf.appendChild(b);
+  });
+  row.appendChild(vf);
+  vfEls.push({row,item,resEl:s.querySelector(".res")});
+  return row;
+}
+
+function buildClosed(){
+  const root=$("closed"); root.innerHTML=""; vfEls=[]; matchEls=[];
+  // campione casuale di Vero/Falso (cloni, così lo stato risposta è pulito ogni simulazione)
+  const sample=shuffle(BANK.slice()).slice(0,N_VF).map(o=>({...o}));
+  const sec=document.createElement("section");
+  sec.innerHTML='<h2>Vero / Falso <span class="pts">· '+N_VF+' affermazioni · campione casuale · 2 pt l\'una</span></h2>';
+  sample.forEach(it=>sec.appendChild(vfRow(it)));
+  root.appendChild(sec);
+  // associazione pattern
+  const ms=document.createElement("section");
+  ms.innerHTML='<h2>Associa la soluzione progettuale al pattern <span class="pts">· 5 pt</span></h2>';
+  const mopts=shuffle(MATCH0.options.slice());
+  shuffle(MATCH0.items.slice()).forEach(src=>{
+    const it={...src};
+    const row=document.createElement("div"); row.className="item";
+    const s=document.createElement("div"); s.className="stmt"; s.innerHTML=it.t+'<div class="res"></div>';
+    const sel=document.createElement("select");
+    sel.innerHTML='<option value="">— scegli —</option>'+mopts.map(o=>'<option>'+o+'</option>').join("");
+    row.appendChild(s); row.appendChild(sel); ms.appendChild(row);
+    matchEls.push({row,sel,item:it,resEl:s.querySelector(".res")});
+  });
+  root.appendChild(ms);
+  // molteplicità
+  const mu=document.createElement("section");
+  mu.innerHTML='<h2>Molteplicità UML <span class="pts">· Vero/Falso · 5 pt</span></h2><p class="muted">'+MULT0.intro+'</p>';
+  MULT0.items.map(o=>({...o})).forEach(it=>mu.appendChild(vfRow(it)));
+  root.appendChild(mu);
+}
+
+function correct(){
+  let ok=0,tot=0,answered=0;
+  vfEls.forEach(({row,item,resEl})=>{
+    tot++; row.classList.remove("correct","wrong");
+    if(item.user===undefined){resEl.textContent="(non risposta) — corretta: "+(item.c?"VERO":"FALSO")+(item.why?" — "+item.why:""); row.classList.add("wrong"); return;}
+    answered++;
+    if(item.user===item.c){ok++; row.classList.add("correct"); resEl.textContent="✔ corretto ("+(item.c?"VERO":"FALSO")+")";}
+    else{row.classList.add("wrong"); resEl.textContent="✗ sbagliato — corretta: "+(item.c?"VERO":"FALSO")+(item.why?" — "+item.why:"");}
+  });
+  matchEls.forEach(({row,sel,item,resEl})=>{
+    tot++; row.classList.remove("correct","wrong");
+    if(!sel.value){resEl.textContent="(non risposta) — corretto: "+item.a; row.classList.add("wrong"); return;}
+    answered++;
+    if(sel.value===item.a){ok++; row.classList.add("correct"); resEl.textContent="✔ "+item.a;}
+    else{row.classList.add("wrong"); resEl.textContent="✗ sbagliato — corretto: "+item.a;}
+  });
+  const pct=Math.round(ok/tot*100);
+  const cls=pct>=80?"ok":pct>=60?"":"ko";
+  $("scorebar").innerHTML='<span class="big '+cls+'">'+ok+' / '+tot+'</span>'+
+    '<span class="muted">risposte chiuse corrette ('+pct+'%) · '+answered+' compilate · ricordati le 3 aperte</span>';
+  $("scorebar").scrollIntoView({behavior:"smooth",block:"end"});
+}
+
+function newSim(){
+  buildClosed(); resetTimer();
+  $("scorebar").innerHTML='<span class="muted">Nuovo campione pronto. Premi «Avvia» e poi «Correggi chiuse».</span>';
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+// ---- timer ----
+let total=45*60,left=total,tick=null;
+function fmt(s){const m=Math.floor(s/60),x=s%60;return (m<10?"0":"")+m+":"+(x<10?"0":"")+x;}
+function render(){const t=$("timer");t.textContent=fmt(left);
+  t.classList.toggle("low",left<=300&&left>0);t.classList.toggle("zero",left===0);}
+function start(){
+  if(tick){clearInterval(tick);tick=null;$("start").textContent="▶ Riprendi";return;}
+  $("start").textContent="⏸ Pausa";
+  tick=setInterval(()=>{ if(left>0){left--;render();} if(left===0){clearInterval(tick);tick=null;$("start").textContent="▶ Avvia";render();
+    $("scorebar").innerHTML='<span class="big ko">⏰ Tempo scaduto!</span><span class="muted">Premi «Correggi chiuse» per il punteggio.</span>';} },1000);
+}
+function resetTimer(){if(tick){clearInterval(tick);tick=null;} left=total;$("start").textContent="▶ Avvia";render();}
+
+$("start").onclick=start;
+$("reset").onclick=resetTimer;
+$("reshuffle").onclick=newSim;
+$("correct").onclick=correct;
+
+buildClosed();
+render();
+</script>
+</body>
+</html>

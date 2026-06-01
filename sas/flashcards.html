@@ -48,7 +48,7 @@
     border:1px solid var(--line);box-shadow:var(--shadow);
     padding:28px 30px;display:flex;flex-direction:column;
   }
-  .front{background:linear-gradient(160deg,var(--card),#161a23)}
+  .front{background:linear-gradient(160deg,var(--card),#161a23);overflow:auto}
   .back{background:linear-gradient(160deg,var(--card2),#1a1f2c);transform:rotateY(180deg);overflow:auto}
   .back .body{align-items:flex-start}
   .chip{
@@ -59,6 +59,7 @@
   .qid{color:var(--muted);font-size:12px;margin-bottom:6px}
   .body{flex:1;display:flex;align-items:center}
   .q{font-size:clamp(18px,2.6vw,24px);font-weight:600}
+  .q img{display:block;margin:12px auto 0;max-width:100%;max-height:30vh;background:#fff;border-radius:8px;padding:6px}
   .a{font-size:clamp(15px,2.1vw,19px)}
   .a b{color:#fff}
   .a .ex{display:block;margin-top:8px;color:#bfe6cd}
@@ -132,7 +133,7 @@
 </main>
 
 <footer>
-  84 card · scorciatoie: <kbd>←</kbd>/<kbd>→</kbd> naviga · <kbd>Spazio</kbd> gira · <kbd>G</kbd> sapevo · <kbd>A</kbd> da rivedere · <kbd>S</kbd> mescola
+  97 card · scorciatoie: <kbd>←</kbd>/<kbd>→</kbd> naviga · <kbd>Spazio</kbd> gira · <kbd>G</kbd> sapevo · <kbd>A</kbd> da rivedere · <kbd>S</kbd> mescola
 </footer>
 
 <script>
@@ -238,6 +239,20 @@ const CARDS = [
 
  {id:"AR1",cat:"Architettura",q:"Cos'è l'architettura a strati (layered)?",a:"La suddivisione di un sistema complesso in <b>strati</b> con responsabilità distinte (es. Presentazione/UI, Logica di dominio, Persistenza), dove ogni strato usa solo quello sottostante.<span class='ex'><b>Esempio (tuo):</b> UI → dominio (EventManager, Event) → persistenza (EventPersistence): la logica di business non conosce l'interfaccia grafica.</span>"},
  {id:"AR2",cat:"Architettura",q:"Cos'è il principio di separazione Modello-Vista?",a:"Il <b>Modello</b> (logica e dati del dominio) non deve dipendere dalla <b>Vista</b> (interfaccia): il modello non conosce la UI né vi è accoppiato.<span class='ex'><b>Perché:</b> puoi cambiare o aggiungere interfacce (CLI, web) senza toccare la logica → favorisce Low Coupling. Nel tuo progetto l'Observer disaccoppia dominio e persistenza in modo analogo.</span>"},
+
+ {id:"AL1",cat:"Esercizi (Altair)",q:"Disegna il <b>modello di dominio</b>: «un catalogo è costituito da più descrizioni di prodotto (identificatore, descrizione, prezzo); ogni catalogo è utilizzato da più negozi (nome, indirizzo)».",a:"<b>Catalogo_di_prodotti</b> ◆—«costituita da» 1..* <b>DescrizioneProdotto</b> (composizione); Catalogo 1 —«utilizzato in»→ 0..* <b>Negozio</b>. Solo concetti e attributi, <b>nessun metodo</b> (è concettuale, mondo reale).<span class='ex'><b>Trappola:</b> niente operazioni nel modello di dominio.</span><img src='notes/dominio_catalogo.jpg' alt='Modello di dominio catalogo'>"},
+ {id:"AL2",cat:"Esercizi (Altair)",q:"Disegna l'<b>SSD</b> dello scenario «Elabora Vendita». Quali sono le operazioni di sistema?",a:"L'Attore manda a <b>:Sistema</b> (scatola nera): <code>iniziaVendita()</code>, poi in <b>loop</b> <code>inserimentoArticolo(ID, quantità)</code> → descrizione/prezzo/totale, <code>fineVendita()</code> → totale, <code>pagamento(costo)</code> → resto/ricevuta.<span class='ex'><b>Rumore bianco:</b> non tutti i passi dello scenario diventano operazioni di sistema.</span><img src='notes/ssd_vendita.png' alt='SSD Elabora Vendita'>"},
+ {id:"AL3",cat:"Esercizi (Altair)",q:"Scrivi pre- e post-condizioni del contratto di <code>enterItem(itemID, quantity)</code>.",a:"<b>Pre:</b> è in corso una vendita <i>s</i>.<br><b>Post:</b> creata istanza <i>sli</i> di SalesLineItem; <i>sli</i> associata alla Sale corrente <i>s</i>; <i>sli</i> associata a una ProductDescription (in base al match con itemID); <i>sli.quantity</i> = quantity.<span class='ex'>Le <b>post-condizioni</b> fotografano lo stato DOPO (dichiarative), con 3 tipi di cambiamento: <b>creazione</b> di istanze, <b>associazioni</b>, modifica di <b>attributi</b>.</span>"},
+ {id:"AL4",cat:"Esercizi (Altair)",q:"DSD di <code>enterItem</code>: <code>:SaleJFrame</code> riceve <code>actionPerformed(...)</code>. A chi delega? Chi è il <b>controller</b> GRASP?",a:"<code>actionPerformed</code> → <b>:SaleJFrame</b> (UI) → <code>enterItem(itemID, qty)</code> → <b>:Register</b> → <code>makeLineItem(itemID, qty)</code> → <b>:Sale</b>.<span class='ex'>Strato UI = SaleJFrame; strato di dominio = Register e Sale. Il <b>controller GRASP è Register</b>.</span><img src='notes/dsd_register.png' alt='DSD Register enterItem'>"},
+ {id:"AL5",cat:"Esercizi (Altair)",q:"DCD: «una vendita è saldata da 1 pagamento; un pagamento salda 1 sola vendita; il pagamento può essere in contanti, con assegno o con carta». Che cardinalità?",a:"<b>Sale</b> 1 —<i>settled</i>— 1 <b>Payment</b>{abstract}(quantity:double); Payment è generalizzato (△) da <b>PaymentWithCash</b>, <b>PaymentWithAllowance</b>, <b>PaymentWithCreditCard</b>.<span class='ex'><b>Cardinalità 1–1:</b> la vendita è obbligatoriamente saldata e un pagamento salda una sola vendita.</span><img src='notes/dcd_payment.png' alt='DCD Sale Payment'>"},
+ {id:"AL6",cat:"Esercizi (Altair)",q:"Quale pattern GoF è realizzato da questo codice? <img src='notes/decorator_code.jpg' alt='Codice Decorator'>",a:"<b>Decorator</b>. <b>FiguraColorata</b> avvolge un <b>Figure</b> (component) e aggiunge dinamicamente responsabilità (ColoreBordo, ColoreSfondo) senza moltiplicare le sottoclassi.<span class='ex'>Regola delle note: «quando si aggiungono nuove funzionalità, di solito è Decorator».</span><img src='notes/decorator_uml.png' alt='UML Decorator'>"},
+ {id:"AL7",cat:"Esercizi (Altair)",q:"Quale pattern GoF è realizzato da questo codice? <img src='notes/composite_code.jpg' alt='Codice Composite'>",a:"<b>Composite</b>. <b>Menu</b> (composto) e <b>MenuItem</b> (foglia) implementano la stessa interfaccia <b>MenuElement</b>; solo il composto ridefinisce <code>add()</code>, mentre la foglia eredita l'<code>add()</code> astratto che lancia <code>UnsupportedOperationException</code>.<span class='ex'>Strutture ad albero / ricorsive: composto e foglia trattati allo stesso modo.</span><img src='notes/composite_uml.png' alt='UML Composite'>"},
+ {id:"AL8",cat:"Esercizi (Altair)",q:"Quale pattern GoF è realizzato da questo codice? <img src='notes/strategy_code.jpg' alt='Codice Strategy'>",a:"<b>Strategy</b>. <b>CompressionContext</b> tiene un <b>CompressionAlgorithm</b> (Zip/Rar) dietro un'interfaccia comune e può cambiarlo a runtime con <code>setCompressionAlgorithm()</code>.<span class='ex'>Si usa quando ci sono più algoritmi intercambiabili che fanno la stessa cosa in modi diversi.</span><img src='notes/strategy_uml.png' alt='UML Strategy'>"},
+ {id:"AL9",cat:"Esercizi (Altair)",q:"Quale pattern GoF è realizzato da questo codice? <img src='notes/visitor_code.jpg' alt='Codice Visitor'>",a:"<b>Visitor</b>. Un'operazione (calcolo del prezzo) va eseguita su elementi diversi — <b>MerceVendutaInPezzi</b> e <b>MerceVendutaAPeso</b> — trattati in modo diverso. Doppio dispatch: <code>merce.accept(scanner)</code> → <code>scanner.scan(this)</code>.<span class='ex'><b>ScannerPerCarrello</b> è il visitor concreto.</span><img src='notes/visitor_uml.png' alt='UML Visitor'>"},
+ {id:"AL10",cat:"Esercizi (Altair)",q:"Quale pattern GoF è realizzato da questo codice? <img src='notes/state_code.jpg' alt='Codice State'>",a:"<b>State</b>. <b>Mammoth</b> delega al <b>Behavior</b> corrente (<b>PeacefulBehavior</b> / <b>AngryBehavior</b>); con <code>changeBehaviorTo()</code> il comportamento cambia al cambiare dello stato.<span class='ex'>Si riconosce dal «pulsante» che cambia stato (qui <code>timePasses()</code>).</span><img src='notes/state_uml.png' alt='UML State'>"},
+ {id:"AL11",cat:"Esercizi (Altair)",q:"Quale pattern GoF è realizzato da questo codice? <img src='notes/observer_code.jpg' alt='Codice Observer'>",a:"<b>Observer</b>. <b>MessageContainer</b> (subject) mantiene una lista di <b>MessageView</b> (observer), con <code>attach()</code>/<code>detach()</code> e <code>show(m)</code> che notifica tutti.<span class='ex'>Sempre presenti: metodo per iscriversi/disiscriversi + metodo di notifica.</span><img src='notes/observer_uml.png' alt='UML Observer'>"},
+ {id:"AL12",cat:"Esercizi (Altair)",q:"Quale pattern GoF è realizzato da questo codice? <img src='notes/adapter_code.jpg' alt='Codice Adapter'>",a:"<b>Adapter</b>. <b>BankCustomer</b> (adapter) implementa l'interfaccia target <b>CreditCard</b> e avvolge <b>BankDetail</b> (adaptee), convertendone l'interfaccia.<span class='ex'>È la versione «a oggetti», preferita a quella «a classi» (ma il prof. può chiedere entrambe).</span><img src='notes/adapter_uml.png' alt='UML Adapter'>"},
+ {id:"AL13",cat:"Esercizi (Altair)",q:"Come riconosci <b>Singleton</b> e <b>Abstract Factory</b> dal codice?",a:"<b>Singleton:</b> una classe con un metodo (spesso statico) che restituisce l'istanza esistente se non è <code>null</code>, altrimenti ne crea una nuova → <b>una sola istanza</b>.<br><b>Abstract Factory:</b> serve a <b>creare oggetti</b> (famiglie di oggetti correlati) e <b>non</b> è il Singleton.<span class='ex'>Nelle note non hanno UML: si riconoscono dal comportamento nel codice.</span>"},
 ];
 
 const LS="flashSAS.progress.v1";
