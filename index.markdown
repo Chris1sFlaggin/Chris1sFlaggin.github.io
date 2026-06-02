@@ -104,7 +104,35 @@ header:
 
       </div>
     </div>
-    
+
+    <div class="section-block">
+      <h2 class="section-title">MATERIALE UNIVERSITARIO</h2>
+      <div class="products-grid">
+
+        <a href="{{ site.baseurl }}/sicurezza/" class="card product-card uni-card">
+          <div class="card-content product-content">
+            <h3>Sicurezza</h3>
+            <p>Flashcards, quiz e ripasso</p>
+          </div>
+        </a>
+
+        <a href="{{ site.baseurl }}/sisint/" class="card product-card uni-card">
+          <div class="card-content product-content">
+            <h3>Sisint</h3>
+            <p>Esami e simulatori</p>
+          </div>
+        </a>
+
+        <a href="{{ site.baseurl }}/sas/" class="card product-card uni-card">
+          <div class="card-content product-content">
+            <h3>SAS</h3>
+            <p>Flashcards, esami e ripasso</p>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
     <div class="dashboard-footer">
       <small>© 2025 Chris1sFlaggin | System Online</small>
     </div>
@@ -242,6 +270,11 @@ header:
     margin-bottom: 1rem;
   }
   
+  /* University cards */
+  .uni-card { height: 160px; background: rgba(100, 255, 218, 0.04); }
+  .uni-card .product-content { justify-content: center; background: transparent; height: 100%; }
+  .uni-card .product-content h3 { color: #64ffda; }
+
   /* Category Images */
   .category-card[data-category="writeups"] .card-bg { background-image: url('/images/writeups.jpg'); }
   .category-card[data-category="projects"] .card-bg { background-image: url('/images/projects.jpg'); }
