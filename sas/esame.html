@@ -28,6 +28,10 @@
   section{background:linear-gradient(160deg,var(--card),#161a23);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:16px 0;box-shadow:var(--shadow)}
   h2{font-size:16px;margin:0 0 4px}
   .pts{color:var(--muted);font-size:12px;font-weight:600}
+  .origin{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;
+    border-radius:999px;padding:2px 9px;margin-left:8px;vertical-align:2px}
+  .origin.real{color:#bdf0cf;background:#1f5138;border:1px solid var(--good)}
+  .origin.ai{color:#d8c4ff;background:#3a2a5e;border:1px solid #7b5cc4}
   .item{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
   .item:first-of-type{border-top:none}
   .stmt{flex:1}
@@ -71,16 +75,17 @@
 
 <main>
   <div class="lead">
-    Esame completo a tempo: <b>45 minuti</b>. Le chiuse (Vero/Falso, associazioni, molteplicità) si correggono in automatico —
-    ogni prova pesca un <b>campione casuale</b> da una banca di ~100 affermazioni costruita sulle prove reali
-    <b>2021–2025</b>: premi <b>🎲 Nuova simulazione</b> per cambiarle. Le aperte si correggono da sole: scrivi la risposta e
-    apri la <b>soluzione modello</b>.
+    Esame completo a tempo: <b>45 minuti</b>. <b>20 Vero/Falso</b> + associazioni + molteplicità + <b>2 aperte</b>.
+    Le V/F sono divise in due blocchi: <span class="origin real">prove reali</span> (campione dalle prove
+    <b>2021–2025</b>) e <span class="origin ai">generate</span> (extra di ripasso scritte ad hoc). Premi
+    <b>🎲 Nuova simulazione</b> per ripescare. Le aperte si correggono da sole: scrivi la risposta e apri la
+    <b>soluzione modello</b>.
   </div>
 
   <div id="closed"></div>
 
   <section>
-    <h2>Domanda aperta 1 <span class="pts">· processi · ~5 pt · (06/06/2025)</span></h2>
+    <h2>Domanda aperta 1 <span class="origin real">prova reale</span><span class="pts">· processi · ~5 pt · (06/06/2025)</span></h2>
     <p>Secondo C. Larman «il metodo a cascata è pratica mediocre per la maggior parte dei progetti software […]
     caratterizzato da una minore produttività, maggiori percentuali di difetti e stime iniziali di tempi e costi
     che variano notevolmente dai valori finali».</p>
@@ -103,42 +108,31 @@
   </section>
 
   <section>
-    <h2>Domanda aperta 2 <span class="pts">· pattern GoF · ~5,5 pt · (06/06/2025)</span></h2>
-    <p>Descrivi il pattern GoF <b>Decorator</b> (Nome / Problema / Soluzione) e <b>disegnane</b> la struttura UML.</p>
-    <textarea placeholder="Nome:&#10;Problema:&#10;Soluzione:&#10;(UML: descrivila o disegnala su carta)"></textarea>
+    <h2>Domanda aperta 2 <span class="origin ai">generata</span><span class="pts">· GRASP + pattern GoF · ~6 pt</span></h2>
+    <p><b>a)</b> Descrivi il pattern GRASP <b>Controller</b>: qual è il problema che risolve, quali sono le due
+    alternative tipiche per scegliere il controller e perché un controller non deve diventare un «bloated
+    controller». <b>b)</b> Descrivi poi il pattern GoF <b>Decorator</b> (Nome / Problema / Soluzione) e
+    <b>disegnane</b> la struttura UML.</p>
+    <textarea placeholder="a) Controller: problema / scelte / bloated...&#10;b) Decorator — Nome / Problema / Soluzione + UML"></textarea>
     <details><summary>Mostra soluzione modello + UML</summary>
       <div class="sol">
-        <b>Nome:</b> Decorator (Wrapper), pattern strutturale.<br>
-        <b>Problema:</b> assegnare responsabilità aggiuntive a un oggetto in modo <b>dinamico</b>, fornendo
-        un'alternativa più flessibile all'ereditarietà ed evitando un'esplosione di sottoclassi e la rigidità della
-        relazione statica.<br>
+        <b>a) Controller.</b> <b>Problema:</b> quale oggetto, oltre lo strato UI, deve ricevere e coordinare
+        un'operazione di sistema? <b>Soluzione:</b> assegnare la responsabilità a un oggetto che rappresenta
+        (i) il <b>sistema/sottosistema globale</b> (facade controller) oppure (ii) uno <b>scenario di caso d'uso</b>
+        (use-case/session controller). Il controller <b>delega</b> il lavoro agli oggetti del dominio; se inizia ad
+        accentrare troppa logica diventa un <b>bloated controller</b> (bassa coesione, alto accoppiamento): la cura è
+        ridistribuire le responsabilità con Information Expert e creare più controller.<br>
+        <b>b) Decorator</b> (Wrapper), pattern strutturale. <b>Problema:</b> aggiungere responsabilità a un oggetto
+        in modo <b>dinamico</b>, come alternativa flessibile all'ereditarietà, evitando l'esplosione di sottoclassi.
         <b>Soluzione:</b> il Decorator implementa la <b>stessa interfaccia</b> Component, <b>contiene</b> (wrappa) un
-        Component e ne estende il comportamento aggiungendo logica prima/dopo aver delegato all'oggetto avvolto;
-        i decorator si possono comporre a catena.
+        Component e ne estende il comportamento prima/dopo aver delegato all'oggetto avvolto; i decorator si compongono
+        a catena.
         <img src="uml/05_decorator.png" alt="Decorator UML">
       </div>
     </details>
-  </section>
-
-  <section>
-    <h2>Domanda aperta 3 <span class="pts">· pattern GoF · ~5,5 pt · (11/07/2025)</span></h2>
-    <p>Descrivi il pattern GoF <b>State</b> (Nome / Problema / Soluzione) e <b>disegnane</b> la struttura UML.
-    Indica anche in cosa differisce da Strategy.</p>
-    <textarea placeholder="Nome:&#10;Problema:&#10;Soluzione:&#10;Differenza con Strategy:"></textarea>
-    <details><summary>Mostra soluzione modello + UML</summary>
-      <div class="sol">
-        <b>Nome:</b> State, pattern comportamentale.<br>
-        <b>Problema:</b> il comportamento di un oggetto dipende dal suo <b>stato interno</b> e il codice si riempie
-        di <code>if</code>/<code>switch</code> sullo stato.<br>
-        <b>Soluzione:</b> si definisce un'interfaccia State con i metodi sensibili allo stato e una <b>classe
-        concreta per ogni stato</b>; il <b>Context</b> mantiene un riferimento allo stato corrente e gli <b>delega</b>
-        le operazioni, cambiando stato quando necessario.<br>
-        <b>vs Strategy:</b> struttura UML quasi identica, ma in <b>Strategy</b> è il cliente a scegliere
-        l'algoritmo, mentre in <b>State</b> è l'oggetto a cambiare comportamento da solo al variare del proprio stato.
-        <img src="uml/07_state.png" alt="State UML">
-      </div>
-    </details>
-    <p class="muted">All'esame il pattern aperto cambia: allenali tutti col <a href="puzzle.html" style="color:var(--accent)">Puzzle UML</a> e con le <a href="flashcards.html" style="color:var(--accent)">Flashcard</a>.</p>
+    <p class="muted">All'esame reale il pattern aperto cambia ogni volta (qui spesso Decorator/State/Observer):
+    allenali tutti col <a href="puzzle.html" style="color:var(--accent)">Puzzle UML</a> e con le
+    <a href="flashcards.html" style="color:var(--accent)">Flashcard</a>.</p>
   </section>
 </main>
 
@@ -276,6 +270,30 @@ const BANK=[
  {t:"TDD e refactoring sono pratiche promosse in particolare dall'eXtreme Programming.",c:true,topic:"Testing"},
 ];
 
+// ---- Vero/Falso GENERATE (extra di ripasso, non dalle prove reali) ----
+const BANK_AI=[
+ {t:"Nel modello a cascata il cliente vede una versione funzionante del sistema solo verso la fine del progetto.",c:true,topic:"Processi"},
+ {t:"Un prototipo usa-e-getta ha lo scopo di diventare il prodotto finale consegnato al cliente.",c:false,why:"Serve a chiarire i requisiti e poi viene scartato; non è il prodotto finale.",topic:"Processi"},
+ {t:"Nella fase di Transizione di UP il sistema viene rilasciato e dispiegato nell'ambiente di produzione.",c:true,topic:"UP"},
+ {t:"In UP il numero di iterazioni è fissato a quattro, una per ciascuna fase.",c:false,why:"Ogni fase può contenere più iterazioni; quattro sono le FASI, non le iterazioni.",topic:"UP"},
+ {t:"La relazione «include» tra casi d'uso fattorizza un comportamento comune riutilizzato da più casi d'uso.",c:true,topic:"Requisiti"},
+ {t:"Un attore di un caso d'uso è sempre una persona umana.",c:false,why:"Può essere un altro sistema, un servizio esterno o un timer.",topic:"Requisiti"},
+ {t:"Nel modello di dominio una classe concettuale può avere attributi ma non firme di operazioni.",c:true,topic:"Dominio"},
+ {t:"Nel modello di dominio è buona pratica usare come attributo un valore semplice (numero, stringa, data) anziché un concetto complesso.",c:true,topic:"Dominio"},
+ {t:"Il nome di un'operazione di sistema in un SSD si ricava dall'evento di sistema generato dall'attore.",c:true,topic:"SSD/Contratti"},
+ {t:"Le pre-condizioni di un contratto sono controlli che il sistema deve verificare e segnalare con un errore.",c:false,why:"Sono assunzioni sullo stato date per vere, non controlli da implementare nell'operazione.",topic:"SSD/Contratti"},
+ {t:"Creator suggerisce che B crei A se B contiene/aggrega A, lo usa strettamente o possiede i dati per inizializzarlo.",c:true,topic:"GRASP"},
+ {t:"Information Expert assegna la responsabilità di calcolare il totale di una vendita alla classe Vendita, che possiede le righe.",c:true,topic:"GRASP"},
+ {t:"Per Low Coupling è preferibile che una classe dipenda da molte altre classi concrete piuttosto che da poche interfacce.",c:false,why:"Low Coupling vuole poche dipendenze e, dove possibile, verso astrazioni stabili, non verso molte classi concrete.",topic:"GRASP"},
+ {t:"Una classe con High Cohesion ha responsabilità fortemente correlate e focalizzate su un unico scopo.",c:true,topic:"GRASP"},
+ {t:"Factory Method definisce un'interfaccia per creare un oggetto, lasciando alle sottoclassi la scelta della classe concreta da istanziare.",c:true,topic:"GoF/Riuso"},
+ {t:"Il pattern Facade fornisce un'interfaccia unificata e semplificata a un sottosistema.",c:true,topic:"GoF/Riuso"},
+ {t:"Nel Template Method le sottoclassi definiscono lo scheletro dell'algoritmo e la superclasse i singoli passi.",c:false,why:"È il contrario: la superclasse fissa lo scheletro, le sottoclassi ridefiniscono i singoli passi.",topic:"GoF/Riuso"},
+ {t:"Un mock object sostituisce una dipendenza reale per isolare l'unità sotto test.",c:true,topic:"Testing"},
+ {t:"In un'architettura a strati una chiamata può scavalcare il dominio e andare dalla UI direttamente al database.",c:false,why:"Ogni strato chiama quello immediatamente inferiore; lo scavalcamento va evitato.",topic:"Architettura"},
+ {t:"Il ciclo del TDD è «red — green — refactor».",c:true,topic:"Testing"},
+];
+
 // ---- Associazione soluzione → pattern (prove reali) ----
 const MATCH0={
   options:["Strategy","Decorator","Adapter","Observer"],
@@ -298,7 +316,7 @@ const MULT0={
   ]
 };
 
-const N_VF=24; // quante Vero/Falso per simulazione
+const N_REAL=10, N_AI=10; // 20 Vero/Falso totali: 10 reali + 10 generate
 const $=id=>document.getElementById(id);
 let vfEls=[], matchEls=[];
 
@@ -320,14 +338,20 @@ function vfRow(item){
   return row;
 }
 
+function vfSection(pool,n,title,originCls,originTxt){
+  // campione casuale di Vero/Falso (cloni, così lo stato risposta è pulito ogni simulazione)
+  const sample=shuffle(pool.slice()).slice(0,n).map(o=>({...o}));
+  const sec=document.createElement("section");
+  sec.innerHTML='<h2>'+title+' <span class="origin '+originCls+'">'+originTxt+'</span>'+
+    '<span class="pts">· '+sample.length+' affermazioni · campione casuale · 2 pt l\'una</span></h2>';
+  sample.forEach(it=>sec.appendChild(vfRow(it)));
+  return sec;
+}
+
 function buildClosed(){
   const root=$("closed"); root.innerHTML=""; vfEls=[]; matchEls=[];
-  // campione casuale di Vero/Falso (cloni, così lo stato risposta è pulito ogni simulazione)
-  const sample=shuffle(BANK.slice()).slice(0,N_VF).map(o=>({...o}));
-  const sec=document.createElement("section");
-  sec.innerHTML='<h2>Vero / Falso <span class="pts">· '+N_VF+' affermazioni · campione casuale · 2 pt l\'una</span></h2>';
-  sample.forEach(it=>sec.appendChild(vfRow(it)));
-  root.appendChild(sec);
+  root.appendChild(vfSection(BANK,N_REAL,"Vero / Falso","real","prove reali"));
+  root.appendChild(vfSection(BANK_AI,N_AI,"Vero / Falso","ai","generate"));
   // associazione pattern
   const ms=document.createElement("section");
   ms.innerHTML='<h2>Associa la soluzione progettuale al pattern <span class="pts">· 5 pt</span></h2>';
@@ -368,7 +392,7 @@ function correct(){
   const pct=Math.round(ok/tot*100);
   const cls=pct>=80?"ok":pct>=60?"":"ko";
   $("scorebar").innerHTML='<span class="big '+cls+'">'+ok+' / '+tot+'</span>'+
-    '<span class="muted">risposte chiuse corrette ('+pct+'%) · '+answered+' compilate · ricordati le 3 aperte</span>';
+    '<span class="muted">risposte chiuse corrette ('+pct+'%) · '+answered+' compilate · ricordati le 2 aperte</span>';
   $("scorebar").scrollIntoView({behavior:"smooth",block:"end"});
 }
 
