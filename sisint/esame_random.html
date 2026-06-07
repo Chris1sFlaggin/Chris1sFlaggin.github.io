@@ -271,7 +271,7 @@ const MATCH_BANK = [
   },
   {
     title:"Algoritmi → compito (set 2)",
-    labels:["A","B","C","D","E","F"],
+    labels:["A","B","C","D","E","F","G"],
     legend:["costruzione di alberi di decisione","classificazione senza un modello","risoluzione in CSP","ricerca in uno spazio degli stati","apprendimento di regole","riduzione spazio di ricerca in gioco con avversario","suggerimento prossima mossa in problema con avversario"],
     items:[
       ["algoritmo di Hunt", 0],
@@ -410,10 +410,15 @@ let selectedMCQ = []; let pickedMCQ = []; let pickedMatch = null; let pickedForm
 // ===== Render =====
 function shuffle(a) { const r = a.slice(); for (let i=r.length-1;i>0;i--) { const j = Math.floor(Math.random()*(i+1)); [r[i],r[j]]=[r[j],r[i]]; } return r; }
 function pick(n, arr) { return shuffle(arr).slice(0,n); }
+// pesca un matching e mescola l'ordine delle righe (altrimenti la soluzione esce sempre A,B,C,D,E in ordine)
+function pickMatch() {
+  const base = MATCH_BANK[Math.floor(Math.random()*MATCH_BANK.length)];
+  return { ...base, items: shuffle(base.items) };
+}
 
 function buildExam() {
   pickedMCQ = pick(5, MCQ_BANK);
-  pickedMatch = MATCH_BANK[Math.floor(Math.random()*MATCH_BANK.length)];
+  pickedMatch = pickMatch();
   pickedFormula = FORMULA_BANK[Math.floor(Math.random()*FORMULA_BANK.length)];
   selectedMCQ = [];
   renderParte1();
@@ -467,7 +472,7 @@ function renderParte2() {
     '<div class="res" id="match-res"></div>';
   c.appendChild(ex1);
   document.getElementById('reroll-match').onclick = () => {
-    pickedMatch = MATCH_BANK[Math.floor(Math.random()*MATCH_BANK.length)];
+    pickedMatch = pickMatch();
     renderParte2();
   };
 
