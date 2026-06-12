@@ -38,9 +38,7 @@
       <p style="margin:0.2rem 0 0;font-size:0.85rem;opacity:0.7">Simulazioni cronometrate con autocorrezione</p>
     </div>
     <div style="flex:1; text-align:right;">
-      <button id="theme-btn" class="theme-toggle">
-        <span class="icon">🌙</span> Dark
-      </button>
+      <button id="theme-btn" class="theme-toggle">Dark</button>
     </div>
   </header>
 
@@ -52,23 +50,34 @@
     </p>
 
     <div class="exam-grid">
+      <a class="exam-tile" href="esame_2026_06_11.html">
+        <h3>Sessione giugno 2026 — ricostruito</h3>
+        <p class="desc">Domande segnalate dagli studenti nei turni del 10–11/06/2026. Novità: i vero/falso ora hanno tre opzioni — <b>vero / falso / non sempre</b>. Include un blocco extra di ripasso.</p>
+        <div class="tags">
+          <span class="badge badge-topic">ricostruito</span>
+          <span class="badge badge-cfu">23 pt</span>
+          <span class="badge badge-parte">18 min</span>
+          <span class="badge badge-integrato">+ NON SEMPRE</span>
+        </div>
+      </a>
+
       <a class="exam-tile" href="esame_2022_12_12.html">
-        <h3>📋 Esame 12/12/2022 — versione A</h3>
+        <h3>Esame 12/12/2022 — versione A</h3>
         <p class="desc">Testo identico al compito reale: 5 MCQ + 2 associazioni (formule + inferenza). Soluzioni dal docente.</p>
         <div class="tags">
           <span class="badge badge-parte">testo esatto</span>
           <span class="badge badge-cfu">23 pt</span>
-          <span class="badge badge-topic">⏱ 18 min</span>
+          <span class="badge badge-topic">18 min</span>
         </div>
       </a>
 
       <a class="exam-tile" href="esame_random.html">
-        <h3>🎲 Simulazione random</h3>
+        <h3>Simulazione random</h3>
         <p class="desc">5 MCQ + 2 associazioni pescate a caso dal bank di domande reali (Soluzioni Esami Vecchi). Ogni partita diversa.</p>
         <div class="tags">
           <span class="badge badge-parte">pool reale</span>
           <span class="badge badge-cfu">23 pt</span>
-          <span class="badge badge-topic">⏱ 18 min</span>
+          <span class="badge badge-topic">18 min</span>
         </div>
       </a>
     </div>
@@ -93,11 +102,11 @@
   const btn = document.getElementById('theme-btn');
   const root = document.documentElement;
   const saved = localStorage.getItem('sisint-theme');
-  if (saved === 'dark') { root.setAttribute('data-theme','dark'); btn.querySelector('.icon').textContent='☀️'; btn.lastChild.textContent=' Light'; }
+  if (saved === 'dark') { root.setAttribute('data-theme','dark'); btn.textContent='Light'; }
   btn.onclick = () => {
     const dark = root.getAttribute('data-theme') === 'dark';
-    if (dark) { root.removeAttribute('data-theme'); btn.querySelector('.icon').textContent='🌙'; btn.lastChild.textContent=' Dark'; localStorage.setItem('sisint-theme','light'); }
-    else { root.setAttribute('data-theme','dark'); btn.querySelector('.icon').textContent='☀️'; btn.lastChild.textContent=' Light'; localStorage.setItem('sisint-theme','dark'); }
+    if (dark) { root.removeAttribute('data-theme'); btn.textContent='Dark'; localStorage.setItem('sisint-theme','light'); }
+    else { root.setAttribute('data-theme','dark'); btn.textContent='Light'; localStorage.setItem('sisint-theme','dark'); }
   };
 </script>
 </body>
