@@ -16,6 +16,7 @@ All'avvio l'utente sceglie il taglio dell'esame: **6 CFU** o **9 CFU**. Il pool 
 - **Solo Parte 2 (matching/VF)** — solo esercizi associativi
 - **Studio per argomento** — filtra per Parte (1/2/3) e topic specifico
 - **Sfoglia tutte le domande** — vista read-only con risposte evidenziate
+- **Flashcards 9 CFU** (`flashcards.html`) — ripasso attivo fronte/retro generato dall'intero bank (MCQ + matching): filtri parte/argomento/tipo, autovalutazione sapevo/non sapevo, le carte sbagliate rientrano nei round successivi
 
 ## Argomenti coperti
 
