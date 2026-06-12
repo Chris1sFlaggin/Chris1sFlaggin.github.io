@@ -14,7 +14,7 @@
   .filters-row label { display:flex; flex-direction:column; gap:.3rem; font-size:.85rem; color:var(--c-muted); }
   .filters-row select, .filters-row input {
     padding:.45rem .6rem; border:1px solid var(--c-border); border-radius:var(--radius-sm);
-    background:var(--c-bg); color:var(--c-text); min-width:160px; font-size:.9rem;
+    background:var(--c-bg); color:var(--c-text); min-width:160px; font-size:.9rem; max-width:280px;
   }
   .deck-info { color:var(--c-muted); font-size:.9rem; margin:.5rem 0 1rem; }
   .btn {
@@ -35,35 +35,24 @@
   progress.fc-bar { width:100%; height:6px; margin-bottom:1rem; }
   .fc-card {
     border:1px solid var(--c-border); border-radius:var(--radius); background:var(--c-bg);
-    padding:1.5rem; min-height:180px; cursor:pointer;
+    padding:1.5rem; min-height:200px; cursor:pointer;
   }
-  .fc-badges { display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:.75rem; }
-  .fc-context { color:var(--c-muted); font-size:.85rem; line-height:1.5; margin-bottom:.6rem; }
-  .fc-front-text { font-size:1.08rem; line-height:1.55; color:var(--c-text); }
-  .fc-front-text code, .fc-context code, .fc-back code {
-    background:var(--c-card); border:1px solid var(--c-border); padding:.05rem .35rem;
-    border-radius:4px; font-size:.9em;
-  }
-  .fc-labels { margin-top:.9rem; font-size:.82rem; color:var(--c-muted); }
-  .fc-labels code {
-    background:var(--c-card); border:1px solid var(--c-border); padding:.05rem .4rem;
-    border-radius:4px; font-weight:700; color:var(--c-primary); margin-right:.25rem;
-  }
-  .fc-labels .lab { margin-right:.8rem; white-space:nowrap; }
-  details.fc-opts { margin-top:.9rem; font-size:.9rem; }
-  details.fc-opts summary { cursor:pointer; color:var(--c-primary); font-weight:600; font-size:.85rem; }
-  details.fc-opts ul { margin:.5rem 0 0; padding-left:1.25rem; color:var(--c-text); }
-  details.fc-opts li { margin-bottom:.3rem; }
-  .fc-hint { text-align:center; color:var(--c-muted); font-size:.8rem; margin-top:1rem; }
+  .fc-badges { display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:.9rem; }
+  .fc-front-text { font-size:1.25rem; font-weight:700; line-height:1.4; color:var(--c-text); }
+  .fc-prompt { color:var(--c-muted); font-size:.85rem; margin-top:.6rem; }
   .fc-back {
-    margin-top:1rem; padding:1rem 1.1rem; border-radius:var(--radius-sm);
+    margin-top:1.1rem; padding:1rem 1.1rem; border-radius:var(--radius-sm);
     background:var(--c-correct-bg); border:1px solid var(--c-correct);
-    font-size:.95rem; line-height:1.55; color:var(--c-text);
+    font-size:.95rem; line-height:1.6; color:var(--c-text);
   }
-  .fc-back .answer { font-weight:700; color:var(--c-correct); }
-  .fc-expl { margin-top:.5rem; font-size:.9rem; }
-  .fc-source { margin-top:.5rem; font-size:.78rem; color:var(--c-muted); }
+  .fc-topics { margin-top:.7rem; font-size:.75rem; color:var(--c-muted); line-height:1.6; }
+  .fc-topics code {
+    background:var(--c-card); border:1px solid var(--c-border); padding:.02rem .35rem;
+    border-radius:4px; margin-right:.25rem;
+  }
+  .fc-source { margin-top:.4rem; font-size:.78rem; color:var(--c-muted); }
   .fc-controls { display:flex; flex-wrap:wrap; gap:.6rem; justify-content:center; margin-top:1.1rem; }
+  .fc-hint { text-align:center; color:var(--c-muted); font-size:.8rem; margin-top:1rem; }
   .fc-end h3 { margin:0 0 .5rem; }
   .fc-end .stats { color:var(--c-muted); margin-bottom:1rem; line-height:1.6; }
   .fc-end .stats b { color:var(--c-text); }
@@ -80,7 +69,7 @@
     </div>
     <div style="flex:2; text-align:center;">
       <h1 style="margin:0;font-size:1.3rem;letter-spacing:-0.5px;">Flashcards 9 CFU</h1>
-      <p style="margin:0.2rem 0 0;font-size:0.8rem;opacity:0.7">ripasso attivo su tutto il bank di domande</p>
+      <p style="margin:0.2rem 0 0;font-size:0.8rem;opacity:0.7">carte concettuali su tutti gli argomenti del corso</p>
     </div>
     <div style="flex:1; text-align:right;">
       <button id="theme-btn" class="theme-toggle">Dark</button>
@@ -94,7 +83,7 @@
     <section id="setup" class="setup-card">
       <h2 style="margin:0 0 .25rem;font-size:1.15rem;">Componi il mazzo</h2>
       <p style="color:var(--c-muted);font-size:.9rem;margin:.25rem 0 0;">
-        Fronte = domanda (senza opzioni) o affermazione da valutare. Retro = risposta corretta + spiegazione.
+        Fronte = un argomento del corso. Prova a spiegarlo a voce (definizione, proprietà, trappole d'esame), poi gira la carta e confrontati con la spiegazione.
         Le carte segnate <b>«Non sapevo»</b> rientrano nei round successivi finché non le sai tutte.
       </p>
       <div class="filters-row">
@@ -106,15 +95,8 @@
             <option value="3">Parte 3 — Agenti e apprendimento</option>
           </select>
         </label>
-        <label>Argomento
-          <select id="f-topic"><option value="all">Tutti</option></select>
-        </label>
-        <label>Tipo
-          <select id="f-tipo">
-            <option value="all">MCQ + vero/falso</option>
-            <option value="mcq">Solo MCQ</option>
-            <option value="match">Solo vero/falso e associazioni</option>
-          </select>
+        <label>Categoria
+          <select id="f-cat"><option value="all">Tutte</option></select>
         </label>
         <label>Numero carte
           <input type="number" id="f-count" min="1" placeholder="tutte">
@@ -136,7 +118,7 @@
       <progress class="fc-bar" id="m-bar" value="0" max="1"></progress>
       <div class="fc-card" id="card"></div>
       <div class="fc-controls" id="controls"></div>
-      <p class="fc-hint">Spazio o click sulla carta = mostra risposta · 1 = Non sapevo · 2 = Sapevo</p>
+      <p class="fc-hint">Spazio o click sulla carta = mostra spiegazione · 1 = Non sapevo · 2 = Sapevo</p>
     </section>
 
     <!-- ===== Fine round ===== -->
@@ -144,7 +126,7 @@
   </main>
 
   <footer>
-    <p>chris1sflaggin — Flashcards generate dal bank di domande del quiz SISINT (programma 9 CFU).</p>
+    <p>chris1sflaggin — Flashcards concettuali del corso SISINT (programma 9 CFU); coprono tutti gli argomenti del bank di domande.</p>
   </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -170,13 +152,6 @@ function escHtml(s) {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function parseLabels(s) {
-  return String(s || '').split('|').map(p => {
-    const [key, ...rest] = p.split('=');
-    return { key: key.trim(), text: rest.join('=').trim() };
-  });
-}
-
 function shuffle(arr) {
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {
@@ -186,78 +161,60 @@ function shuffle(arr) {
   return a;
 }
 
-// rows = oggetti con chiavi pari agli header dei CSV
-function buildCards(mcqRows, matchRows) {
+// rows = oggetti con chiavi pari agli header di flashcards.csv
+function buildCards(rows) {
   const cards = [];
-  for (const r of mcqRows) {
-    if (!r.id || !r.question) continue;
-    const key = String(r.correct || '').trim().toLowerCase();
-    const correctText = { a: r.opt_a, b: r.opt_b, c: r.opt_c }[key];
-    if (!correctText) continue;
+  for (const r of rows) {
+    if (!r.id || !r.front || !r.back) continue;
     cards.push({
-      kind: 'mcq', parte: r.parte, topic: r.topic,
-      context: '', front: r.question,
-      opts: [r.opt_a, r.opt_b, r.opt_c],
-      labels: null,
-      back: correctText,
-      expl: r.explanation || '',
-      source: r.source || ''
-    });
-  }
-  for (const r of matchRows) {
-    if (!r.group_id || !r.item_text) continue;
-    const labels = parseLabels(r.labels);
-    const lab = labels.find(l => l.key === String(r.correct || '').trim());
-    if (!lab) continue;
-    cards.push({
-      kind: 'match', parte: r.parte, topic: r.topic,
-      context: r.group_text || '', front: r.item_text,
-      opts: null,
-      labels,
-      back: lab.key + ' — ' + lab.text,
-      expl: r.explanation || '',
+      parte: r.parte,
+      categoria: r.categoria,
+      cfu: r.cfu,
+      front: r.front,
+      back: r.back,
+      topics: String(r.topics || '').split('|').filter(Boolean),
       source: r.source || ''
     });
   }
   return cards;
 }
 
-function filterCards(cards, { parte, topic, tipo }) {
+function filterCards(cards, { parte, cat }) {
   return cards.filter(c =>
     (parte === 'all' || c.parte === parte) &&
-    (topic === 'all' || c.topic === topic) &&
-    (tipo === 'all' || c.kind === tipo));
+    (cat === 'all' || c.categoria === cat));
 }
 
 // ===== DOM & stato =====
-let ALL = [];                       // tutte le carte
+let ALL = [];
 let deck = [], pos = 0, missed = [], round = 1, flipped = false;
 let knownTotal = 0, initialSize = 0;
 
 const $ = id => document.getElementById(id);
 
 function currentFilters() {
-  return { parte: $('f-parte').value, topic: $('f-topic').value, tipo: $('f-tipo').value };
+  return { parte: $('f-parte').value, cat: $('f-cat').value };
 }
 
-function refreshTopics() {
+function refreshCats() {
   const parte = $('f-parte').value;
   const sub = ALL.filter(c => parte === 'all' || c.parte === parte);
   const counts = {};
-  sub.forEach(c => { counts[c.topic] = (counts[c.topic] || 0) + 1; });
-  const sel = $('f-topic');
+  sub.forEach(c => { counts[c.categoria] = (counts[c.categoria] || 0) + 1; });
+  const sel = $('f-cat');
   const prev = sel.value;
-  sel.innerHTML = '<option value="all">Tutti</option>' +
-    Object.keys(counts).sort().map(t =>
-      `<option value="${escHtml(t)}">${escHtml(t)} (${counts[t]})</option>`).join('');
+  sel.innerHTML = '<option value="all">Tutte</option>' +
+    Object.keys(counts).sort().map(k =>
+      `<option value="${escHtml(k)}">${escHtml(k)} (${counts[k]})</option>`).join('');
   if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
 }
 
 function refreshInfo() {
   const f = filterCards(ALL, currentFilters());
-  const nm = f.filter(c => c.kind === 'mcq').length;
+  const n9 = f.filter(c => c.cfu === '9').length;
   $('deck-info').textContent =
-    `Mazzo disponibile: ${f.length} carte (${nm} MCQ + ${f.length - nm} vero/falso e associazioni).`;
+    `Mazzo disponibile: ${f.length} carte concettuali` +
+    (n9 ? ` (di cui ${n9} su argomenti solo 9 CFU).` : '.');
   $('start-btn').disabled = f.length === 0;
 }
 
@@ -297,23 +254,15 @@ function renderCard() {
 
   let html = '<div class="fc-badges">' +
     badge('badge-parte', 'Parte ' + c.parte) +
-    badge('badge-topic', c.topic) +
-    badge('badge-cfu', c.kind === 'mcq' ? 'MCQ' : 'associazione') +
+    badge('badge-topic', c.categoria) +
+    (c.cfu === '9' ? badge('badge-cfu', 'solo 9 CFU') : '') +
     (c.source === 'integrato' ? badge('badge-integrato', 'argomento integrato') : '') +
     '</div>';
-  if (c.context) html += `<div class="fc-context">${escHtml(c.context)}</div>`;
   html += `<div class="fc-front-text">${escHtml(c.front)}</div>`;
-  if (c.kind === 'match' && c.labels) {
-    html += '<div class="fc-labels">' + c.labels.map(l =>
-      `<span class="lab"><code>${escHtml(l.key)}</code>${escHtml(l.text)}</span>`).join('') + '</div>';
-  }
-  if (c.kind === 'mcq') {
-    html += '<details class="fc-opts"><summary>Mostra le 3 opzioni (senza soluzione)</summary><ul>' +
-      shuffle(c.opts).map(o => `<li>${escHtml(o)}</li>`).join('') + '</ul></details>';
-  }
+  html += '<div class="fc-prompt">Spiega: definizione, proprietà chiave, trappole d’esame. Poi gira la carta.</div>';
   html += '<div id="back-slot"></div>';
   $('card').innerHTML = html;
-  $('controls').innerHTML = '<button class="btn primary" id="flip-btn">Mostra risposta</button>';
+  $('controls').innerHTML = '<button class="btn primary" id="flip-btn">Mostra spiegazione</button>';
   $('flip-btn').onclick = flip;
 }
 
@@ -322,9 +271,10 @@ function flip() {
   flipped = true;
   const c = deck[pos];
   const src = SOURCE_LABELS[c.source] || c.source;
+  const backHtml = escHtml(c.back).replace(/\n/g, '<br>');
   $('back-slot').innerHTML =
-    `<div class="fc-back"><span class="answer">Risposta: ${escHtml(c.back)}</span>` +
-    (c.expl ? `<div class="fc-expl">${escHtml(c.expl)}</div>` : '') +
+    `<div class="fc-back">${backHtml}` +
+    (c.topics.length ? `<div class="fc-topics">Argomenti del quiz coperti: ${c.topics.map(t => '<code>' + escHtml(t) + '</code>').join('')}</div>` : '') +
     (src ? `<div class="fc-source">Fonte: ${escHtml(src)}</div>` : '') +
     '</div>';
   $('controls').innerHTML =
@@ -381,7 +331,7 @@ document.addEventListener('keydown', e => {
   else if (e.key === '2' && flipped) grade(true);
 });
 document.addEventListener('click', e => {
-  if (e.target.closest('#card') && !e.target.closest('details')) flip();
+  if (e.target.closest('#card')) flip();
 });
 
 // ===== tema =====
@@ -397,13 +347,12 @@ tbtn.onclick = () => {
 // ===== bootstrap =====
 (async () => {
   try {
-    const [mcqText, matchText] = await Promise.all([
-      fetch('mcq.csv').then(r => { if (!r.ok) throw new Error('mcq.csv: HTTP ' + r.status); return r.text(); }),
-      fetch('matching.csv').then(r => { if (!r.ok) throw new Error('matching.csv: HTTP ' + r.status); return r.text(); })
-    ]);
-    const mcq = Papa.parse(mcqText, { header: true, skipEmptyLines: true }).data;
-    const match = Papa.parse(matchText, { header: true, skipEmptyLines: true }).data;
-    ALL = buildCards(mcq, match);
+    const text = await fetch('flashcards.csv').then(r => {
+      if (!r.ok) throw new Error('flashcards.csv: HTTP ' + r.status);
+      return r.text();
+    });
+    const rows = Papa.parse(text, { header: true, skipEmptyLines: true }).data;
+    ALL = buildCards(rows);
   } catch (e) {
     const err = $('err');
     err.style.display = '';
@@ -411,11 +360,10 @@ tbtn.onclick = () => {
       '.<br>I CSV vanno serviti via web server, non aperti da file:// — ad esempio: <code>python3 -m http.server 8000</code> nella cartella del sito.';
     return;
   }
-  refreshTopics();
+  refreshCats();
   refreshInfo();
-  $('f-parte').addEventListener('change', () => { refreshTopics(); refreshInfo(); });
-  $('f-topic').addEventListener('change', refreshInfo);
-  $('f-tipo').addEventListener('change', refreshInfo);
+  $('f-parte').addEventListener('change', () => { refreshCats(); refreshInfo(); });
+  $('f-cat').addEventListener('change', refreshInfo);
   $('start-btn').addEventListener('click', startDeck);
   $('quit-btn').addEventListener('click', () => { refreshInfo(); show('setup'); });
 })();
