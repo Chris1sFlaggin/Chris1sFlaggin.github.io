@@ -1,0 +1,310 @@
+id,cfu,parte,categoria,front,back,topics,source
+1,both,1,Agenti e IA,Intelligenza Artificiale e Test di Turing,"Il termine 'artificiale' indica solo che il sistema è costruito dall'uomo, non naturale/biologico (può essere un semplice software).
+Test di Turing: un giudice umano dialoga per iscritto con un interlocutore nascosto; se non distingue la macchina dall'umano, la macchina supera il test. È una verifica comportamentale: non spiega che cosa sia l'intelligenza.
+CAPTCHA = Test di Turing INVERSO: è il computer che fa un test a te per capire se sei umano.",intelligenza|turing_test|captcha,sisint1
+2,both,1,Agenti e IA,Stanza cinese e Weak vs Strong AI,"Weak AI: costruire sistemi che si COMPORTANO come se fossero intelligenti (obiettivo ingegneristico).
+Strong AI: chiedersi se la macchina PENSI davvero, se abbia una mente.
+Stanza cinese (Searle): chi è nella stanza risponde correttamente in cinese seguendo regole sintattiche, senza capire il cinese. Argomento CONTRO la Strong AI: manipolare simboli non implica comprensione semantica.",stanza_cinese|strong_weak_ai,sisint1
+3,both,1,Agenti e IA,"Agente, autonomia, razionalità","Agente: astrazione di un sistema che PERCEPISCE l'ambiente tramite sensori e AGISCE tramite attuatori.
+Autonomo: riceve compiti ad ALTO LIVELLO e ragiona da solo su come risolverli (diverso dall'automazione passo-passo).
+Razionale: sceglie l'azione che massimizza l'utilità ATTESA data la sua conoscenza.
+Trappola: razionale non significa onnisciente: può sbagliare per informazione incompleta.",agente|autonomia|agente_razionale,sisint1
+4,both,1,Agenti e IA,Tipi di agente,"REATTIVO SEMPLICE: regole condizione-azione sulla sola percezione corrente, nessuno stato interno; ha senso solo in ambienti COMPLETAMENTE OSSERVABILI (es. termostato).
+BASATO SU MODELLO: mantiene uno stato interno che traccia le parti non osservate del mondo (es. auto con mappa interna).
+GOAL-DRIVEN: sceglie le azioni per raggiungere un obiettivo (ricerca/pianificazione).
+UTILITY-DRIVEN: massimizza una funzione di utilità, cioè gradi di preferenza fra stati (es. profitto atteso).",reattivo|model_based|goal_driven|utility_driven|agenti_tipo,sisint1
+5,both,1,Agenti e IA,Ambienti: classificazione,"Completamente vs parzialmente OSSERVABILE: i sensori vedono tutto lo stato? Scacchi sì, poker no.
+DETERMINISTICO vs STOCASTICO: lo stato successivo è fissato da stato+azione? Scacchi deterministici, backgammon stocastico (dadi).
+EPISODICO vs sequenziale: ogni decisione è indipendente dalle precedenti? Classificatore di immagini: episodico.
+Inoltre: statico/dinamico, discreto/continuo, singolo/multi-agente.
+Cause dell'incertezza per un agente: conoscenza imperfetta + osservabilità parziale.",ambiente|ambiente_classific|incertezza,sisint1
+6,both,1,Agenti e IA,Approccio dichiarativo vs procedurale,"DICHIARATIVO: separa la descrizione del COSA (conoscenza, vincoli, obiettivi) da un programma generale che la elabora (motore di inferenza). KB + inferenza è l'esempio tipico.
+PROCEDURALE/imperativo: prescrivi il COME, passo per passo.",paradigmi,sisint1
+7,both,1,Ricerca: problemi e strategie cieche,Problema di ricerca: definizione formale,"Componenti: stato INIZIALE, AZIONI/funzione successore, TEST OBIETTIVO, COSTO di cammino.
+Trappola: l'euristica NON fa parte della definizione del problema (riguarda solo la ricerca informata).
+Mondo dei blocchi: toy problem classico per illustrare ricerca e pianificazione.",problema|problema_def|blocchi,sisint1
+8,both,1,Ricerca: problemi e strategie cieche,Soluzione e soluzione ottima,"Soluzione = CAMMINO nell'albero/grafo di ricerca dal nodo iniziale a un nodo che soddisfa il test obiettivo.
+OTTIMA = costo di cammino minimo fra tutte le soluzioni.
+Trappole: non è 'lo stato che rende vero il test' (quello è il goal); l'assegnamento di valori a variabili è la soluzione di un CSP, non di un problema di ricerca.",soluzione,sisint1
+9,both,1,Ricerca: problemi e strategie cieche,Ricerca blind vs informata,"BLIND (non informata): usa SOLO la definizione del problema, inclusa la caratterizzazione dell'obiettivo (test obiettivo). Nessuna stima della distanza dal goal.
+INFORMATA: usa in più un'euristica h(n) che stima il costo dal nodo al goal.
+Trappola: anche la blind 'conosce' l'obiettivo (deve riconoscerlo); ciò che le manca è l'euristica.",ricerca_blind|blind_vs_informed,sisint1
+10,both,1,Ricerca: problemi e strategie cieche,BFS — ricerca in ampiezza,"Frontiera = coda FIFO: espande prima i nodi meno profondi.
+COMPLETA (con branching finito); OTTIMA con costi unitari.
+Complessità in tempo E MEMORIA: O(b^d). Il collo di bottiglia pratico è la memoria esponenziale.",bfs|complessita_bfs,sisint1
+11,both,1,Ricerca: problemi e strategie cieche,DFS — ricerca in profondità,"Frontiera = pila LIFO: scende fino in fondo prima di tornare indietro.
+Memoria LINEARE O(b·m): è il suo vantaggio su BFS.
+NON completa in spazi infiniti o con cicli (tree-search); non ottima. Tempo O(b^m).",dfs|memoria,sisint1
+12,both,1,Ricerca: problemi e strategie cieche,IDS / IDDFS,"DFS ripetuta con limite di profondità CRESCENTE (0,1,2,...).
+Combina i vantaggi di BFS (completezza, ottimalità a costi unitari) e DFS (memoria lineare).
+Completa per spazi con branching finito; rigenerare i livelli costa poco perché il livello più profondo domina.",ids|iddfs,sisint1
+13,both,1,Ricerca: problemi e strategie cieche,Uniform Cost Search,"Espande il nodo con costo di cammino g(n) MINIMO (coda con priorità).
+Completa e ottima con costi d'arco maggiori di una soglia positiva.
+Equivale ad A* con h=0; è la generalizzazione della BFS a costi non unitari.",uniform_cost,sisint1
+14,both,1,Ricerca: problemi e strategie cieche,Tree-search vs graph-search,"GRAPH-SEARCH mantiene l'insieme degli stati già visitati e NON riespande gli stati ripetuti.
+TREE-SEARCH non ricorda nulla: può rivisitare stati e ciclare.
+Conseguenza per A*: l'ottimalità in graph-search richiede euristica CONSISTENTE, non solo ammissibile.",ricerca_grafo,aima_ch3
+15,both,1,Ricerca: problemi e strategie cieche,Strategie a confronto (strutture dati e proprietà),"BFS = coda FIFO; completa, ottima a costi unitari.
+DFS = pila LIFO; memoria lineare ma non completa in spazi infiniti.
+UCS = coda con priorità sul costo g.
+IDS = DFS con limite di profondità incrementale; combina i vantaggi di BFS e DFS.
+A* = ricerca informata con f = g + h.",strategie_ricerca|blind_search_match,sisint1
+16,both,1,Ricerca informata ed euristiche,A*,"Espande il nodo che minimizza f(n) = g(n) + h(n) (costo speso + stima del restante).
+Con h AMMISSIBILE è ottimo in tree-search; con h CONSISTENTE è ottimo anche in graph-search. Ottimamente efficiente a parità di euristica.
+Limite pratico: memoria (mantiene l'intera frontiera).
+Trappola NON SEMPRE: 'A* è ottimo' dipende dalle ipotesi sull'euristica.",astar,sisint1
+17,both,1,Ricerca informata ed euristiche,Greedy best-first,"Espande il nodo con h(n) MINIMA: ignora completamente il costo già speso g.
+Né completa né ottima in generale (può infilarsi in vicoli ciechi); spesso veloce in pratica.",greedy,sisint1
+18,both,1,Ricerca informata ed euristiche,RBFS,"Best-first RICORSIVO: tiene in memoria solo il cammino corrente più il miglior f alternativo (backtracking ricorsivo).
+Vantaggio su A*: memoria LINEARE nella profondità. Costo: rivisita nodi già generati.",rbfs,sisint1
+19,both,1,Ricerca informata ed euristiche,Euristica ammissibile,"h(n) <= h*(n) per ogni nodo: non SOVRASTIMA mai il costo reale verso il goal ('ottimista').
+Garantisce l'ottimalità di A* in tree-search.
+Trappole: la disuguaglianza triangolare definisce la CONSISTENZA; 'assumere valori maggiori di un'altra euristica' è la DOMINANZA.",ammissibile,sisint1
+20,both,1,Ricerca informata ed euristiche,Euristica consistente (monotona),"h(n) <= c(n,n') + h(n') per ogni arco: disuguaglianza triangolare.
+Consistente IMPLICA ammissibile (non viceversa). Lungo un cammino f non decresce mai.
+Serve per l'ottimalità di A* in GRAPH-search.",consistente,sisint1
+21,both,1,Ricerca informata ed euristiche,Dominanza e combinazione di euristiche,"h2 DOMINA h1 se h2(n) >= h1(n) per ogni n (entrambe ammissibili): stima più stretta, quindi A* con h2 non espande più nodi che con h1.
+max(h1,h2) di due ammissibili è ancora ammissibile e DOMINA entrambe: tecnica standard per combinare euristiche.",dominante|euristica|combine_h,sisint1
+22,both,1,Ricerca informata ed euristiche,Euristiche dell'8-puzzle,"h1 = numero di tessere FUORI POSTO: ammissibile (ogni tessera fuori posto richiede almeno una mossa), ma non dominante.
+h2 = distanza di MANHATTAN (somma delle distanze di ogni tessera dalla sua casella): ammissibile e DOMINA h1.
+Un'euristica come 'costo medio osservato x 10' può sovrastimare: NON ammissibile.",manhattan|euristica_es|heur_property,aima_ch3
+23,both,1,Ricerca informata ed euristiche,Progettare euristiche: problema rilassato,"Rimuovi vincoli dal problema (problema RILASSATO) e risolvilo esattamente: il costo ottimo del rilassato è un'euristica AMMISSIBILE per il problema originale (il rilassato non costa mai di più).
+8-puzzle: 'le tessere si teletrasportano' -> tessere fuori posto; 'si muovono anche su caselle occupate' -> Manhattan.",heuristic_design,aima_ch3
+24,both,1,Giochi,Classificazione dei giochi e funzione di valutazione,"Assi: DETERMINISTICO vs STOCASTICO (c'è il caso? backgammon sì) e informazione COMPLETA vs INCOMPLETA (vedi tutto lo stato? poker no).
+Scacchi: deterministici, informazione completa. Backgammon: stocastico, informazione completa. Poker: stocastico, informazione incompleta.
+SOMMA ZERO: il guadagno di un giocatore è la perdita dell'altro.
+FUNZIONE DI VALUTAZIONE: stima l'utilità di uno stato NON terminale quando il taglio in profondità impedisce di raggiungere le foglie.",gioco_tipo|giochi_completi|giochi_incompleti|giochi_stoc|giochi,sisint1
+25,both,1,Giochi,Minimax,"Per giochi deterministici, 2 giocatori, somma zero: MAX massimizza, MIN minimizza; i valori risalgono dai nodi terminali.
+Assume avversario OTTIMO (gioca la mossa peggiore per noi); contro un avversario subottimale si ottiene almeno lo stesso valore.
+Esplorazione in profondità: tempo O(b^m).",minimax|minimax_assunzione|minimax_facts,sisint1
+26,both,1,Giochi,Potatura alfa-beta,"Salta i rami che non possono cambiare la decisione (alfa = miglior valore per MAX, beta = miglior valore per MIN trovati finora).
+NON cambia il risultato: stesso valore di minimax con meno nodi esplorati.
+Con ordinamento OTTIMO delle mosse: O(b^(m/2)), cioè profondità esplorabile raddoppiata.",alfa_beta,sisint1
+27,9,1,Giochi,Expectiminimax,"Estende minimax ai giochi STOCASTICI: 4 tipi di nodi: MAX, MIN, CASUALI (chance), TERMINALI.
+Valore di un nodo casuale = MEDIA PESATA per probabilità dei valori dei figli.
+Prerequisito: conoscere le distribuzioni di probabilità degli eventi casuali (es. 1/36 per ogni coppia di dadi).
+Complessità O(b^m · n^m) con n esiti casuali; alfa-beta applicabile solo in forma limitata (servono bound sulle utilità).
+Trappola: NON esistono 'nodi goal' negli alberi di gioco (sono del problem solving).",expectiminimax|expectiminimax_tree|nodi_casuali|expectiminimax_alfabeta|expectiminimax_compl,sisint1
+28,both,1,CSP,CSP: definizione e soluzione,"CSP = (VARIABILI, DOMINI, VINCOLI).
+Soluzione = assegnamento COMPLETO (tutte le variabili) e CONSISTENTE (nessun vincolo violato).
+Trappola: la soluzione è un ASSEGNAMENTO, non un cammino.
+Esempio classico: colorazione di una mappa con k colori.",csp|csp_soluzione|csp_es,sisint1
+29,both,1,CSP,N regine come CSP,"Variabili = le N regine, una per colonna; dominio = {1..N} (la riga di ciascuna).
+Vincoli BINARI fra ogni coppia: non stessa riga, non stessa diagonale.
+Si risolve con backtracking + propagazione o con ricerca locale (min-conflicts).
+Trappola: la soluzione è l'assegnamento finale, non una sequenza di mosse.",nqueen|csp_struttura,sisint1
+30,both,1,CSP,"Backtracking, backjumping, forward checking","BACKTRACKING: assegna una variabile alla volta; al conflitto torna alla variabile più RECENTE.
+BACKJUMPING: salta direttamente alla variabile più recente RESPONSABILE del conflitto (conflict set), evitando backtrack inutili.
+FORWARD CHECKING: dopo ogni assegnamento elimina dai domini delle variabili collegate i valori incompatibili; fallisce appena un dominio si svuota.",backtracking|backjumping|forward_checking|csp_techniques,sisint1
+31,both,1,CSP,AC-3 e k-consistency,"ARC CONSISTENCY (= 2-consistency): per ogni valore di X esiste almeno un valore compatibile in Y, per ogni arco (X,Y). AC-3 la stabilisce propagando le revisioni dei domini.
+Garantisce la consistenza d'arco, NON l'esistenza della soluzione.
+K-CONSISTENCY: ogni assegnamento consistente di k-1 variabili è estendibile consistentemente a una k-esima variabile.",ac3|kconsistency,sisint1
+32,both,2,Logica proposizionale,"KB, interrogazione, rappresentazione della conoscenza","KB (base di conoscenza) = insieme di formule (fatti + regole) che rappresentano ciò che l'agente sa del mondo.
+INTERROGARE (ASK) = chiedere se una formula alfa è conseguenza logica della KB: vale KB |= alfa?
+La rappresentazione della conoscenza codifica il mondo in forma DICHIARATIVA su cui un motore generale può fare inferenza.",kb|query|kr_intro,sisint1
+33,both,2,Logica proposizionale,Modello e conseguenza logica,"MODELLO (interpretazione) = assegnamento di un valore di verità a OGNI simbolo proposizionale; m è modello di alfa se alfa è vera in m.
+KB |= alfa sse alfa è vera in TUTTI i modelli in cui la KB è vera.
+Trappola: il modello è un assegnamento, non 'una formula sempre vera' (quella è una tautologia).",logica_intro,sisint1
+34,both,2,Logica proposizionale,"Formula atomica, letterale, clausola","Formula ATOMICA: un simbolo proposizionale (in FOL: un predicato applicato a termini).
+LETTERALE: formula atomica o sua negazione (P, non P).
+CLAUSOLA: DISGIUNZIONE di letterali (A or non B or C).",prop_sintassi|letterale|clausola,sisint1
+35,both,2,Logica proposizionale,"Tautologia, soddisfacibile, contraddizione, consistenza","VALIDA / TAUTOLOGIA: vera in OGNI interpretazione (P or non P: terzo escluso).
+SODDISFACIBILE: vera in ALMENO una interpretazione.
+CONTRADDIZIONE / insoddisfacibile: vera in NESSUNA interpretazione (P and non P).
+KB CONSISTENTE: ha almeno un modello.
+Legame: alfa è valida se e solo se (non alfa) è insoddisfacibile.",tautologia|validita|soddisfacibile|contraddizione|coerenza|prop_assertions,sisint1
+36,both,2,Logica proposizionale,Implicazione ed equivalenza,"A => B è semanticamente equivalente a (non A) or B: è falsa SOLO quando A è vera e B falsa. Antecedente falso -> implicazione vera.
+A <=> B equivale a (A => B) and (B => A).",implicazione|equivalenza,sisint1
+37,both,2,Logica proposizionale,CNF — forma normale congiuntiva,"CONGIUNZIONE di clausole: AND di OR di letterali.
+Ogni formula proposizionale è convertibile in una CNF equivalente.
+È il formato richiesto dalla risoluzione.",cnf,sisint1
+38,both,2,Logica proposizionale,Clausola di Horn,"Clausola con AL PIÙ un letterale POSITIVO.
+DEFINITA = esattamente UN positivo: è un fatto o una regola ((non A) or (non B) or C equivale a (A and B) => C). Goal clause = zero positivi.
+Esempi: (non A) or (non B) or C -> Horn; A or B or (non C) -> NON Horn (due positivi).
+Importanza: su KB Horn, forward/backward chaining sono COMPLETI e lineari.
+Trappola: 'al più uno' = Horn in generale; 'esattamente uno' = Horn definita.",clausola_horn|horn_es|horn_cnf|horn_use,sisint1
+39,both,2,Logica proposizionale,Correttezza vs completezza dell'inferenza,"CORRETTO (sound): se KB |- alfa allora KB |= alfa: deriva SOLO conseguenze logiche.
+COMPLETO: se KB |= alfa allora KB |- alfa: deriva TUTTE le conseguenze logiche (per qualsiasi KB).
+Terminare sempre = DECIDIBILITÀ, proprietà diversa.
+Trappola d'esame classica: le due definizioni vengono scambiate.",inferenza_completa,sisint1
+40,both,2,Inferenza e risoluzione,Modus ponens,"Da A e A => B deduci B. Regola corretta (sound).
+GENERALIZZATO (FOL): la regola (A1 and ... and An) => B scatta se esiste UNA sostituzione che unifica TUTTI gli antecedenti con fatti noti.
+Trappola: se manca anche un solo fatto (es. Gamma(COST)), il MP non è applicabile.",modus_ponens,sisint1
+41,both,2,Inferenza e risoluzione,Forward e backward chaining,"FORWARD (data-driven): parte dai FATTI, applica le regole con tutti gli antecedenti soddisfatti, aggiunge le conclusioni, ripete. Si ferma quando deriva il goal o non deriva più nulla.
+BACKWARD (goal-driven): parte dal GOAL, cerca regole che lo concludono e ne riduce gli antecedenti a sottogoal, fino ai fatti.
+Entrambi lavorano su clausole di Horn definite; completi su KB Horn.",forward_chain|backward_chain,sisint1
+42,both,2,Inferenza e risoluzione,Risoluzione,"Regola: da (alfa or L) e (beta or non L) deriva il RISOLVENTE (alfa or beta).
+Applicabile SOLO se le due clausole contengono letterali COMPLEMENTARI (P e non P); richiede la KB in clausole (CNF).
+{P,Q} e {non P,R} -> risolvente {Q,R}. {P} e {Q,R} -> NON applicabile (nessun letterale complementare).
+Proprietà: sound e refutation-complete.",risoluzione|resolution_steps|resolution_letterali,sisint1
+43,both,2,Inferenza e risoluzione,Dimostrazione per refutazione,"Per dimostrare KB |= alfa: (1) converti la KB in CNF, (2) aggiungi il goal NEGATO (non alfa), (3) applica la risoluzione fino a derivare la CLAUSOLA VUOTA (contraddizione).
+Clausola vuota derivata -> KB and (non alfa) insoddisfacibile -> KB |= alfa.
+La risoluzione (con fattorizzazione, in FOL) è REFUTATION-COMPLETE: se l'insieme è insoddisfacibile, la clausola vuota è sempre derivabile.",refutation|refutation_steps|refutation_complete,risol_FOL
+44,both,2,Logica del prim'ordine,"FOL: predicati, funzioni, termini","La FOL estende la proposizionale con oggetti, relazioni e quantificatori.
+PREDICATO: relazione vera o falsa su tuple di oggetti (Cane(Fuffi)).
+FUNZIONE: mappa oggetti in oggetti, DENOTA un oggetto (PadreDi(x)); non ha valore di verità.
+TERMINI: costanti, variabili, funzioni applicate a termini.",fol_intro|fol_predicato|fol_funzione,sisint1
+45,both,2,Logica del prim'ordine,Quantificatori,"PER OGNI x P(x): P vale per ogni oggetto del dominio; si usa tipicamente con =>: per ogni x (Cane(x) => Animale(x)) = 'ogni cane è un animale'.
+ESISTE x P(x): vale per almeno un oggetto; tipicamente con AND.
+Validità: per ogni x (P(x) or non P(x)) è VALIDA; esiste x (P(x) and non P(x)) è INSODDISFACIBILE.
+Trappola: 'per ogni' con AND ed 'esiste' con => sono quasi sempre formalizzazioni sbagliate.",fol_quant|fol_es|fol_quant_use,sisint1
+46,both,2,Logica del prim'ordine,Ground: termini e formule,"GROUND = privo di variabili.
+F(K) (funzione applicata a una costante) è un TERMINE ground. P(F(K)) è una FORMULA ATOMICA ground: NON è un termine!
+Classificazione d'esame (scegli la categoria PIÙ SPECIFICA): tautologia / formula ground / clausola / formula FOL generica.
+Esempi: Cane(Fuffi) => non Gatto(Fuffi) -> ground; non Piove or Piove -> tautologia; A or non B or C -> clausola; Blu(x) or Sopra(x,y) and non Sopra(x,z) -> formula FOL.",ground|formule_tipo,sisint1
+47,both,2,Logica del prim'ordine,Unificazione e MGU,"UNIFICATORE: sostituzione theta che rende sintatticamente IDENTICHE due espressioni atomiche.
+MGU (Most General Unifier): l'unificatore più generale, quello che impone meno vincoli; ogni altro unificatore ne è un'istanza.
+Esempio: P(x) e P(F(K)) unificano con theta = {x/F(K)}.",unificazione,sisint1
+48,both,2,Logica del prim'ordine,Skolemizzazione,"Elimina i quantificatori ESISTENZIALI (passo della conversione in CNF).
+'Esiste' fuori dallo scope di ogni 'per ogni' -> COSTANTE di Skolem.
+'Esiste' nello scope di 'per ogni' -> FUNZIONE di Skolem delle variabili universali: per ogni x esiste y Ama(x,y) -> Ama(x, F(x)).
+Preserva la SODDISFACIBILITÀ, non l'equivalenza logica.",skolem|fol_skolem_es,sisint1
+49,both,2,Logica del prim'ordine,Lifting e inferenza in FOL,"LIFTING: solleva le regole proposizionali (modus ponens, risoluzione) al prim'ordine sostituendo il confronto esatto fra simboli con l'UNIFICAZIONE.
+Esempio d'esame: da (non Alfa(x)) or Beta(x) or (non Gamma(x)) e Alfa(COST): la RISOLUZIONE è applicabile (theta={x/COST}, risolvente Beta(COST) or non Gamma(COST)); il FORWARD CHAINING no, perché alla regola (Alfa and Gamma) => Beta manca il fatto Gamma(COST).",lifting|inferenza_FOL,sisint1
+50,both,2,Planning e situation calculus,Planning e PDDL,"PLANNING: trovare automaticamente una SEQUENZA DI AZIONI che porta dallo stato iniziale a uno stato goal.
+PDDL (Planning Domain Definition Language): linguaggio standard per descrivere dominio e problema; ogni azione ha PRECONDIZIONI ed EFFETTI.",planning_intro|pddl,sisint1
+51,both,2,Planning e situation calculus,Situation calculus: fluenti e assiomi,"FLUENTE: proprietà o relazione che CAMBIA con la situazione (On(A,B,s)); la situazione è un argomento esplicito.
+Assioma di APPLICABILITÀ: precondizioni perché l'azione sia eseguibile nella situazione s.
+Assioma di EFFETTO: che cosa diventa vero dopo l'azione.
+Assioma di FRAME: che cosa NON cambia eseguendo l'azione.
+FRAME PROBLEM: esplosione del numero di assiomi frame necessari; si mitiga con gli assiomi di stato-successore.
+Trappola: 'assioma di minimo regret' e 'assioma di congruenza' NON esistono nel situation calculus.",situation_calc|assioma_eff|assioma_appl|frame_axiom|frame_problem|planning_facts,sisint1
+52,both,2,Planning e situation calculus,Anomalia di Sussman,"Esempio (tre blocchi) in cui perseguire un sottogoal DISFA un sottogoal già raggiunto: i sottogoal NON sono indipendenti.
+Conseguenza: la pianificazione non è sempre lineare; servono pianificatori capaci di intrecciare i piani dei sottogoal (interleaving).",sussman,sisint1
+53,both,2,Ontologie e KR,"Tassonomia, ereditarietà, ontologia","TASSONOMIA: organizzazione GERARCHICA di categorie tramite relazioni IS-A.
+EREDITARIETÀ: le sottoclassi ereditano le proprietà delle sovraclassi (gli Uccelli volano -> l'Aquila vola), salvo eccezioni esplicite.
+ONTOLOGIA: insieme di CONCETTI e RELAZIONI di un dominio (una rete semantica): più ricca di una semplice gerarchia.",tassonomia|ereditarieta|ontologia|ont_descr,sisint1
+54,both,2,Ontologie e KR,IS-A vs MEMBER,"IS-A(C1,C2): C1 è SOTTOCLASSE di C2: relazione fra CATEGORIE, transitiva ('il Dalmata è un tipo di Cane').
+MEMBER(P,C): P è ISTANZA della categoria C: individuo vs classe ('Pongo è un Dalmata').
+Trappola d'esame: distinguere istanza-classe (member) da classe-classe (is-a).",is_a|member|categorie_pred|is_a_member,ontologie
+55,9,2,Ontologie e KR,Part-of e bunch-of,"PART-OF(x,y): x è parte di y; relazione TRANSITIVA (dito parte della mano, mano parte del braccio -> dito parte del braccio).
+BUNCH-OF({a,b,c}): l'oggetto COMPOSTO che ha come parti a, b e c, SENZA specificare le relazioni fra le parti.",part_of|bunch_of,sisint1
+56,9,2,Ontologie e KR,"Disjoint, decomposizione esaustiva, partizione","DISJOINT(S): le categorie di S sono a coppie DISGIUNTE (nessuna istanza in comune).
+EXHAUSTIVEDEC(S,C): decomposizione ESAUSTIVA: ogni istanza di C appartiene ad ALMENO una categoria di S (possono sovrapporsi!).
+PARTITION(S,C) = Disjoint + ExhaustiveDec: disgiunte E coprono C.
+Trappola: 'esaustiva' NON implica disgiunzione; la partizione richiede entrambe.",disjoint|exhaustive|partition|ontologia_partition,sisint1
+57,both,2,Ontologie e KR,"RDF, OWL, Semantic Web","RDF: conoscenza espressa come STATEMENT/TRIPLE soggetto-predicato-oggetto.
+OWL: linguaggio W3C per ontologie del semantic web; descrive l'ontologia con tre tipi di elementi: ENTITÀ (riferimenti a oggetti del mondo reale), ASSIOMI (statement di base), ESPRESSIONI (combinazioni di entità).
+SEMANTIC WEB: estensione del WWW in cui i contenuti sono arricchiti da METADATI che abilitano interpretazione automatica, inferenza e interrogazione.
+Interrogazione tipica di un'ontologia: un'istanza appartiene a una categoria? gode di una certa proprietà?",rdf|owl|semantic_web|interrogare_ontologia,sisint1
+58,9,2,Ontologie e KR,Allineamento di ontologie,"EQUIVALENTI: condividono vocabolario e assiomatizzazione, anche se espresse in linguaggi diversi.
+ESTENSIONI: O2 preserva tutti i simboli di O1 (con proprietà e relazioni) ma non viceversa: O2 estende O1.
+STRONGLY-TRANSLATABLE (O_source in O_dest): vocabolario totalmente mappabile, assiomatizzazione resta valida, SENZA perdita di informazione né inconsistenze.
+WEAKLY-TRANSLATABLE: traduzione possibile ma CON perdita di informazione.",allineamento|allineamento_match,sisint1
+59,9,2,Probabilità e reti bayesiane,Spazio campionario e assiomi della probabilità,"Spazio campionario Omega: insieme degli ESITI ELEMENTARI, mutuamente ESCLUSIVI ed ESAUSTIVI (se ne verifica esattamente uno).
+Funzione di probabilità: ogni esito ha 0 <= P <= 1; la somma su tutti gli esiti è 1; P(evento) = somma delle probabilità dei suoi esiti.
+Trappola: gli esiti NON devono essere equiprobabili né 'indipendenti': le proprietà richieste sono mutua esclusività ed esaustività.",spazio_campionario|prob_assiomi,sisint1
+60,9,2,Probabilità e reti bayesiane,Variabile aleatoria,"Funzione che associa a ogni esito dello spazio campionario un VALORE di un dominio (booleano, discreto, continuo), con una distribuzione di probabilità associata.
+Esempi: Dado con valori {1..6}; Pioggia con valori {vero, falso}.",variabile_aleatoria|aima_prob,sisint1
+61,9,2,Probabilità e reti bayesiane,"Probabilità condizionata, regola del prodotto, priori/posteriori","P(A|B) = P(A and B) / P(B), con P(B) > 0.
+REGOLA DEL PRODOTTO: P(A and B) = P(A|B) · P(B).
+A PRIORI: probabilità prima di osservare evidenza. A POSTERIORI: aggiornata dopo l'evidenza (probabilità condizionata sull'evidenza).",prob_cond|regola_prodotto|priori_posteriori,sisint1
+62,9,2,Probabilità e reti bayesiane,Indipendenza e indipendenza condizionata,"X e Y INDIPENDENTI sse P(X,Y) = P(X)·P(Y) (equivalente: P(X|Y) = P(X)).
+X e Y CONDIZIONATAMENTE indipendenti dato Z sse P(X,Y|Z) = P(X|Z)·P(Y|Z).
+L'indipendenza condizionata è ciò che rende compatte le reti bayesiane.",indipendenza|cond_indep,sisint1
+63,9,2,Probabilità e reti bayesiane,Teorema di Bayes,"P(A|B) = P(B|A) · P(A) / P(B).
+INVERTE il condizionamento: dalla verosimiglianza P(effetto|causa) e dal prior P(causa) si ottiene P(causa|effetto).
+Base della diagnosi e della classificazione bayesiana.",prob_bayes,sisint1
+64,9,2,Probabilità e reti bayesiane,Distribuzione congiunta completa,"Assegna una probabilità a OGNI combinazione di valori delle n variabili: con n variabili booleane, 2^n celle (2^n - 1 parametri liberi).
+Crescita ESPONENZIALE: è il motivo per cui si usano le reti bayesiane (sfruttano le indipendenze condizionate).",prob_completa,sisint1
+65,9,2,Probabilità e reti bayesiane,Rete bayesiana e CPT,"DAG: nodi = variabili aleatorie, archi = influenze dirette (genitore -> figlio).
+Ogni nodo ha una CPT (Conditional Probability Table): P(nodo | genitori).
+COMPATTEZZA: con n nodi binari e al più k genitori ciascuno: al più n·2^k parametri, contro i 2^n della congiunta completa.",bayes_net|cpt|bayes_compatta|bayes_num,sisint1
+66,9,2,Probabilità e reti bayesiane,Semantica globale e locale di una rete bayesiana,"GLOBALE: la congiunta completa si FATTORIZZA sulla struttura della rete: P(x1,...,xn) = prodotto su i di P(xi | genitori(Xi)) (chain rule).
+LOCALE: ogni nodo è condizionatamente indipendente dai suoi NON-DISCENDENTI dati i suoi genitori.
+Le due semantiche sono equivalenti.",semantica_globale|semantica_locale|bayes_chain|bayes_facts,sisint1
+67,9,2,Probabilità e reti bayesiane,Markov blanket,"Coperta di Markov di un nodo X: i suoi GENITORI + i suoi FIGLI + i GENITORI DEI FIGLI.
+Data la coperta, X è condizionatamente INDIPENDENTE da tutto il resto della rete.",markov_blanket,sisint1
+68,9,2,Probabilità e reti bayesiane,Naive Bayes,"Classificatore bayesiano che assume gli attributi CONDIZIONATAMENTE INDIPENDENTI data la classe: 'ingenuo' perché l'assunzione è spesso falsa, ma in pratica funziona.
+P(C|x1..xn) proporzionale a P(C) · prodotto su i di P(xi|C).
+Struttura: la classe è genitore di tutti gli attributi.",bayes_ingenuo,sisint1
+69,both,3,Apprendimento: basi e valutazione,Agente che apprende,"Quattro componenti: elemento di ESECUZIONE (sceglie le azioni), elemento di APPRENDIMENTO (migliora il comportamento), modulo CRITICO (valuta le prestazioni rispetto a uno standard e fornisce feedback), GENERATORE DI PROBLEMI (propone esperienze esplorative).",agente_apprende,sisint1
+70,both,3,Apprendimento: basi e valutazione,"Supervisionato, non supervisionato, auto-supervisionato","SUPERVISIONATO: ogni esempio del training set ha la classe/target associata: il 'supervisore' è l'ETICHETTA, non una persona. Esempio: spam/non spam con esempi etichettati.
+NON SUPERVISIONATO: nessuna etichetta; si cerca struttura nei dati (clustering: segmentare i clienti).
+AUTO-SUPERVISIONATO: il segnale di supervisione viene dai dati stessi (un LLM che predice la parola successiva).
+Trappola: 'monitorato da un supervisore umano' è il distrattore classico.",supervisionato|supervisionato_def|supervisionato_vs_no|non_supervisionato|ml_tipo,sisint1
+71,both,3,Apprendimento: basi e valutazione,Classificazione e tipi di attributi,"CLASSIFICAZIONE: imparare dagli esempi una funzione che assegna a ogni istanza (vettore di attributi) una CLASSE discreta.
+Attributi BINARI, NOMINALI, ORDINALI: direttamente trattabili da un albero di decisione; gli attributi CONTINUI richiedono soglie/discretizzazione.",classificazione|attributi,sisint1
+72,both,3,Apprendimento: basi e valutazione,"Training set, test set, cross-validation","TEST SET: dati MAI usati in addestramento: unica stima onesta della generalizzazione.
+Errore di training basso + errore di test alto = OVERFITTING.
+CROSS-VALIDATION (k-fold): ruota la partizione train/validation per stimare le prestazioni in modo robusto, utile quando i dati sono pochi.",training_test|cross_valid|error_test_train,sisint1
+73,both,3,Apprendimento: basi e valutazione,"Matrice di confusione, accuratezza, error rate","Matrice: RIGHE = classe reale, COLONNE = classe predetta; la diagonale contiene le predizioni corrette.
+ACCURATEZZA = corrette / totale. ERROR RATE = 1 - accuratezza.
+Derivabili dalla matrice anche precision, recall, F1. NON derivabili: entropia, livello di confidenza.
+Esempio d'esame (3 classi, 100 istanze, diagonale 30+25+30=85): accuratezza 0,85; error rate 0,15. Una classe è 'perfetta' solo se riga E colonna fuori diagonale sono tutte zero (precision = recall = 1).",matrice_confusione|accuratezza|error_rate|modello_classif,sisint1
+74,both,3,Apprendimento: basi e valutazione,Matrice dei costi,"Associa un COSTO a ogni cella (classe reale, classe predetta), cioè a ogni tipo di errore o predizione corretta.
+Permette di pesare diversamente gli errori (un falso negativo medico è più grave di un falso positivo): si minimizza il costo atteso, non il semplice error rate.",matrice_costi,sisint1
+75,both,3,Apprendimento: basi e valutazione,Overfitting e underfitting,"OVERFITTING: il modello impara anche il RUMORE del training set: errore di training molto basso, errore di test alto. Negli alberi: albero troppo profondo e specifico.
+UNDERFITTING: modello troppo semplice: errore alto sia in training che in test.
+Rimedi all'overfitting: più dati, pruning, regolarizzazione.
+Trappola: alta accuratezza SUL TRAINING non garantisce generalizzazione.",overfitting|underfitting|overfitting_facts,sisint1
+76,both,3,Apprendimento: basi e valutazione,Bias-variance trade-off,"BIAS: errore dovuto ad assunzioni troppo rigide del modello (troppo semplice -> underfitting).
+VARIANZA: sensibilità alle fluttuazioni del training set (troppo complesso -> overfitting).
+Ridurre l'uno tende ad aumentare l'altra: si cerca il punto di equilibrio.",bias_var,integrato
+77,both,3,Apprendimento: basi e valutazione,Rasoio di Occam e MDL,"OCCAM: a parità di prestazioni preferisci il modello PIÙ SEMPLICE (generalizza meglio).
+MDL (Minimum Description Length): scegli il modello che minimizza L(modello) + L(dati|modello), cioè descrizione del modello + errori/eccezioni: formalizzazione del rasoio di Occam.",occam|mdl,sisint1
+78,both,3,Apprendimento: basi e valutazione,Rote learning e votazione (k-NN),"ROTE LEARNING (apprendimento meccanico): memorizza le istanze e su una nuova istanza cerca quella identica o più simile; nessuna generalizzazione (antenato del k-NN).
+Votazione a MAGGIORANZA: fra i vicini più simili vince la classe più votata.
+Votazione PESATA: ogni vicino pesa in modo inversamente proporzionale alla distanza: i più vicini contano di più.",rote_learning|votazione_maggioranza|votazione_pesata,sisint1
+79,both,3,Alberi di decisione,Albero di decisione: struttura e regole,"Nodi INTERNI = test su attributi; ARCHI = esiti del test; FOGLIE = classi.
+Classificare = far scendere l'istanza dalla radice fino a una foglia.
+Ogni cammino radice-foglia si converte in una regola IF-THEN (premesse = i test, conclusione = la classe): l'albero è un modello interpretabile.",alberi_decisione|decision_tree|reg_dt,sisint1
+80,both,3,Alberi di decisione,Algoritmo di Hunt,"Costruzione RICORSIVA top-down: se il nodo è PURO (istanze tutte della stessa classe) o non restano attributi -> diventa FOGLIA; altrimenti scegli l'attributo di split migliore, partiziona le istanze nei figli, ricorri.
+I figli di uno split PARTIZIONANO le istanze del padre (sottoinsiemi disgiunti ed esaustivi).
+Trappola NON SEMPRE: 'il figlio è una foglia' dipende dalla purezza; e il nodo dello split non è necessariamente la radice.",hunt,sisint1
+81,both,3,Alberi di decisione,"Entropia, information gain, Gini","ENTROPIA di un nodo: impurità/incertezza della distribuzione delle classi (0 = nodo puro; massima con classi equiprobabili).
+INFORMATION GAIN di uno split = entropia(padre) - media pesata delle entropie dei figli: si sceglie lo split che lo MASSIMIZZA.
+Indice di GINI: misura alternativa di impurità (1 - somma dei quadrati delle frequenze).",entropia|gain|gini,sisint1
+82,both,3,Alberi di decisione,Pruning: pre e post,"PREPRUNING: ferma la crescita dell'albero in anticipo (soglie su gain, supporto minimo, profondità massima). Rischio: fermarsi troppo presto.
+POSTPRUNING: costruisce l'albero completo e poi POTA i rami che non migliorano l'errore su un validation set. Più costoso, di solito più efficace.
+Entrambi servono contro l'overfitting.",prepruning|postpruning,sisint1
+83,both,3,Perceptron e reti neurali,"Perceptron: modello, iperpiano, memoria","Calcola una somma PESATA degli input e applica una soglia/attivazione: codifica un test lineare (w·x >= theta).
+Geometricamente: separa lo spazio con un IPERPIANO.
+La 'memoria' (conoscenza appresa) risiede nei PESI delle connessioni (e nella soglia), non nella funzione di attivazione.",perceptron|iperpiano,sisint1
+84,both,3,Perceptron e reti neurali,Apprendimento del perceptron e limite XOR,"Apprende per CORREZIONE DELL'ERRORE: per ogni esempio classificato male aggiorna i pesi (w <- w + eta · errore · input). Converge SE i dati sono linearmente separabili.
+XOR non è linearmente separabile -> IMPOSSIBILE per un singolo perceptron (Minsky-Papert): serve un MLP con strato nascosto.",perceptron_apprende|perceptron_xor|nn_facts,sisint1
+85,both,3,Perceptron e reti neurali,Rete neurale e MLP,"Rete neurale: unità (neuroni) connesse da archi PESATI, organizzate in livelli (input, nascosti, output).
+MLP (multi-layer perceptron): uno o più strati nascosti con attivazioni NON LINEARI: supera i limiti del perceptron (rappresenta XOR; con un solo strato nascosto abbastanza largo è un approssimatore universale).",rete_neurale|mlp,sisint1
+86,both,3,Perceptron e reti neurali,"Gradiente, backpropagation, learning rate, epoca","DISCESA DEL GRADIENTE: aggiorna i pesi nella direzione OPPOSTA al gradiente della funzione di errore.
+BACKPROPAGATION: calcola i gradienti propagando l'ERRORE all'indietro, strato per strato (regola della catena).
+LEARNING RATE: ampiezza del passo: troppo grande -> oscilla o diverge; troppo piccolo -> convergenza lentissima.
+EPOCA: un passaggio completo su tutto il training set.",gradiente|backprop|lr|epoca,sisint1
+87,both,3,Perceptron e reti neurali,Funzioni di attivazione,"SIGMOIDE 1/(1+e^-x): output in (0,1), derivabile: storicamente la scelta per la backpropagation.
+TANH: output in (-1,1), derivabile.
+ReLU max(0,x): output in [0, infinito), lineare a tratti, non derivabile in 0.
+GRADINO (step): non derivabile: inutilizzabile con la discesa del gradiente.",sigmoide|attivazione_match,sisint1
+88,9,3,Perceptron e reti neurali,CNN e RNN,"CNN (convolutional): filtri convolutivi con pesi condivisi su porzioni locali dell'input; dominio tipico: IMMAGINI.
+RNN / LSTM / GRU: stato ricorrente aggiornato a ogni passo: adatte a SEQUENZE (testo, serie temporali). LSTM e GRU mitigano il vanishing gradient.",nn_recenti|nn_recurrent,integrato
+89,9,3,Perceptron e reti neurali,Autoencoder,"Rete encoder -> bottleneck -> decoder addestrata a RICOSTRUIRE l'input: il bottleneck è una rappresentazione COMPRESSA dei dati.
+Apprendimento senza etichette (auto-supervisionato). Varianti: denoising autoencoder, VAE (generativo).",autoencoder,integrato
+90,9,3,Transformer e LLM,Transformer: self-attention ed encoder,"Architettura basata su SELF-ATTENTION MULTI-HEAD: ogni token pesa la rilevanza di tutti gli altri token della sequenza (niente ricorrenza né convoluzioni).
+Strato ENCODER = self-attention + rete feed-forward, ciascuna con residual connection e normalizzazione.",nn_transformer|transformer_encoder|transformer_match,sisint1
+91,9,3,Transformer e LLM,"Decoder: masking, cross-attention, residual","Lo strato DECODER aggiunge rispetto all'encoder: self-attention MASCHERATA + attention sull'output dell'encoder (cross-attention).
+MASCHERAMENTO: la predizione in posizione i non può usare le posizioni FUTURE della sequenza -> generazione autoregressiva, un token alla volta.
+RESIDUAL CONNECTION: somma l'INPUT del sottostrato al suo OUTPUT (poi normalizzazione): per questo tutti i sottostrati producono vettori della stessa dimensione.",transformer_decoder|masking_decoder|residual_connection,sisint1
+92,9,3,Transformer e LLM,Language model e assunzione di Markov,"LANGUAGE MODEL: distribuzione di probabilità sulle sequenze di parole; predice il token successivo dato il contesto.
+Fattorizzazione esatta: P(X1..Xn) = prodotto su i di P(Xi | X1..Xi-1) (chain rule).
+Assunzione di MARKOV: approssima la storia con le ULTIME POCHE parole (un bigramma usa solo la precedente: P(wn|wn-1)) -> calcolo trattabile (n-gram).",language_model|lm_sequenza|lm_markov,sisint1
+93,9,3,Transformer e LLM,"One-hot, embeddings, semantica distribuzionale, tf-idf","ONE-HOT: vettore lungo |V| con un solo 1: spazialmente enorme e NON coglie la semantica (tutti i vettori sono ortogonali).
+EMBEDDING: vettore denso e corto; parole con significato simile -> vettori vicini.
+Semantica DISTRIBUZIONALE (Firth): il significato di un termine è dato 'dalla sua compagnia': contesti simili -> significati simili (fondamento degli embeddings).
+IDF: i termini che compaiono in POCHI documenti sono i più discriminativi; tf-idf = frequenza nel documento x rarità nella collezione (le stop word valgono poco).",one_hot|embeddings|sem_distribuzionale|tf_idf,sisint1
+94,9,3,Transformer e LLM,LLM: architettura e fasi di apprendimento,"LLM (es. GPT): transformer (tipicamente solo decoder) AUTOREGRESSIVO addestrato su corpora enormi di testo.
+Fasi, nell'ordine: PRE-TRAINING (impara la lingua) -> FINE-TUNING (impara un compito) -> ALLINEAMENTO (raffina il comportamento) -> VALUTAZIONI.",llm|fasi_llm,sisint1
+95,9,3,Transformer e LLM,Bias degli LLM (per fase),"RACCOLTA DATI -> bias di COPERTURA: i dati riguardano una frazione troppo piccola della popolazione.
+ANNOTAZIONE -> bias di CONFERMA: l'annotatore processa i dati per confermare le proprie ipotesi.
+ADDESTRAMENTO -> OMOGENEITÀ DEL GRUPPO ESTERNO: stereotipare chi appartiene a un gruppo esterno ai dati.
+USO -> bias di AUTOMAZIONE: preferire i risultati solo perché generati automaticamente.",bias_match,sisint1
+96,9,3,Transformer e LLM,Grounding,"Tre forme: PERCETTIVO (ancoraggio ai sensi), CAUSALE-INFORMATIVO (affordance, conseguenze delle azioni), NORMATIVO-SOCIALE (norme condivise).
+Gli appunti osservano che i sistemi artificiali NE SONO PRIVI: gli LLM manipolano testo senza ancoraggio diretto al mondo reale.",grounding_llm,sisint1
+97,9,3,IA generativa e clustering,IA generativa: panorama,"Obiettivo: GENERARE nuovi contenuti plausibili (testo, immagini, ...) imparando la distribuzione dei dati.
+Architetture e meccanismi: Transformer/LLM -> self-attention multi-head; GAN -> competizione generatore vs discriminatore; modelli di DIFFUSIONE -> denoising progressivo; CNN -> convoluzioni (building block, classicamente discriminativa).",gen_ai|gen_ai_match,integrato
+98,9,3,IA generativa e clustering,GAN,"Due reti in COMPETIZIONE: il GENERATORE produce campioni finti, il DISCRIMINATORE distingue i veri dai finti.
+Addestramento avversariale: il generatore migliora finché il discriminatore non riesce più a distinguere.",gan,integrato
+99,9,3,IA generativa e clustering,Modelli di diffusione,"Generano immagini per DENOISING PROGRESSIVO: partono da rumore puro e rimuovono rumore passo dopo passo fino al campione finale.
+Addestramento: imparare a INVERTIRE un processo che aggiunge rumore gradualmente ai dati.",diffusion,integrato
+100,9,3,IA generativa e clustering,Clustering e k-means,"CLUSTERING (non supervisionato): raggruppare istanze SIMILI senza etichette.
+K-MEANS: (1) scegli k centroidi, (2) assegna ogni punto al centroide più vicino, (3) ricalcola i centroidi come medie dei gruppi, (4) ripeti fino a convergenza.
+k è un IPERPARAMETRO: fissato a priori dall'utente, non appreso dall'algoritmo.",clustering_def|kmeans|kmeans_k,integrato
+101,9,3,IA generativa e clustering,Apprendimento di sistemi di regole,"Produce modelli simbolici IF condizione THEN classe (es. sequential covering: impara una regola, togli i casi coperti, ripeti).
+Vantaggio: interpretabilità. Un sistema di regole equivalente si ottiene anche convertendo un albero di decisione (un cammino = una regola).",reg_learning,integrato

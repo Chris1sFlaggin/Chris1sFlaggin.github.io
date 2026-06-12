@@ -16,7 +16,7 @@ All'avvio l'utente sceglie il taglio dell'esame: **6 CFU** o **9 CFU**. Il pool 
 - **Solo Parte 2 (matching/VF)** — solo esercizi associativi
 - **Studio per argomento** — filtra per Parte (1/2/3) e topic specifico
 - **Sfoglia tutte le domande** — vista read-only con risposte evidenziate
-- **Flashcards 9 CFU** (`flashcards.html`) — ripasso attivo fronte/retro generato dall'intero bank (MCQ + matching): filtri parte/argomento/tipo, autovalutazione sapevo/non sapevo, le carte sbagliate rientrano nei round successivi
+- **Flashcards 9 CFU** (`flashcards.html` + `flashcards.csv`) — carte concettuali: fronte = argomento, retro = spiegazione con trappole d'esame. Coprono tutti i topic del bank (colonna `topics`). Filtri parte/categoria, autovalutazione sapevo/non sapevo, le carte sbagliate rientrano nei round successivi
 
 ## Argomenti coperti
 
@@ -55,8 +55,21 @@ site/
 ├── app.js          logica del quiz (vanilla JS + PapaParse via CDN)
 ├── mcq.csv         domande a scelta multipla
 ├── matching.csv    esercizi di matching / vero-falso
+├── flashcards.html pagina flashcards concettuali
+├── flashcards.csv  carte concettuali (una per riga)
 └── README.md
 ```
+
+### Formato `flashcards.csv`
+
+```
+id,cfu,parte,categoria,front,back,topics,source
+```
+
+- `front`: titolo dell'argomento (fronte della carta)
+- `back`: spiegazione (retro); le interruzioni di riga interne sono preservate
+- `topics`: slug dei topic del bank coperti dalla carta, separati da `|` (ogni topic di `mcq.csv`/`matching.csv` è coperto da almeno una carta)
+- `categoria`: macro-categoria usata come filtro nella pagina
 
 ### Formato `mcq.csv`
 
