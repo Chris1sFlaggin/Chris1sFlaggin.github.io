@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>kura — sicurezza Instagram per creator</title>
+<meta name="description" content="kura — sicurezza per chi vive di Instagram. Audit, blindatura e protezione continua per il tuo account. Non ti mostro la faccia, ti mostro il codice.">
+<meta name="keywords" content="sicurezza instagram, instagram security, account recovery, audit sicurezza, protezione creator, 2FA, kura">
+<meta name="theme-color" content="#121110">
+
+<!-- Open Graph -->
+<meta property="og:title" content="kura — Quiet security for loud accounts.">
+<meta property="og:description" content="Sicurezza per chi vive di Instagram. Audit · Recovery · Protection.">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --sumi:#121110;          /* ink / bg          */
+  --sumi-2:#1a1917;        /* raised surface    */
+  --sumi-3:#222020;        /* card border base  */
+  --shu:#E0402F;           /* seal red / accent */
+  --shu-soft:#e0402f1a;    /* red wash          */
+  --washi:#F2EFE9;         /* paper / text      */
+  --hai:#8A8782;           /* ash / muted       */
+  --hai-line:#8a878222;    /* hairlines         */
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Inter,Roboto,sans-serif;
+  --mincho:"Noto Serif JP",serif;
+  --maxw:920px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--sumi);
+  color:var(--washi);
+  font-family:var(--sans);
+  font-weight:300;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  position:relative;
+}
+
+/* film grain overlay */
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+::selection{background:var(--shu);color:var(--washi)}
+
+a{color:inherit;text-decoration:none}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 1.5rem;position:relative;z-index:2}
+
+/* ---- section frame ---- */
+section{padding:6rem 0;position:relative}
+.eyebrow{
+  font-size:.72rem;letter-spacing:.42em;text-transform:uppercase;
+  color:var(--hai);margin-bottom:1.6rem;font-weight:400;
+}
+.eyebrow .mark{font-family:var(--mincho);color:var(--shu);margin-right:.5em;letter-spacing:0}
+h2{font-size:clamp(1.7rem,4.5vw,2.6rem);font-weight:300;letter-spacing:-.01em;line-height:1.15}
+h2 em{font-style:normal;color:var(--shu)}
+.lead{color:var(--hai);font-size:1.05rem;max-width:46ch;margin-top:1.2rem}
+
+/* giant faint kanji watermark per section */
+.watermark{
+  position:absolute;font-family:var(--mincho);font-weight:700;
+  color:#ffffff;opacity:.018;font-size:clamp(14rem,40vw,30rem);
+  line-height:.7;z-index:1;pointer-events:none;user-select:none;
+  top:50%;transform:translateY(-50%);
+}
+.watermark.r{right:-2rem}
+.watermark.l{left:-2rem}
+
+/* ================= HERO ================= */
+.hero{
+  min-height:100vh;display:flex;align-items:center;
+  border-bottom:1px solid var(--hai-line);
+  background:
+    radial-gradient(120% 80% at 80% -10%, #e0402f0d 0%, transparent 55%),
+    radial-gradient(80% 60% at 0% 110%, #ffffff05 0%, transparent 50%);
+}
+.brandbar{
+  display:flex;justify-content:space-between;align-items:center;
+  position:absolute;top:0;left:0;right:0;padding:1.6rem 0;
+}
+.brandbar .wrap{display:flex;justify-content:space-between;align-items:center;width:100%}
+.tag-top{font-size:.7rem;letter-spacing:.4em;text-transform:uppercase;color:var(--hai)}
+.handle{font-size:.78rem;letter-spacing:.08em;color:var(--shu);font-weight:400}
+
+.seal{
+  width:84px;height:84px;border-radius:18px;background:var(--shu);
+  display:grid;place-items:center;flex:0 0 auto;
+  font-family:var(--mincho);font-weight:700;font-size:2.6rem;color:var(--washi);
+  box-shadow:0 12px 40px -8px #e0402f66, inset 0 0 0 1px #ffffff14;
+}
+.logo-row{display:flex;align-items:center;gap:1.4rem;margin-bottom:2.2rem}
+.wordmark{font-size:clamp(3rem,11vw,5.5rem);font-weight:300;letter-spacing:.12em;line-height:1}
+.kana{font-family:var(--mincho);color:var(--hai);font-size:.95rem;letter-spacing:.5em;display:block;margin-top:.5rem}
+
+.hero h1{
+  font-size:clamp(2rem,6vw,3.4rem);font-weight:300;letter-spacing:-.015em;
+  line-height:1.12;max-width:16ch;margin-bottom:1.4rem;
+}
+.hero h1 em{font-style:normal;color:var(--shu)}
+.who{
+  font-size:1rem;color:var(--hai);margin-bottom:2.6rem;
+  padding-left:1rem;border-left:2px solid var(--shu);
+}
+.who b{color:var(--washi);font-weight:400}
+
+.subline{font-size:.74rem;letter-spacing:.34em;text-transform:uppercase;color:var(--hai);margin-bottom:.6rem}
+
+/* buttons */
+.cta-row{display:flex;gap:1rem;flex-wrap:wrap}
+.btn{
+  font-size:.84rem;letter-spacing:.14em;text-transform:uppercase;font-weight:400;
+  padding:1rem 1.8rem;border-radius:10px;transition:.25s ease;display:inline-flex;
+  align-items:center;gap:.6rem;cursor:pointer;border:1px solid transparent;
+}
+.btn-primary{background:var(--shu);color:var(--washi);box-shadow:0 10px 30px -10px #e0402f80}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 40px -10px #e0402faa}
+.btn-ghost{border-color:var(--hai-line);color:var(--washi);background:#ffffff06}
+.btn-ghost:hover{border-color:var(--shu);color:var(--shu);transform:translateY(-2px)}
+
+/* scroll hint */
+.scrollhint{
+  position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);
+  font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:var(--hai);
+  display:flex;flex-direction:column;align-items:center;gap:.6rem;
+}
+.scrollhint::after{content:"";width:1px;height:34px;background:linear-gradient(var(--shu),transparent);animation:drop 1.8s infinite}
+@keyframes drop{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ================= PROBLEM ================= */
+.problem{background:var(--sumi-2);border-bottom:1px solid var(--hai-line)}
+.problem h2{max-width:18ch}
+.bignum{font-family:var(--mincho);color:var(--shu);font-size:1.1rem}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2.5rem;margin-top:3rem}
+.stat .n{font-size:2.4rem;font-weight:300;color:var(--washi);letter-spacing:-.02em}
+.stat .n em{color:var(--shu);font-style:normal}
+.stat .l{color:var(--hai);font-size:.92rem;margin-top:.4rem}
+
+/* ================= WHAT I DO / PRICING ================= */
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.2rem;margin-top:3rem}
+.svc{
+  background:var(--sumi-2);border:1px solid var(--hai-line);border-radius:14px;
+  padding:1.6rem;transition:.25s ease;position:relative;
+}
+.svc:hover{transform:translateY(-4px);border-color:#8a878244;background:#e0402f06}
+.svc .ic{font-family:var(--mincho);color:var(--shu);font-size:1.5rem;display:block;margin-bottom:.9rem}
+.svc h4{font-size:1.05rem;font-weight:400;margin-bottom:.4rem}
+.svc p{color:var(--hai);font-size:.86rem;font-weight:300}
+
+.price-line{
+  margin-top:2.4rem;color:var(--hai);font-size:1rem;font-weight:300;max-width:56ch;
+  padding-left:1rem;border-left:2px solid var(--shu);
+}
+.price-line b{color:var(--washi);font-weight:400}
+
+.tiers{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin-top:1.4rem}
+.tier{
+  background:var(--sumi-2);border:1px solid var(--hai-line);border-radius:16px;
+  padding:2.2rem;position:relative;transition:.3s ease;overflow:hidden;
+}
+.tier:hover{transform:translateY(-4px);border-color:#8a878244}
+.tier.featured{border-color:var(--shu);background:linear-gradient(180deg,#e0402f10,transparent 40%)}
+.tier .badge{
+  position:absolute;top:1.4rem;right:1.4rem;font-family:var(--mincho);
+  font-size:1.4rem;color:var(--shu);opacity:.5;
+}
+.tier .featured-flag{
+  font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--shu);
+  margin-bottom:1rem;
+}
+.tier h3{font-size:1.4rem;font-weight:400;letter-spacing:.02em;margin-bottom:.3rem}
+.tier .price-note{color:var(--hai);font-size:.85rem;margin-bottom:1.6rem}
+.tier ul{list-style:none}
+.tier li{
+  color:var(--washi);font-size:.95rem;padding:.55rem 0 .55rem 1.6rem;position:relative;
+  border-top:1px solid var(--hai-line);font-weight:300;
+}
+.tier li:first-of-type{border-top:none}
+.tier li::before{content:"守";font-family:var(--mincho);color:var(--shu);position:absolute;left:0;font-size:.85rem;top:.6rem}
+.tier .plus{color:var(--shu)}
+
+/* free audit highlight */
+.audit-call{
+  margin-top:3rem;border:1px dashed #8a878255;border-radius:16px;padding:2.2rem;
+  display:flex;justify-content:space-between;align-items:center;gap:2rem;flex-wrap:wrap;
+  background:radial-gradient(120% 200% at 100% 0%, #e0402f10, transparent 50%);
+}
+.audit-call h3{font-weight:300;font-size:1.5rem}
+.audit-call p{color:var(--hai);font-size:.92rem;margin-top:.4rem;max-width:42ch}
+
+/* ================= METHOD ================= */
+.method{background:var(--sumi-2);border-top:1px solid var(--hai-line);border-bottom:1px solid var(--hai-line)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:3rem;counter-reset:s}
+.step{padding:2rem 1.4rem;border-left:1px solid var(--hai-line);position:relative}
+.step:first-child{border-left:none}
+.step .idx{font-family:var(--mincho);font-size:.8rem;color:var(--shu);letter-spacing:.2em;margin-bottom:1.2rem}
+.step h4{font-size:1.1rem;font-weight:400;margin-bottom:.5rem}
+.step p{color:var(--hai);font-size:.88rem;font-weight:300}
+.step .kj{font-family:var(--mincho);font-size:2.2rem;color:#ffffff;opacity:.06;position:absolute;top:1.2rem;right:1rem}
+
+/* ================= PROOF / CODE ================= */
+.proof h2 em{color:var(--shu)}
+.proof .quote{
+  font-family:var(--mincho);font-size:clamp(1.6rem,4vw,2.4rem);font-weight:400;
+  line-height:1.4;max-width:20ch;margin:2rem 0 1rem;
+}
+.repos{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.2rem;margin-top:2.5rem}
+.repo{
+  background:var(--sumi-2);border:1px solid var(--hai-line);border-radius:14px;
+  padding:1.6rem;transition:.25s ease;display:block;
+}
+.repo:hover{transform:translateY(-4px);border-color:var(--shu);background:#e0402f08}
+.repo .top{display:flex;align-items:center;gap:.6rem;margin-bottom:.8rem}
+.repo .dot{width:9px;height:9px;border-radius:50%;background:var(--shu);box-shadow:0 0 10px var(--shu)}
+.repo .rname{font-size:1.05rem;font-weight:400;font-family:ui-monospace,"SF Mono",Menlo,monospace}
+.repo p{color:var(--hai);font-size:.85rem;font-weight:300}
+.repo .arrow{color:var(--shu);font-size:.8rem;margin-top:1rem;letter-spacing:.1em;text-transform:uppercase}
+.proof .ghlink{margin-top:2rem;display:inline-block;color:var(--hai);font-size:.85rem;border-bottom:1px solid var(--hai-line);padding-bottom:.2rem;transition:.2s}
+.proof .ghlink:hover{color:var(--shu);border-color:var(--shu)}
+
+/* ================= FOUNDING MEMBER ================= */
+.testi{background:var(--sumi-2);border-top:1px solid var(--hai-line)}
+.founding-points{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.2rem;margin-top:3rem}
+.fp{border:1px solid var(--hai-line);border-radius:14px;padding:1.8rem;background:var(--sumi);transition:.25s ease}
+.fp:hover{border-color:var(--shu);transform:translateY(-4px)}
+.fp .ic{font-family:var(--mincho);color:var(--shu);font-size:1.4rem;display:block;margin-bottom:.8rem}
+.fp p{font-weight:300;font-size:.95rem;color:var(--washi)}
+
+/* ================= FINAL CTA ================= */
+.final{
+  text-align:center;
+  background:
+    radial-gradient(100% 80% at 50% 120%, #e0402f1a, transparent 60%);
+  border-top:1px solid var(--hai-line);
+}
+.final .seal{margin:0 auto 2rem}
+.final h2{max-width:18ch;margin:0 auto}
+.final .cta-row{justify-content:center;margin-top:2.5rem}
+.vault{
+  margin-top:2.5rem;color:var(--hai);font-size:.9rem;
+}
+.vault code{
+  font-family:ui-monospace,"SF Mono",Menlo,monospace;color:var(--shu);
+  background:var(--shu-soft);padding:.2rem .6rem;border-radius:6px;letter-spacing:.1em;
+}
+
+/* footer */
+footer{padding:3rem 0;text-align:center;border-top:1px solid var(--hai-line);color:var(--hai);font-size:.78rem}
+footer .fkana{font-family:var(--mincho);color:var(--shu);margin-right:.5em}
+footer a{color:var(--hai);border-bottom:1px solid var(--hai-line)}
+footer a:hover{color:var(--shu)}
+
+/* ---- reveal animation ---- */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .9s ease,transform .9s ease}
+.reveal.in{opacity:1;transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}.d4{transition-delay:.32s}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}.scrollhint::after{animation:none}}
+
+/* ---- responsive ---- */
+@media(max-width:720px){
+  section{padding:4rem 0}
+  .tiers{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .step{border-left:none;border-top:1px solid var(--hai-line);padding:1.6rem 0}
+  .step:first-child{border-top:none}
+  .audit-call{flex-direction:column;align-items:flex-start}
+  .tag-top{display:none}
+}
+@media(max-width:440px){
+  .steps{grid-template-columns:1fr}
+  .seal{width:64px;height:64px;font-size:2rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="brandbar">
+    <div class="wrap">
+      <span class="tag-top">Brand System · 02</span>
+      <span class="handle">@kura.ig_</span>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="logo-row reveal">
+      <div class="seal">蔵</div>
+      <div>
+        <div class="wordmark">kura</div>
+        <span class="kana">クラ — instagram security</span>
+      </div>
+    </div>
+
+    <h1 class="reveal d1">Sicurezza per chi <em>vive</em> di Instagram.</h1>
+
+    <p class="who reveal d2"><b>chris1sflaggin</b>, informatico — metodo kura.<br>Niente faccia. Codice vero, lavoro verificabile.</p>
+
+    <div class="subline reveal d3">Audit — Recovery — Protection</div>
+    <div class="cta-row reveal d3">
+      <a href="#cta" class="btn btn-primary">Prenota un audit gratuito</a>
+      <a href="#metodo" class="btn btn-ghost">Come funziona</a>
+    </div>
+  </div>
+
+  <div class="scrollhint">scroll</div>
+</header>
+
+<!-- ============ PROBLEM ============ -->
+<section class="problem">
+  <div class="watermark r">危</div>
+  <div class="wrap">
+    <p class="eyebrow reveal"><span class="mark">壱</span>Il problema</p>
+    <h2 class="reveal d1">Anni di lavoro, <em>una notte sola</em> per perderli.<br>Le minacce non si fermano mai.</h2>
+    <p class="lead reveal d2">Un takeover, un clone, una password trapelata: per chi ci lavora davvero non è un fastidio, è tutto quello che hai costruito che svanisce. E gli attacchi non aspettano che tu sia pronto.</p>
+
+    <div class="stat-row">
+      <div class="stat reveal d1">
+        <div class="n"><em>180k</em></div>
+        <div class="l">follower possono sparire entro la mattina dopo un takeover.</div>
+      </div>
+      <div class="stat reveal d2">
+        <div class="n">24<em>/</em>7</div>
+        <div class="l">phishing, cloni e tentativi di accesso non dormono mai.</div>
+      </div>
+      <div class="stat reveal d3">
+        <div class="n">1<em>×</em></div>
+        <div class="l">una sola falla aperta basta per perdere tutto il lavoro.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHAT I DO ============ -->
+<section id="servizi">
+  <div class="watermark l">守</div>
+  <div class="wrap">
+    <p class="eyebrow reveal"><span class="mark">弐</span>Cosa faccio</p>
+    <h2 class="reveal d1">Prima ti <em>blindo</em>. Poi monto la guardia, ogni mese.</h2>
+    <p class="lead reveal d2">Si parte da un audit gratuito. Poi un abbonamento che tiene il tuo account al sicuro nel tempo — perché la sicurezza non è un lavoro che si fa una volta sola.</p>
+
+    <!-- services catalogue -->
+    <div class="svc-grid">
+      <div class="svc reveal d1"><span class="ic">検</span><h4>Audit di sicurezza</h4><p>Analisi completa dell'account: accessi, sessioni, impostazioni, punti deboli.</p></div>
+      <div class="svc reveal d1"><span class="ic">固</span><h4>Blindatura account</h4><p>2FA fatto bene, chiusura sessioni sospette, email e recovery messi in sicurezza.</p></div>
+      <div class="svc reveal d2"><span class="ic">漏</span><h4>Controllo leak credenziali</h4><p>Verifico se le tue password sono finite in data breach noti e ti dico cosa cambiare.</p></div>
+      <div class="svc reveal d2"><span class="ic">影</span><h4>Caccia ai cloni</h4><p>Trovo i profili fake che ti impersonano e ti guido nella segnalazione/takedown.</p></div>
+      <div class="svc reveal d3"><span class="ic">復</span><h4>Recupero account</h4><p>Account bloccato, hackerato o disabilitato: ti accompagno nel processo di recupero.</p></div>
+      <div class="svc reveal d3"><span class="ic">監</span><h4>Monitoraggio continuo</h4><p>Richeck periodici e sorveglianza nel tempo: la guardia resta su, non solo una volta.</p></div>
+      <div class="svc reveal d4"><span class="ic">報</span><h4>Report mensile</h4><p>Ogni mese, nero su bianco, cosa ho controllato e protetto. La sicurezza resa visibile.</p></div>
+      <div class="svc reveal d4"><span class="ic">教</span><h4>Formazione anti-phishing</h4><p>Ti insegno a riconoscere DM truffa, finti "Meta support" e tentativi di social engineering.</p></div>
+    </div>
+
+    <!-- two levels, no prices -->
+    <p class="eyebrow reveal d1" style="margin-top:4rem"><span class="mark">弐 · 弐</span>I due livelli</p>
+    <div class="tiers">
+      <div class="tier reveal d1">
+        <div class="badge">蔵</div>
+        <h3>Base</h3>
+        <p class="price-note">Protezione continua, l'essenziale.</p>
+        <ul>
+          <li>Controllo leak credenziali</li>
+          <li>Richeck periodico delle impostazioni</li>
+          <li>Report mensile di sicurezza</li>
+          <li>Supporto diretto</li>
+        </ul>
+      </div>
+
+      <div class="tier featured reveal d2">
+        <div class="featured-flag">Consigliato</div>
+        <div class="badge">守</div>
+        <h3>Premium</h3>
+        <p class="price-note">Tutto il piano Base, e in più:</p>
+        <ul>
+          <li><span class="plus">+</span> Caccia ai cloni del profilo</li>
+          <li><span class="plus">+</span> Recupero prioritario in caso di blocco</li>
+          <li><span class="plus">+</span> Tutto ciò che è incluso nel piano Base</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="price-line reveal d2">Il prezzo varia in base al servizio e a quanto è esposto il tuo account. <b>Ne parliamo in DM</b> — dopo l'audit gratuito sai esattamente cosa ti serve.</p>
+
+    <div class="audit-call reveal d2">
+      <div>
+        <h3>L'audit è gratuito.</h3>
+        <p>15–30 minuti, condivisione schermo. Trovo le falle e te le mostro. Senza impegno.</p>
+      </div>
+      <a href="#cta" class="btn btn-primary">Inizia in DM</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ METHOD ============ -->
+<section id="metodo" class="method">
+  <div class="wrap">
+    <p class="eyebrow reveal"><span class="mark">参</span>Il metodo kura</p>
+    <h2 class="reveal d1">Quattro passi. <em>Niente magia, solo metodo.</em></h2>
+
+    <div class="steps">
+      <div class="step reveal d1"><span class="kj">検</span><div class="idx">壱 / audit</div><h4>Audit</h4><p>Mappo lo stato reale dell'account e trovo ogni falla aperta.</p></div>
+      <div class="step reveal d2"><span class="kj">固</span><div class="idx">弐 / lock</div><h4>Blindatura</h4><p>2FA fatto bene, sessioni, accessi e impostazioni messi in sicurezza.</p></div>
+      <div class="step reveal d3"><span class="kj">守</span><div class="idx">参 / guard</div><h4>Protezione continua</h4><p>Monitoraggio leak e cloni, richeck periodici. La guardia resta su.</p></div>
+      <div class="step reveal d4"><span class="kj">報</span><div class="idx">肆 / report</div><h4>Report mensile</h4><p>Ogni mese vedi nero su bianco cosa ho protetto. La sicurezza invisibile, resa visibile.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROOF / CODE ============ -->
+<section id="lavoro" class="proof">
+  <div class="watermark r">蔵</div>
+  <div class="wrap">
+    <p class="eyebrow reveal"><span class="mark">肆</span>Chi sono · il lavoro</p>
+    <p class="quote reveal d1">Non ti mostro la faccia.<br><em style="color:var(--shu);font-style:normal">Ti mostro il codice.</em></p>
+    <p class="lead reveal d2">Per chi vende sicurezza, un portfolio tecnico vale più di mille selfie. Repo veri, codice vero — la prova che dietro kura c'è un tecnico capace.</p>
+
+    <div class="repos">
+      <a href="https://chris1sflaggin.it/LCSAJdump" target="_blank" rel="noopener" class="repo reveal d1">
+        <div class="top"><span class="dot"></span><span class="rname">LCSAJdump</span></div>
+        <p>Tool di reverse engineering e analisi del control flow per exploit development. Sicurezza a livello binario.</p>
+        <div class="arrow">apri →</div>
+      </a>
+      <a href="https://github.com/chris1sflaggin" target="_blank" rel="noopener" class="repo reveal d2">
+        <div class="top"><span class="dot"></span><span class="rname">CTF write-ups</span></div>
+        <p>Write-up di pwn, stack & heap exploitation. Come si rompono i sistemi — e quindi come si difendono.</p>
+        <div class="arrow">apri →</div>
+      </a>
+      <a href="https://github.com/chris1sflaggin" target="_blank" rel="noopener" class="repo reveal d3">
+        <div class="top"><span class="dot"></span><span class="rname">+ altri progetti</span></div>
+        <p>Tutto il codice è pubblico su GitHub. Nessun hype, nessuno screenshot: solo lavoro verificabile.</p>
+        <div class="arrow">github →</div>
+      </a>
+    </div>
+    <a href="https://github.com/chris1sflaggin" target="_blank" rel="noopener" class="ghlink reveal d3">github.com/chris1sflaggin →</a>
+  </div>
+</section>
+
+<!-- ============ FOUNDING MEMBER ============ -->
+<section class="testi">
+  <div class="watermark l">初</div>
+  <div class="wrap">
+    <p class="eyebrow reveal"><span class="mark">伍</span>Founding member</p>
+    <h2 class="reveal d1">kura è <em>appena nato</em>. Tu puoi essere tra i primi.</h2>
+    <p class="lead reveal d2">Nessuna recensione finta, nessun numero gonfiato: parto adesso, e lo dico chiaro. Chi entra ora lavora direttamente con me, con attenzione totale — e diventa la prima prova sociale reale di kura.</p>
+
+    <div class="founding-points">
+      <div class="fp reveal d1"><span class="ic">壱</span><p>Audit gratuito e accesso diretto, senza intermediari.</p></div>
+      <div class="fp reveal d2"><span class="ic">弐</span><p>Condizioni da founding member su misura, definite in DM.</p></div>
+      <div class="fp reveal d3"><span class="ic">参</span><p>La trasparenza è il prodotto: ti mostro il codice, non promesse.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section id="cta" class="final">
+  <div class="wrap">
+    <div class="seal reveal">蔵</div>
+    <h2 class="reveal d1">Scopriamo insieme dov'è <em>la falla</em>.</h2>
+    <p class="lead reveal d2" style="margin-left:auto;margin-right:auto">Tutto parte da un DM. Scrivimi <b style="color:var(--washi)">VAULT</b> e parte l'audit gratuito: ti mostro cosa è esposto oggi e come kura lo chiude.</p>
+
+    <div class="cta-row reveal d2">
+      <a href="https://ig.me/m/kura.ig_" target="_blank" rel="noopener" class="btn btn-primary">Scrivi VAULT in DM →</a>
+      <a href="https://instagram.com/kura.ig_" target="_blank" rel="noopener" class="btn btn-ghost">Vai al profilo</a>
+    </div>
+
+    <p class="vault reveal d3">Risposta automatica attiva: scrivi <code>VAULT</code> e ricevi subito i primi passi.</p>
+  </div>
+</section>
+
+<footer>
+  <span class="fkana">クラ</span> kura — instagram security for creators · copenhagen 2026<br>
+  <span style="opacity:.7">@kura.ig_ · <a href="https://chris1sflaggin.it">chris1sflaggin.it</a></span>
+</footer>
+
+<script>
+// scroll reveal
+const io=new IntersectionObserver((es)=>{
+  es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}});
+},{threshold:.12,rootMargin:"0px 0px -8% 0px"});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+// hero reveals fire immediately
+window.addEventListener('load',()=>{
+  document.querySelectorAll('.hero .reveal').forEach(el=>el.classList.add('in'));
+});
+</script>
+</body>
+</html>
