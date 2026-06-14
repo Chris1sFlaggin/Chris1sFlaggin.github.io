@@ -256,10 +256,13 @@ h2 em{font-style:normal;color:var(--shu)}
 }
 
 /* footer */
-footer{padding:3rem 0;text-align:center;border-top:1px solid var(--hai-line);color:var(--hai);font-size:.78rem}
+footer{padding:3rem 0;border-top:1px solid var(--hai-line);color:var(--hai);font-size:.78rem;position:relative;z-index:5;background:var(--sumi)}
+footer .wrap{display:flex;flex-direction:column;align-items:center;gap:1.1rem;text-align:center}
+footer .fbrand{letter-spacing:.04em}
 footer .fkana{font-family:var(--mincho);color:var(--shu);margin-right:.5em}
-footer a{color:var(--hai);border-bottom:1px solid var(--hai-line)}
-footer a:hover{color:var(--shu)}
+footer .flinks{display:flex;flex-wrap:wrap;justify-content:center;gap:1.6rem}
+footer a{color:var(--hai);border-bottom:1px solid var(--hai-line);padding-bottom:.15rem;transition:.2s}
+footer a:hover{color:var(--shu);border-color:var(--shu)}
 
 /* ---- reveal animation ---- */
 .reveal{opacity:0;transform:translateY(28px);transition:opacity .9s ease,transform .9s ease}
@@ -479,12 +482,14 @@ footer a:hover{color:var(--shu)}
 </section>
 
 <footer>
-  <span class="fkana">クラ</span> kura — instagram security for creators · copenhagen 2026<br>
-  <span style="opacity:.7">
-    <a href="https://instagram.com/kura.ig_" target="_blank" rel="noopener">@kura.ig_</a> ·
-    <a href="https://calendly.com/kura-ig/30min" target="_blank" rel="noopener">prenota audit</a> ·
-    <a href="https://chris1sflaggin.it">chris1sflaggin.it</a>
-  </span>
+  <div class="wrap">
+    <p class="fbrand"><span class="fkana">クラ</span> kura — instagram security for creators</p>
+    <nav class="flinks">
+      <a href="https://instagram.com/kura.ig_" target="_blank" rel="noopener">@kura.ig_</a>
+      <a href="https://calendly.com/kura-ig/30min" target="_blank" rel="noopener">prenota audit</a>
+      <a href="https://chris1sflaggin.it">chris1sflaggin.it</a>
+    </nav>
+  </div>
 </footer>
 
 <script>
