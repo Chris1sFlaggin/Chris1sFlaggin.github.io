@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SISINT Made Easy — Mappa dei concetti</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="grafo.css">
+</head>
+<body>
+  <header>
+    <div>
+      <h1>SISINT Made Easy</h1>
+      <p id="cfu-display">Mappa interattiva dei concetti · clicca un nodo per la spiegazione</p>
+    </div>
+    <div class="mz-head-actions">
+      <a class="theme-toggle" href="index.html">&larr; SISINT</a>
+      <button id="theme-btn" class="theme-toggle"><span class="icon">🌙</span> Dark</button>
+    </div>
+  </header>
+
+  <div class="mz-toolbar">
+    <div class="mz-layouts" id="layout-tabs">
+      <button class="mz-lay active" data-layout="force">🕸️ Rete</button>
+      <button class="mz-lay" data-layout="dag">🔮 Rete di Bayes</button>
+      <button class="mz-lay" data-layout="mlp">🧠 MLP a layer</button>
+      <button class="mz-lay" data-layout="tree">🌳 Albero</button>
+      <button class="mz-lay" data-layout="isa">🏷️ Tassonomia</button>
+    </div>
+    <div class="mz-search">
+      <input id="node-search" list="node-list" placeholder="🔍 Cerca argomento…" autocomplete="off" spellcheck="false">
+      <datalist id="node-list"></datalist>
+    </div>
+  </div>
+
+  <div class="mz-stage" id="stage">
+    <svg id="canvas" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow-prereq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" class="mz-arrow-prereq"></path>
+        </marker>
+        <marker id="arrow-isa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="none" class="mz-arrow-isa"></path>
+        </marker>
+      </defs>
+      <g id="viewport">
+        <g id="edges-layer"></g>
+        <g id="nodes-layer"></g>
+      </g>
+    </svg>
+
+    <div class="mz-legend" id="legend"></div>
+
+    <div class="mz-hint" id="hint">Trascina per spostarti · rotella per zoom · trascina un nodo (in modalità Rete)</div>
+
+    <aside class="mz-panel" id="node-panel" hidden>
+      <button class="mz-close" id="panel-close" aria-label="Chiudi">×</button>
+      <span class="mz-cat-badge" id="panel-cat"></span>
+      <h2 id="panel-title"></h2>
+      <p id="panel-blurb"></p>
+      <div class="mz-neighbors">
+        <h3>Collegato a</h3>
+        <div id="panel-neighbors"></div>
+      </div>
+      <a id="panel-flash" class="mz-flashlink" href="flashcards.html">Ripassa con le flashcards &rarr;</a>
+    </aside>
+  </div>
+
+  <div class="mz-poc" id="poc">
+    <button class="mz-poc-toggle" id="poc-toggle">🎬 PoC ricerca <span class="mz-chev">▴</span></button>
+    <div class="mz-poc-body" id="poc-body">
+      <div class="mz-poc-row">
+        <label class="mz-field">Da<select id="poc-start"></select></label>
+        <label class="mz-field">A<select id="poc-goal"></select></label>
+        <label class="mz-field">Algoritmo
+          <select id="poc-algo">
+            <optgroup label="Ricerca cieca">
+              <option value="bfs">BFS — frontiera FIFO</option>
+              <option value="dfs">DFS — frontiera LIFO</option>
+              <option value="ids">IDS — deepening iterativo</option>
+              <option value="ucs">UCS — costo accumulato g(n)</option>
+            </optgroup>
+            <optgroup label="Ricerca informata">
+              <option value="greedy">Greedy best-first — solo h(n)</option>
+              <option value="astar">A* — f(n)=g(n)+h(n)</option>
+            </optgroup>
+          </select>
+        </label>
+        <label class="mz-field">Velocità<input type="range" id="poc-speed" min="60" max="1200" value="450"></label>
+        <div class="mz-poc-btns">
+          <button id="poc-play" class="mz-btn-primary">▶ Play</button>
+          <button id="poc-step">⏭ Step</button>
+          <button id="poc-reset">⟲ Reset</button>
+        </div>
+      </div>
+      <div class="mz-poc-legend">
+        <span><i class="sw sw-current"></i>corrente</span>
+        <span><i class="sw sw-frontier"></i>frontiera</span>
+        <span><i class="sw sw-visited"></i>visitato</span>
+        <span><i class="sw sw-path"></i>cammino</span>
+      </div>
+      <div class="mz-poc-status" id="poc-status">Scegli start, goal e algoritmo, poi Play.</div>
+    </div>
+  </div>
+
+  <script src="graph-data.js"></script>
+  <script src="search.js"></script>
+  <script src="layout.js"></script>
+  <script src="grafo.js"></script>
+</body>
+</html>
