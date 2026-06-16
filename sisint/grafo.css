@@ -1,0 +1,162 @@
+/* SISINT Made Easy — layout a tutta pagina per la mappa interattiva.
+   Riusa le variabili :root e [data-theme=dark] di style.css. */
+
+html, body { height: 100%; }
+body { display: flex; flex-direction: column; overflow: hidden; }
+
+.mz-head-actions { display: flex; gap: 0.5rem; align-items: center; }
+
+/* ---- toolbar ---- */
+.mz-toolbar {
+  display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1.5rem;
+  background: var(--c-bg);
+  border-bottom: 1px solid var(--c-border);
+  z-index: 50;
+}
+.mz-layouts { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.mz-lay {
+  background: var(--c-card); border: 1px solid var(--c-border); color: var(--c-text);
+  border-radius: 9999px; padding: 0.4rem 0.85rem; cursor: pointer;
+  font-size: 0.85rem; font-weight: 600; transition: all 0.15s; white-space: nowrap;
+}
+.mz-lay:hover { background: var(--c-opt-hover); transform: translateY(-1px); }
+.mz-lay.active { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
+.mz-search input {
+  background: var(--c-card); border: 1px solid var(--c-border); color: var(--c-text);
+  border-radius: 9999px; padding: 0.5rem 1rem; font-size: 0.9rem; min-width: 240px;
+  font-family: inherit;
+}
+.mz-search input:focus { outline: none; border-color: var(--c-primary); }
+
+/* ---- stage / canvas ---- */
+.mz-stage { position: relative; flex: 1; overflow: hidden; background: var(--c-bg); }
+#canvas { width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+#canvas.grabbing { cursor: grabbing; }
+
+/* edges */
+.mz-edge { stroke: var(--c-border); stroke-width: 1.4; opacity: 0.7; }
+.mz-edge.t-prereq { stroke: var(--c-muted); stroke-width: 1.6; }
+.mz-edge.t-isa { stroke: var(--c-tag-cfu-text); stroke-width: 1.5; }
+.mz-edge.t-rel { stroke: var(--c-border); stroke-dasharray: 4 4; }
+.mz-edge.dim { opacity: 0.08; }
+.mz-edge.hl { opacity: 1; stroke-width: 3; }
+.mz-edge.path { stroke: var(--c-correct); stroke-width: 4; opacity: 1; }
+.mz-arrow-prereq { fill: var(--c-muted); }
+.mz-arrow-isa { stroke: var(--c-tag-cfu-text); stroke-width: 1.5; }
+
+/* nodes */
+.mz-node { cursor: pointer; }
+.mz-node circle {
+  r: 8; stroke: var(--c-card); stroke-width: 2; transition: r 0.12s ease, stroke-width 0.12s ease;
+}
+.mz-node text {
+  font-family: var(--font-sans); font-size: 8.5px; font-weight: 600; fill: var(--c-text);
+  text-anchor: middle; pointer-events: none; paint-order: stroke;
+  stroke: var(--c-bg); stroke-width: 2.4px;
+}
+.mz-node:hover circle { r: 11; stroke-width: 3; }
+.mz-node.sel circle { stroke: var(--c-text); stroke-width: 3; r: 12; }
+.mz-node.dim { opacity: 0.18; }
+.mz-node.dim text { opacity: 0; }
+
+/* PoC node states */
+.mz-node.s-visited circle { fill: var(--c-muted) !important; }
+.mz-node.s-frontier circle { fill: var(--c-warn) !important; r: 10; }
+.mz-node.s-current circle { fill: var(--c-primary) !important; r: 13; stroke: var(--c-text); }
+.mz-node.s-path circle { fill: var(--c-correct) !important; r: 11; }
+.mz-node.s-current text, .mz-node.s-path text, .mz-node.s-frontier text { opacity: 1; }
+
+/* ---- legend ---- */
+.mz-legend {
+  position: absolute; top: 0.75rem; left: 0.75rem; max-width: 220px;
+  background: color-mix(in srgb, var(--c-card) 88%, transparent);
+  border: 1px solid var(--c-border); border-radius: var(--radius-sm);
+  padding: 0.5rem 0.7rem; font-size: 0.72rem; box-shadow: var(--shadow-sm);
+  display: flex; flex-wrap: wrap; gap: 0.2rem 0.8rem; backdrop-filter: blur(6px);
+}
+.mz-legend .lg { display: inline-flex; align-items: center; gap: 0.3rem; cursor: default; }
+.mz-legend .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+
+.mz-hint {
+  position: absolute; bottom: 0.6rem; left: 0.75rem; font-size: 0.72rem; color: var(--c-muted);
+  background: color-mix(in srgb, var(--c-card) 80%, transparent); padding: 0.3rem 0.6rem;
+  border-radius: var(--radius-sm); pointer-events: none;
+}
+
+/* ---- node detail panel ---- */
+.mz-panel {
+  position: absolute; top: 0; right: 0; bottom: 0; width: min(360px, 86vw);
+  background: var(--c-card); border-left: 1px solid var(--c-border);
+  box-shadow: var(--shadow-md); padding: 1.5rem; overflow-y: auto; z-index: 60;
+  animation: mzslide 0.25s cubic-bezier(0.16,1,0.3,1);
+}
+.mz-panel[hidden] { display: none; }
+@keyframes mzslide { from { transform: translateX(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+.mz-close {
+  position: absolute; top: 0.8rem; right: 0.9rem; background: none; border: none;
+  font-size: 1.5rem; line-height: 1; color: var(--c-muted); cursor: pointer;
+}
+.mz-close:hover { color: var(--c-text); }
+.mz-cat-badge {
+  display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.03em;
+  color: #fff; padding: 0.2rem 0.6rem; border-radius: 9999px; text-transform: uppercase;
+}
+.mz-panel h2 { font-size: 1.35rem; margin: 0.7rem 0 0.6rem; }
+.mz-panel p { font-size: 0.95rem; color: var(--c-text); line-height: 1.65; }
+.mz-neighbors h3 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--c-muted); margin: 1.2rem 0 0.5rem; }
+.mz-neighbors { margin-bottom: 1rem; }
+#panel-neighbors { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.mz-nb {
+  background: var(--c-tag-topic-bg); color: var(--c-tag-topic-text); border: none;
+  border-radius: 9999px; padding: 0.3rem 0.7rem; font-size: 0.8rem; cursor: pointer;
+  font-family: inherit; font-weight: 600; display: inline-flex; align-items: center; gap: 0.3rem;
+}
+.mz-nb:hover { filter: brightness(0.95); }
+.mz-nb .nbdot { width: 8px; height: 8px; border-radius: 50%; }
+.mz-flashlink { display: inline-block; margin-top: 0.5rem; font-weight: 600; }
+
+/* ---- PoC panel ---- */
+.mz-poc { background: var(--c-card); border-top: 1px solid var(--c-border); z-index: 70; }
+.mz-poc-toggle {
+  width: 100%; text-align: left; background: none; border: none; color: var(--c-text);
+  padding: 0.6rem 1.5rem; font-size: 0.95rem; font-weight: 700; cursor: pointer;
+  font-family: inherit; display: flex; align-items: center; gap: 0.5rem;
+}
+.mz-chev { margin-left: auto; transition: transform 0.2s; color: var(--c-muted); }
+.mz-poc.collapsed .mz-chev { transform: rotate(180deg); }
+.mz-poc.collapsed .mz-poc-body { display: none; }
+.mz-poc-body { padding: 0 1.5rem 0.9rem; }
+.mz-poc-row { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: end; }
+.mz-field { display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.72rem;
+  font-weight: 700; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+.mz-field select, .mz-field input[type=range] {
+  font-family: inherit; font-size: 0.85rem; font-weight: 500; color: var(--c-text);
+  background: var(--c-bg); border: 1px solid var(--c-border); border-radius: var(--radius-sm);
+  padding: 0.4rem 0.5rem; text-transform: none;
+}
+.mz-field input[type=range] { padding: 0; min-width: 120px; accent-color: var(--c-primary); }
+.mz-poc-btns { display: flex; gap: 0.4rem; }
+.mz-poc-btns button, .mz-btn-primary {
+  font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+  border-radius: var(--radius-sm); padding: 0.45rem 0.8rem; border: 1px solid var(--c-border);
+  background: var(--c-card); color: var(--c-text);
+}
+.mz-btn-primary { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
+.mz-poc-btns button:hover { transform: translateY(-1px); }
+.mz-poc-legend { display: flex; gap: 1rem; flex-wrap: wrap; margin: 0.7rem 0 0.4rem; font-size: 0.78rem; color: var(--c-muted); }
+.mz-poc-legend .sw { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 0.3rem; vertical-align: -1px; }
+.sw-current { background: var(--c-primary); }
+.sw-frontier { background: var(--c-warn); }
+.sw-visited { background: var(--c-muted); }
+.sw-path { background: var(--c-correct); }
+.mz-poc-status { font-size: 0.85rem; color: var(--c-text); min-height: 1.2em; }
+.mz-poc-status code { background: var(--c-bg); padding: 0.05rem 0.35rem; border-radius: 4px; font-size: 0.82rem; }
+
+@media (max-width: 640px) {
+  .mz-search input { min-width: 0; width: 100%; }
+  .mz-legend { display: none; }
+  .mz-poc-row { gap: 0.5rem; }
+}
