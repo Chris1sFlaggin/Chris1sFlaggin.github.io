@@ -100,7 +100,7 @@ images: images/LCSAJfull.png
                     <div class="flex items-center gap-2 justify-center lg:justify-start mb-4 flex-wrap">
                         <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/30 text-sm text-primary font-mono font-bold">
                             <span class="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
-                            v2.0.3
+                            v2.0.7
                         </div>
                         <a href="https://github.com/chris1sflaggin/lcsajdump" target="_blank"
                            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm text-gray-400 hover:border-yellow-400/50 hover:text-yellow-400 transition-all">
@@ -315,7 +315,7 @@ images: images/LCSAJfull.png
               <div class="border-l-2 border-gray-600 pl-4">
                 <h4 class="font-mono text-gray-400 uppercase font-bold text-sm mb-1">Level 1: Static Heuristic</h4>
                 <p class="text-sm text-gray-500 mb-1">Manual additive formula with fixed magic numbers. Struggles on complex binaries and modern obfuscation.</p>
-                <p class="text-xs font-mono text-gray-600">NDCG@10: ~0.72 <span class="text-gray-500">(Baseline heuristics)</span></p>
+                <p class="text-xs font-mono text-gray-600">NDCG@10: ~0.81 <span class="text-gray-500">(Baseline heuristics)</span></p>
               </div>
 
               <div class="border-l-2 border-primary/50 pl-4">
@@ -326,8 +326,8 @@ images: images/LCSAJfull.png
 
               <div class="border-l-2 border-primary pl-4 relative">
                 <h4 class="font-mono text-primary uppercase font-bold text-sm mb-1">Level 3: Hybrid ML (LGBM + angr)</h4>
-                <p class="text-sm text-gray-500 mb-1">LightGBM LambdaRank with 38 features (28 structural + 10 semantic via angr symbolic execution). Zero runtime overhead via pre-computed inference.</p>
-                <p class="text-xs font-mono text-primary"><a href="https://huggingface.co/chris1sflaggin/chainfinder_v5_hybrid" target="_blank" class="hover:underline text-blue-400">NDCG@1: 85.5% · NDCG@5: 83.7%</a> <span class="text-gray-500">(Production-ready ranking)</span></p>
+                <p class="text-sm text-gray-500 mb-1">LightGBM LambdaRank with 29 features (26 structural + 3 semantic via angr symbolic execution). Zero runtime overhead via pre-computed inference.</p>
+                <p class="text-xs font-mono text-primary"><a href="https://huggingface.co/chris1sflaggin/roptimizer" target="_blank" class="hover:underline text-blue-400">NDCG@1: 91.4% · NDCG@5: 90.0%</a> <span class="text-gray-500">(Production-ready ranking)</span></p>
               </div>
             </div>
                 </div>
@@ -335,20 +335,20 @@ images: images/LCSAJfull.png
         <div class="bg-black border border-white/10 sharp p-6 relative group h-full shadow-2xl">
           <div class="scanlines absolute inset-0 opacity-50 pointer-events-none"></div>
           <div class="relative z-10 font-mono text-xs leading-relaxed text-gray-300">
-            <p class="text-gray-500 mb-4">$ cat evaluate_hybrid_v4.log</p>
+            <p class="text-gray-500 mb-4">$ cat evaluate_hybrid_v7.log</p>
 
-            <p class="text-primary font-bold"># Model Specs (Hybrid ML v4)</p>
+            <p class="text-primary font-bold"># Model Specs (Hybrid ML v7)</p>
             <p>> Architecture: <span class="text-white">LightGBM LambdaRank</span></p>
-            <p>> Features: <span class="text-white">38 (28 Structural + 10 Semantic via angr)</span></p>
-            <p>> Training: <span class="text-white">~1,700 gadgets from real CTF exploits</span></p>
-            <p>> Validation: <span class="text-white">K-Fold Cross Validation (k=5)</span></p>
+            <p>> Features: <span class="text-white">29 (26 Structural + 3 Semantic via angr)</span></p>
+            <p>> Training: <span class="text-white">2772 gadgets / 27 binaries (real CTF exploits)</span></p>
+            <p>> Validation: <span class="text-white">Group-aware 5-Fold Cross Validation</span></p>
             <br>
 
             <p class="text-primary font-bold"># NDCG Performance (Validation Set)</p>
-            <p>> NDCG@1  : <span class="text-white">0.8549</span> <span class="text-gray-500">(#1 ranked gadget is optimal 85% of the time)</span></p>
-            <p>> NDCG@3  : <span class="text-white">0.8549</span> <span class="text-gray-500">(Top-3 precision)</span></p>
-            <p>> NDCG@5  : <span class="text-white">0.8374</span> <span class="text-gray-500">(Top-5 recall)</span></p>
-            <p>> NDCG@10 : <span class="text-white">0.8165</span> <span class="text-gray-500">(Top-10 ranking quality)</span></p>
+            <p>> NDCG@1  : <span class="text-white">0.914</span> <span class="text-gray-500">(#1 ranked gadget is optimal 91% of the time)</span></p>
+            <p>> NDCG@3  : <span class="text-white">0.907</span> <span class="text-gray-500">(Top-3 precision)</span></p>
+            <p>> NDCG@5  : <span class="text-white">0.900</span> <span class="text-gray-500">(Top-5 recall)</span></p>
+            <p>> NDCG@10 : <span class="text-white">0.922</span> <span class="text-gray-500">(Top-10 ranking quality)</span></p>
             <br>
 
             <p class="text-primary font-bold"># Top Feature Importances (SHAP)</p>
@@ -360,7 +360,7 @@ images: images/LCSAJfull.png
             <br>
 
             <p class="text-gray-500">Note: Semantic features (extracted via angr symbolic execution)</p>
-            <p class="text-gray-500">enable cross-architecture transfer learning and filter syntactic noise.</p>
+            <p class="text-gray-500">capture real memory side-effects and filter out syntactic noise.</p>
 
             <p class="text-primary animate-pulse mt-4">_</p>
           </div>
@@ -408,11 +408,11 @@ images: images/LCSAJfull.png
                             <img src="../images/arm.png" onerror="this.onerror=null; this.src='images/arm.png';" alt="arm Logo" class="w-full h-full object-contain" style="filter: brightness(0) saturate(100%) invert(62%) sepia(95%) saturate(600%) hue-rotate(35deg) brightness(105%) contrast(101%);">
                         </div>
                         <div>
-                            <h3 class="text-primary font-bold text-xl">ARM</h3>
+                            <h3 class="text-primary font-bold text-xl">ARM64</h3>
                             <span class="text-[10px] px-1.5 py-0.5 bg-primary/10 text-primary uppercase tracking-widest font-bold">Fully Supported</span>
                         </div>
                     </div>
-                    <p class="text-sm text-gray-400 flex-1">Latest update with ARM support. Handles variable-length instructions and Thumb/Thumb-2 mixed-mode gadgets.</p>
+                    <p class="text-sm text-gray-400 flex-1">Full ARM64 support. Handles fixed-length 32-bit instructions and deeply filters bloated gadgets via strict heuristic penalties.</p>
                 </div>
             </div>
         </div>
