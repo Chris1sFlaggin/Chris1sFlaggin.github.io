@@ -82,7 +82,8 @@ async function loadData() {
   for (const row of match) {
     const gid = row.group_id;
     if (!groups[gid]) {
-      const isVF6 = (row.labels || '').trim() === 'VF6';
+      // formato "6 ipotesi, 2 vere + 2 false": gruppi con etichette esattamente V/F
+      const isVF6 = (row.labels || '').trim() === 'V=vero|F=falso';
       groups[gid] = {
         type: 'matching',
         id: 'mt-' + gid,
@@ -92,7 +93,7 @@ async function loadData() {
         topic: row.topic,
         group_text: row.group_text,
         format: isVF6 ? 'vf6' : 'std',
-        labels: isVF6 ? [{ key: 'V', text: 'vero' }, { key: 'F', text: 'falso' }] : parseLabels(row.labels),
+        labels: parseLabels(row.labels),
         items: [],
         source: row.source
       };
