@@ -416,6 +416,7 @@ progress::-moz-progress-bar { background-color: var(--c-primary); border-radius:
 }
 .label-item { display: inline-flex; align-items: baseline; margin-right: 1.25rem; margin-bottom: 0.5rem; }
 .label-key { font-weight: 700; color: var(--c-primary); margin-right: 0.4rem; background: var(--c-card); border: 1px solid var(--c-border); padding: 0.1rem 0.5rem; border-radius: 4px; }
+.vf6-hint { background: var(--c-primary-light, rgba(59,130,246,0.1)); border-left: 4px solid var(--c-warn, #d97706); padding: 0.7rem 1rem; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin-bottom: 0.75rem; font-size: 0.9rem; color: var(--c-text); }
 
 /* Explanations */
 .explain-zone { margin-top: 1.5rem; border-top: 1px dashed var(--c-border); padding-top: 1.5rem; }
