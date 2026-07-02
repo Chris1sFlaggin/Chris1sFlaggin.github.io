@@ -405,6 +405,12 @@ progress::-moz-progress-bar { background-color: var(--c-primary); border-radius:
 .matching-item select { min-width: 140px; }
 .matching-item.correct { background: var(--c-correct-bg); border-color: var(--c-correct); }
 .matching-item.wrong { background: var(--c-wrong-bg); border-color: var(--c-wrong); }
+/* Mobile: impila testo sopra il menu così l'affermazione non va a capo una parola per riga */
+@media (max-width: 640px) {
+  .matching-item { flex-direction: column; align-items: stretch; gap: 0.6rem; }
+  .matching-item .item-text { flex: none; }
+  .matching-item select { min-width: 0; width: 100%; }
+}
 
 .labels-legend {
   background: var(--c-bg);
