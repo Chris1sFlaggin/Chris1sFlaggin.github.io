@@ -82,6 +82,7 @@ async function loadData() {
   for (const row of match) {
     const gid = row.group_id;
     if (!groups[gid]) {
+      const isVF6 = (row.labels || '').trim() === 'VF6';
       groups[gid] = {
         type: 'matching',
         id: 'mt-' + gid,
@@ -90,7 +91,8 @@ async function loadData() {
         parte: row.parte,
         topic: row.topic,
         group_text: row.group_text,
-        labels: parseLabels(row.labels),
+        format: isVF6 ? 'vf6' : 'std',
+        labels: isVF6 ? [{ key: 'V', text: 'vero' }, { key: 'F', text: 'falso' }] : parseLabels(row.labels),
         items: [],
         source: row.source
       };
@@ -181,17 +183,36 @@ function selectMode(mode) {
   }
 }
 
+// ===== anti-ripetizione: memorizza le domande già uscite per "sezione" =====
+// Non ripropone la stessa domanda nella stessa sezione finché il pool non si esaurisce, poi azzera.
+function pickUnseen(pool, n, sectionKey) {
+  if (!pool.length) return [];
+  const storeKey = 'sisint-seen:' + sectionKey;
+  let seen;
+  try { seen = new Set(JSON.parse(localStorage.getItem(storeKey) || '[]')); }
+  catch (e) { seen = new Set(); }
+  let unseen = pool.filter(q => !seen.has(q.id));
+  // se le domande mai viste non bastano, azzera la memoria di questa sezione e riparti
+  if (unseen.length < Math.min(n, pool.length)) { seen = new Set(); unseen = pool.slice(); }
+  const picked = shuffle(unseen).slice(0, n);
+  picked.forEach(q => seen.add(q.id));
+  try { localStorage.setItem(storeKey, JSON.stringify([...seen])); } catch (e) {}
+  return picked;
+}
+
 // ===== quiz setup =====
 function startQuiz(mode, opts = {}) {
   let qs = [];
   let scoring = { mcq: 1, matchItem: 1, maxPoints: null, examMode: false };
   if (mode === 'esame') {
-    // ESEMPIO format: 5 MCQ (3pt each) + 2 matching/VF groups (4 items × 1pt each) = 23pt
-    const mcqs = shuffle(state.pool.filter(q => q.type === 'mcq')).slice(0, 5);
+    // ESEMPIO format: 5 MCQ (3pt each) + 2 matching/VF groups (4 pt each) = 23pt
+    const sec = 'esame|' + state.cfu;
+    const mcqs = pickUnseen(state.pool.filter(q => q.type === 'mcq'), 5, sec + '|mcq');
     const mtCandidates = state.pool.filter(q => q.type === 'matching' && q.items.length >= 4);
-    const mts = shuffle(mtCandidates).slice(0, 2).map(g => ({
+    const mts = pickUnseen(mtCandidates, 2, sec + '|mt').map(g => ({
       ...g,
-      items: shuffle(g.items).slice(0, 4)
+      // i gruppi V/F "6 ipotesi" mostrano tutte e 6 le affermazioni; gli altri restano a 4 voci
+      items: g.format === 'vf6' ? shuffle(g.items) : shuffle(g.items).slice(0, 4)
     }));
     qs = mcqs.concat(mts);
     scoring = { mcq: 3, matchItem: 1, maxPoints: 5*3 + 2*4*1, examMode: true };
@@ -205,7 +226,8 @@ function startQuiz(mode, opts = {}) {
     if (opts.topic !== 'all') arr = arr.filter(q => q.topic === opts.topic);
     if (opts.type === 'mcq') arr = arr.filter(q => q.type === 'mcq');
     if (opts.type === 'matching') arr = arr.filter(q => q.type === 'matching');
-    qs = shuffle(arr).slice(0, opts.count);
+    const sec = 'topic|' + state.cfu + '|' + opts.parte + '|' + opts.topic + '|' + opts.type;
+    qs = pickUnseen(arr, opts.count, sec);
   }
   if (qs.length === 0) {
     alert('Nessuna domanda corrisponde a questo filtro.');
@@ -289,6 +311,9 @@ function renderCard(q, userAnswer, showCorrect) {
     </div>`;
   }
   // matching
+  const hint = q.format === 'vf6'
+    ? '<div class="vf6-hint">📝 Individua <b>2 affermazioni VERE</b> e <b>2 FALSE</b> (le altre 2 lasciale vuote).</div>'
+    : '';
   const legend = '<div class="labels-legend"><strong>Etichette:</strong>' +
     q.labels.map(l => `<span class="label-item"><span class="label-key">${escHtml(l.key)}</span> ${escHtml(l.text)}</span>`).join('') +
     '</div>';
@@ -296,7 +321,9 @@ function renderCard(q, userAnswer, showCorrect) {
     const ans = userAnswer && userAnswer[it.id];
     let cls = '';
     if (showCorrect) {
-      cls = (ans === it.correct) ? ' correct' : ' wrong';
+      // nel formato VF6 le voci lasciate in bianco sono neutre (non sbagliate)
+      if (q.format === 'vf6') cls = ans ? (ans === it.correct ? ' correct' : ' wrong') : '';
+      else cls = (ans === it.correct) ? ' correct' : ' wrong';
     }
     const explBtn = it.explanation ? `<button class="explain-btn small" data-target="expl-${q.id}-${it.id}">💡</button>` : '';
     const explPanel = it.explanation ? `<div class="explanation item-expl" id="expl-${q.id}-${it.id}" hidden>
@@ -320,7 +347,7 @@ function renderCard(q, userAnswer, showCorrect) {
       <div class="q-tags">${tags}</div>
     </div>
     <p class="q-text">${escHtml(q.group_text)}</p>
-    ${legend}
+    ${hint}${legend}
     <div class="matching-items">${items}</div>
     ${cite}
   </div>`;
@@ -381,6 +408,19 @@ function submitQuiz() {
       const pts = ok ? sc.mcq : 0;
       if (ok) { correctCount += 1; earnedPoints += pts; }
       detail.push({ q, ok, ans, pts, maxPts: sc.mcq });
+    } else if (q.format === 'vf6') {
+      // 6 affermazioni: contano solo 2 marcate VERE + 2 marcate FALSE (max 4 pt).
+      // Marcare più di 2 volte lo stesso valore invalida quel gruppo di marcature.
+      totalCount += 4;
+      maxPoints += 4 * sc.matchItem;
+      const vMarks = q.items.filter(it => ans && ans[it.id] === 'V');
+      const fMarks = q.items.filter(it => ans && ans[it.id] === 'F');
+      let s = 0;
+      if (vMarks.length <= 2) s += vMarks.filter(it => it.correct === 'V').length;
+      if (fMarks.length <= 2) s += fMarks.filter(it => it.correct === 'F').length;
+      const invalid = vMarks.length > 2 || fMarks.length > 2;
+      correctCount += s; earnedPoints += s * sc.matchItem;
+      detail.push({ q, ok: s === 4, ans, itemsCorrect: s, itemsTotal: 4, pts: s * sc.matchItem, maxPts: 4 * sc.matchItem, invalid });
     } else {
       let itemsCorrect = 0;
       let itemPts = 0;
@@ -418,7 +458,7 @@ function submitQuiz() {
         ? `<div class="feedback ok">✓ Corretta (${ansLetter}) — <strong>${d.pts}/${d.maxPts} pt</strong></div>`
         : `<div class="feedback ko">✗ La tua: ${ansLetter}. Corretta: ${d.q.correct.toUpperCase()} — <strong>0/${d.maxPts} pt</strong></div>`;
     } else {
-      fb = `<div class="feedback ${d.ok?'ok':'ko'}">${d.itemsCorrect}/${d.itemsTotal} item corretti — <strong>${d.pts}/${d.maxPts} pt</strong></div>`;
+      fb = `<div class="feedback ${d.ok?'ok':'ko'}">${d.itemsCorrect}/${d.itemsTotal} corrette — <strong>${d.pts}/${d.maxPts} pt</strong>${d.invalid ? ' · ⚠️ marcate più di 2 V o 2 F: quelle marcature non contano' : ''}</div>`;
     }
     return `<div class="result-item">${card}${fb}</div>`;
   }).join('');
@@ -427,9 +467,16 @@ function submitQuiz() {
   showScreen('results-screen');
 }
 
+// "Riprova stesso quiz": rigioca ESATTAMENTE le stesse domande (non ripesca dal pool,
+// così non consuma la memoria anti-ripetizione e il bottone fa quello che dice).
 function retryQuiz() {
-  if (!state.lastConfig) return;
-  startQuiz(state.lastConfig.mode, state.lastConfig.opts);
+  if (!state.quiz || !state.quiz.length) return;
+  state.idx = 0;
+  state.answers = {};
+  document.getElementById('q-total').textContent = state.quiz.length;
+  document.getElementById('q-progress').max = state.quiz.length;
+  renderQuestion();
+  showScreen('quiz-screen');
 }
 
 // ===== review =====
