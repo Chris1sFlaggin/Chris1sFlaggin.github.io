@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <!-- Favicon (chris) -->
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Joystick MQTT — telecomando analogico via browser</title>
+<meta name="description" content="Joystick analogico nel browser che pubblica comandi MQTT su WebSocket: stick, pulsanti, tastiera e gamepad fisico. Per rover, droni, luci e qualsiasi cosa parli MQTT.">
+<meta name="keywords" content="mqtt, joystick, websocket, mqtt over websocket, telecomando, rover, raspberry pi, iot, gamepad">
+<meta name="theme-color" content="#0d0f13">
+<meta property="og:title" content="Joystick MQTT">
+<meta property="og:description" content="Telecomando analogico nel browser che pubblica comandi MQTT su WebSocket.">
+<meta property="og:type" content="website">
+
+<script src="https://unpkg.com/mqtt@5.15.2/dist/mqtt.min.js"></script>
+<script>window.mqtt||document.write('<script src="https://cdn.jsdelivr.net/npm/mqtt@5.15.2/dist/mqtt.min.js"><\/script>');</script>
+
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="brand"><span class="glyph">✛</span> JOYSTICK <span class="sub">mqtt</span></div>
+  <div class="spacer"></div>
+  <span class="badge" id="gpBadge" hidden>🎮 gamepad</span>
+  <div class="status"><span class="dot" id="dot"></span><span id="statusText">disconnesso</span></div>
+</header>
+
+<main class="wrap">
+
+  <!-- ── CONFIG ───────────────────────────────────────── -->
+  <section class="panel">
+    <details id="cfg" open>
+      <summary>Configurazione <span class="hint" id="topicHint">joystick/1/move</span></summary>
+
+      <div class="subhead">Broker</div>
+      <div class="grid">
+        <div class="f wide">
+          <label for="host">Host broker</label>
+          <input type="text" id="host" spellcheck="false" autocapitalize="off" autocomplete="off" value="broker.emqx.io"
+                 placeholder="broker.example.com — oppure incolla wss://host:porta/path">
+          <small id="urlPreview">wss://broker.emqx.io:8084/mqtt</small>
+        </div>
+        <div class="f">
+          <label for="port">Porta WebSocket</label>
+          <input type="number" id="port" min="1" max="65535" step="1" value="8084">
+          <small id="portWarn"></small>
+        </div>
+        <div class="f">
+          <label for="path">Percorso</label>
+          <input type="text" id="path" spellcheck="false" autocapitalize="off" value="/mqtt" placeholder="/mqtt">
+        </div>
+        <div class="f chk"><input type="checkbox" id="tls" checked><label for="tls">TLS (wss://)</label></div>
+        <div class="f">
+          <label for="preset">Preset</label>
+          <select id="preset">
+            <option value="">— scegli —</option>
+            <option value="broker.emqx.io|8084|/mqtt|1">EMQX pubblico</option>
+            <option value="broker.hivemq.com|8884|/mqtt|1">HiveMQ pubblico</option>
+            <option value="test.mosquitto.org|8081|/mqtt|1">Mosquitto test</option>
+          </select>
+        </div>
+        <div class="f">
+          <label for="user">Username</label>
+          <input type="text" id="user" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="(vuoto)">
+        </div>
+        <div class="f">
+          <label for="pass">Password</label>
+          <input type="password" id="pass" autocomplete="off" placeholder="(vuota)">
+        </div>
+        <div class="f">
+          <label for="cid">Client ID</label>
+          <input type="text" id="cid" spellcheck="false" autocapitalize="off">
+        </div>
+        <div class="f">
+          <label for="proto">Versione MQTT</label>
+          <select id="proto">
+            <option value="4" selected>3.1.1</option>
+            <option value="5">5.0</option>
+            <option value="3">3.1</option>
+          </select>
+        </div>
+        <div class="f">
+          <label for="keepalive">Keepalive (s)</label>
+          <input type="number" id="keepalive" min="0" max="65535" step="5" value="30">
+        </div>
+        <div class="f">
+          <label for="reconnect">Riconnessione (ms)</label>
+          <input type="number" id="reconnect" min="0" max="60000" step="500" value="2500">
+        </div>
+        <div class="chkrow">
+        <div class="f chk"><input type="checkbox" id="clean" checked><label for="clean">Clean session</label></div>
+        <div class="f chk"><input type="checkbox" id="remember"><label for="remember">Ricorda password</label></div>
+        </div>
+      </div>
+
+      <div class="subhead">Topic</div>
+      <div class="grid">
+        <div class="f wide">
+          <label for="tMove">Topic movimento</label>
+          <input type="text" id="tMove" spellcheck="false" autocapitalize="off" value="joystick/1/move">
+        </div>
+        <div class="f wide">
+          <label for="tSpeed">Topic velocità (leva)</label>
+          <input type="text" id="tSpeed" spellcheck="false" autocapitalize="off" value="joystick/1/speed">
+        </div>
+        <div class="f">
+          <label for="qos">QoS</label>
+          <select id="qos"><option selected>0</option><option>1</option><option>2</option></select>
+        </div>
+        <div class="chkrow">
+        <div class="f chk"><input type="checkbox" id="sub" checked><label for="sub">Sottoscrivi (eco + RTT)</label></div>
+        <div class="f chk"><input type="checkbox" id="retain"><label for="retain">Retain</label></div>
+        </div>
+      </div>
+
+      <div class="subhead">Payload</div>
+      <div class="grid">
+        <div class="f">
+          <label for="fmt">Formato</label>
+          <select id="fmt">
+            <option value="json">JSON {x,y,m,a}</option>
+            <option value="tank">JSON motori {l,r}</option>
+            <option value="csv">CSV "x,y"</option>
+            <option value="dir">Direzione a 8 vie (up/down/…)</option>
+            <option value="custom">Personalizzato (template)</option>
+            <option value="raw">Raw (testo letterale)</option>
+          </select>
+        </div>
+        <div class="f chk"><input type="checkbox" id="addType"><label for="addType">Aggiungi campo <code>type</code></label></div>
+        <div class="f wide" id="fTplMove" hidden>
+          <label for="tplMove">Template movimento</label>
+          <input type="text" id="tplMove" spellcheck="false" autocapitalize="off" value='{"x":{x},"y":{y}}'>
+        </div>
+        <div class="f wide" id="fTplSpeed" hidden>
+          <label for="tplSpeed">Template velocità</label>
+          <input type="text" id="tplSpeed" spellcheck="false" autocapitalize="off" value='{"speed":{speed}}'>
+          <small>{x} {y} {m} {a} {dir} {l} {r} {src} {t} {speed} · interi: {xi} {yi} {mi} {li} {ri} {speedi}</small>
+        </div>
+        <div class="f wide" id="fRawMove" hidden>
+          <label for="rawMove">Payload movimento (raw)</label>
+          <input type="text" id="rawMove" spellcheck="false" autocapitalize="off" value="1">
+        </div>
+        <div class="f wide" id="fRawSpeed" hidden>
+          <label for="rawSpeed">Payload velocità (raw)</label>
+          <input type="text" id="rawSpeed" spellcheck="false" autocapitalize="off" value="1">
+          <small>byte per byte come li scrivi: nessuna sostituzione, nessun JSON. Payload vuoto = messaggio a lunghezza zero.</small>
+        </div>
+      </div>
+
+      <div class="subhead">Comportamento</div>
+      <div class="grid">
+        <div class="f">
+          <label for="rate">Frequenza (Hz)</label>
+          <select id="rate">
+            <option>1</option><option>5</option><option>10</option><option selected>20</option><option>30</option><option>50</option>
+          </select>
+        </div>
+        <div class="f">
+          <label for="dz">Zona morta (%)</label>
+          <input type="number" id="dz" min="0" max="60" step="1" value="8">
+        </div>
+        <div class="f">
+          <label for="hb">Heartbeat (ms)</label>
+          <input type="number" id="hb" min="0" max="10000" step="100" value="1000">
+        </div>
+        <div class="chkrow">
+        <div class="f chk"><input type="checkbox" id="onchange" checked><label for="onchange">Invia solo se cambia</label></div>
+        <div class="f chk"><input type="checkbox" id="invY"><label for="invY">Inverti asse Y</label></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="btnConnect" class="primary">CONNETTI</button>
+        <button id="btnReset" type="button">Reset impostazioni</button>
+      </div>
+      <p class="tip" id="protoTip">La pagina è servita in HTTPS, quindi serve la porta <b>WebSocket su TLS</b> del tuo broker (<code>wss://</code>): tipicamente <code>8084</code> o <code>8884</code> con percorso <code>/mqtt</code>. Le porte <code>1883</code> e <code>8883</code> sono MQTT su TCP e dal browser non sono raggiungibili.</p>
+    </details>
+  </section>
+
+  <!-- ── STAGE ────────────────────────────────────────── -->
+  <section class="panel stage">
+
+    <div class="padwrap">
+      <div class="pad" id="pad" role="application" aria-label="Joystick analogico" tabindex="0">
+        <svg viewBox="-1 -1 2 2" aria-hidden="true">
+          <line class="grid-line" x1="-1" y1="0" x2="1" y2="0"></line>
+          <line class="grid-line" x1="0" y1="-1" x2="0" y2="1"></line>
+          <circle class="ring" cx="0" cy="0" r="0.62"></circle>
+          <circle class="ring" cx="0" cy="0" r="0.99"></circle>
+          <circle class="dz" id="dzCircle" cx="0" cy="0" r="0.08"></circle>
+          <line class="vec" id="vecLine" x1="0" y1="0" x2="0" y2="0"></line>
+        </svg>
+        <div class="knob" id="knob"></div>
+      </div>
+      <div class="padlbl">trascina<span class="only-wide"> · <span id="padKeys">WASD</span> · gamepad</span></div>
+    </div>
+
+    <div class="hud">
+      <div class="stats">
+        <div class="stat"><b>x</b><span class="acc" id="oX">0.000</span></div>
+        <div class="stat"><b>y</b><span class="acc" id="oY">0.000</span></div>
+        <div class="stat"><b>modulo</b><span id="oM">0.000</span></div>
+        <div class="stat"><b>angolo</b><span id="oA">—</span></div>
+        <div class="stat"><b>sorgente</b><span id="oSrc">idle</span></div>
+        <div class="stat speedstat"><b id="oSpeedLbl">velocità</b><span class="acc" id="oSpeed">0%</span></div>
+        <div class="stat"><b>msg/s</b><span id="oRate">0</span></div>
+        <div class="stat"><b>inviati</b><span id="oSent">0</span></div>
+        <div class="stat"><b>rtt</b><span id="oRtt">—</span></div>
+      </div>
+      <div class="motors">
+        <div class="motor"><span>L</span><div class="track"><div class="fill" id="mL"></div></div></div>
+        <div class="motor"><span>R</span><div class="track"><div class="fill" id="mR"></div></div></div>
+      </div>
+      <button id="stop" class="danger" type="button">STOP</button>
+    </div>
+
+    <div class="leverwrap">
+      <div class="lever" id="lever" role="slider" tabindex="0"
+           aria-label="Velocità" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="rail">
+          <div class="ticks" id="leverTicks"></div>
+          <div class="lfill" id="leverFill"></div>
+          <div class="handle" id="leverHandle"><span></span></div>
+        </div>
+      </div>
+      <div class="leverval" id="leverVal">0</div>
+      <button class="dirbtn" id="dirBtn" type="button" aria-pressed="false">
+        <span class="arrow" id="dirArrow">▲</span><span id="dirLabel">avanti</span>
+      </button>
+      <div class="padlbl" id="leverLbl">velocità</div>
+      <div class="padlbl only-wide" id="leverKeys"></div>
+    </div>
+  </section>
+
+  <!-- ── LOG ──────────────────────────────────────────── -->
+  <section class="panel log">
+    <div class="head">
+      <b>Log</b>
+      <span class="sp"></span>
+      <button id="btnPause" type="button">Pausa</button>
+      <button id="btnClear" type="button">Pulisci</button>
+    </div>
+    <div class="pubrow">
+      <input type="text" id="pubTopic" spellcheck="false" autocapitalize="off" placeholder="topic (invio manuale)">
+      <input type="text" id="pubPayload" class="pl" spellcheck="false" autocapitalize="off" placeholder='payload, es. {"cmd":"home"}'>
+      <div class="f chk"><input type="checkbox" id="pubRetain"><label for="pubRetain">retain</label></div>
+      <button id="btnPub" type="button">INVIA</button>
+    </div>
+    <div class="logbox" id="log"></div>
+  </section>
+
+  <!-- ── HELP ─────────────────────────────────────────── -->
+  <section class="panel help">
+    <details>
+      <summary>Come si usa <span class="hint">broker, topic, snippet</span></summary>
+      <div class="body">
+
+        <h3>Topic (tutti modificabili)</h3>
+        <p>Due topic, uno per lo stick e uno per la leva. Puoi anche puntarli sullo stesso e distinguerli con il campo <code>type</code>. Con <b>Sottoscrivi</b> attivo la pagina si rimette in ascolto sui propri topic: gli echi finiscono nel log e servono a misurare l'RTT.</p>
+        <ul>
+          <li><b>Movimento</b> — vettore dello stick, alla frequenza scelta. Default <code>&lt;base&gt;/move</code>.</li>
+          <li><b>Velocità</b> — posizione della leva e senso di marcia: <code>{"speed":120,"dir":1}</code>. Si imposta in <code>config.js</code> dentro <code>lever.topic</code>.</li>
+        </ul>
+        <p>La riga sopra il log pubblica un payload qualsiasi su un topic qualsiasi: per il resto è un normale client MQTT.</p>
+
+        <h3>Payload su misura</h3>
+        <p>Con formato <b>Raw</b> il payload è il testo che scrivi, spedito tale e quale: nessun JSON, nessuna sostituzione. Serve per i dispositivi che si aspettano una stringa fissa (<code>ON</code>, <code>1</code>, <code>toggle</code>…) e vale sia per il topic movimento sia per quello dei pulsanti.</p>
+        <p>Con formato <b>Personalizzato</b> scrivi tu il payload; i segnaposto vengono sostituiti a ogni invio:</p>
+        <ul>
+          <li><code>{x} {y}</code> assi −1..1 · <code>{m}</code> modulo · <code>{a}</code> angolo in gradi · <code>{dir}</code> direzione a 8 vie</li>
+          <li><code>{l} {r}</code> miscelazione arcade per motori differenziali · <code>{src}</code> sorgente · <code>{t}</code> timestamp ms</li>
+          <li><code>{xi} {yi} {mi} {li} {ri}</code> stessi valori come interi −100..100 (comodi per PWM e servo)</li>
+          <li><code>{speed}</code> posizione della leva nella sua scala (con <code>max: 220</code> va da 0 a 220), <code>{speedi}</code> la stessa arrotondata a intero, <code>{speedn}</code> normalizzata 0..1</li>
+          <li><code>{dir}</code> senso di marcia: <code>1</code> avanti, <code>0</code> retromarcia · <code>{heading}</code> direzione a 8 vie dello stick (up, down-left…)</li>
+        </ul>
+        <pre>servo/pan {xi}                       → "42"
+casa/luce/set {"state":"{dir}"}      → {"state":"up-right"}
+rover/cmd {"L":{li},"R":{ri}}        → {"L":73,"R":21}</pre>
+
+        <h3>Comandi</h3>
+        <ul>
+          <li>Stick: trascina (mouse/dito), <span class="kbd">WASD</span> o frecce, oppure lo stick sinistro di un gamepad collegato.</li>
+          <li>Levetta della velocità: si trascina, si muove con la rotellina del mouse, con i tasti indicati sotto la leva e con il grilletto o lo stick destro del gamepad. Resta dove la lasci e, se <code>scalesStick</code> è attivo, riduce già x e y in uscita.</li>
+          <li>Bottoncino <b>avanti/retro</b> sotto la leva (o il suo tasto): commuta <code>dir</code> fra <code>1</code> e <code>0</code> e ripubblica subito la velocità.</li>
+          <li><span class="kbd">Spazio</span> = STOP: azzera tutto e pubblica <code>{"cmd":"stop"}</code>. Anche cambiando scheda o perdendo il focus viene inviato lo zero.</li>
+        </ul>
+
+        <h3>Personalizzare comandi e leva</h3>
+        <p>Tutto quello che riguarda i comandi sta in <code>config.js</code>, accanto alla pagina: nessun build, si salva e si ricarica. <code>lever</code> descrive la levetta (scala, scatto, tasti, gamepad, se torna a zero da sola e se riduce l'uscita dello stick), <code>axis</code> i tasti dello stick e gli assi del gamepad, <code>defaults</code> i valori con cui parte la pagina (broker, topic, formato, frequenza…).</p>
+<pre>lever: {
+  label: "velocità", unit: "%",
+  min: 0, max: 100, start: 0, step: 5,
+  spring: false,          // true = torna a zero quando la lasci
+  scalesStick: true,      // riduce già x e y in uscita
+  keys: { up: ["KeyR"], down: ["KeyF"], zero: ["KeyZ"] },
+  gamepadAxis: 3, gamepadUp: 7, gamepadDown: 6,
+  topic: "esp32_car_fralor/speed",
+  reverse: { start: 1, keys: ["KeyX"], gamepadButton: 1 }
+}</pre>
+        <p>La posizione della leva non viene ricordata fra una sessione e l'altra: alla riapertura riparte sempre da <code>start</code>, così non ti ritrovi un mezzo che scatta al primo comando.</p>
+        <p>Le impostazioni cambiate dall'interfaccia restano memorizzate nel browser e vincono su <code>defaults</code>: per tornare al file usa <b>Reset impostazioni</b>.</p>
+
+        <h3>Ascoltare i comandi</h3>
+        <pre>mosquitto_sub -h broker.emqx.io -p 1883 -t 'joystick/1/#' -v</pre>
+
+        <h3>Consumarli in Python (paho-mqtt)</h3>
+<pre>import json, time, paho.mqtt.client as mqtt
+
+MOVE, BUTTON = "joystick/1/move", "joystick/1/button"
+last = time.time()
+
+def on_connect(c, u, f, rc):
+    c.subscribe([(MOVE, 0), (BUTTON, 0)])
+
+def on_message(c, u, msg):
+    global last
+    d = json.loads(msg.payload)
+    if msg.topic == MOVE:
+        last = time.time()
+        drive(d["x"], d["y"])          # -1..1
+    else:
+        print(d["btn"], d["state"])
+
+c = mqtt.Client()
+c.on_connect, c.on_message = on_connect, on_message
+c.connect("broker.emqx.io", 1883, 30)
+c.loop_start()
+
+while True:                            # watchdog: nessun comando da 0.6 s → fermo
+    if time.time() - last > 0.6:
+        drive(0, 0)
+    time.sleep(0.1)</pre>
+
+        <h3>Che porta mettere</h3>
+        <p>Dal browser MQTT viaggia solo su WebSocket: conta la porta <i>WebSocket</i> del broker, non quella TCP. Nel campo host puoi anche incollare un URL intero (<code>wss://host:8884/mqtt</code>): viene spezzato da solo in host, porta, percorso e TLS.</p>
+        <ul>
+          <li><code>broker.emqx.io</code> — <b>8084</b> <code>/mqtt</code> TLS (in chiaro: 8083)</li>
+          <li><code>broker.hivemq.com</code> — <b>8884</b> <code>/mqtt</code> TLS (in chiaro: 8000)</li>
+          <li><code>test.mosquitto.org</code> — <b>8081</b> <code>/mqtt</code> TLS (in chiaro: 8080)</li>
+          <li>HiveMQ Cloud / EMQX Cloud — <b>8884</b> <code>/mqtt</code> TLS, con username e password del tuo cluster</li>
+          <li><code>1883</code> e <code>8883</code> sono MQTT su TCP: dal browser non funzionano</li>
+        </ul>
+        <p>Broker tuo in LAN senza TLS: da questa pagina in HTTPS il browser blocca <code>ws://</code>. Servono un certificato sul broker (o un reverse proxy TLS) oppure aprire questa pagina in locale su <code>http://</code>.</p>
+
+        <h3>Sicurezza</h3>
+        <p>I broker pubblici sono <b>aperti a chiunque</b>: chi indovina il topic guida il tuo hardware. Per qualcosa di reale usa un broker tuo con TLS, utenza dedicata, ACL sul topic e un watchdog lato dispositivo (se non arriva un <code>move</code> entro N ms, fermati).</p>
+      </div>
+    </details>
+  </section>
+
+  <footer>joystick mqtt — <a href="/">chris1sflaggin</a></footer>
+</main>
+
+<script src="config.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
