@@ -1,18 +1,3 @@
-/* ──────────────────────────────────────────────────────────────────────────
-   Joystick MQTT — configurazione
-   Questo è l'unico file da toccare per personalizzare comandi e valori
-   iniziali. Niente build: salvi e ricarichi la pagina.
-
-   Due comandi, due levette:
-     · sinistra, orizzontale → l'ANGOLO di sterzata (intero) sul topic movimento
-     · destra, verticale     → la VELOCITÀ (intero) + marcia sul topic velocità
-   Tutti i numeri pubblicati sono interi.
-
-   Nota: le impostazioni che cambi dall'interfaccia vengono ricordate nel
-   browser e hanno la precedenza su "defaults". Il pulsante "Reset
-   impostazioni" cancella la memoria e rimette i valori di questo file.
-   ────────────────────────────────────────────────────────────────────────── */
-
 window.JOYSTICK_CONFIG = {
 
   /* ── LEVETTA ORIZZONTALE — ANGOLO ────────────────────────────────────────
