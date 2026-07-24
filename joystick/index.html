@@ -123,10 +123,9 @@
         <div class="f">
           <label for="fmt">Formato</label>
           <select id="fmt">
-            <option value="json">JSON {x,y,m,a}</option>
-            <option value="tank">JSON motori {l,r}</option>
-            <option value="csv">CSV "x,y"</option>
-            <option value="dir">Direzione a 8 vie (up/down/…)</option>
+            <option value="json">JSON {angle}</option>
+            <option value="csv">CSV (solo numero)</option>
+            <option value="dir">Direzione (left/straight/right)</option>
             <option value="custom">Personalizzato (template)</option>
             <option value="raw">Raw (testo letterale)</option>
           </select>
@@ -138,8 +137,8 @@
         </div>
         <div class="f wide" id="fTplSpeed" hidden>
           <label for="tplSpeed">Template velocità</label>
-          <input type="text" id="tplSpeed" spellcheck="false" autocapitalize="off" value='{"speed":{speed}}'>
-          <small>{x} {y} {m} {a} {dir} {l} {r} {src} {t} {speed} · interi: {xi} {yi} {mi} {li} {ri} {speedi}</small>
+          <input type="text" id="tplSpeed" spellcheck="false" autocapitalize="off" value='{"speed":{speed}, "dir": {dir}}'>
+          <small>tutti interi · {angle} sterzo · {speed} velocità · {dir} marcia (1/0) · {heading} left/straight/right · {src} {t}</small>
         </div>
         <div class="f wide" id="fRawMove" hidden>
           <label for="rawMove">Payload movimento (raw)</label>
@@ -161,17 +160,10 @@
           </select>
         </div>
         <div class="f">
-          <label for="dz">Zona morta (%)</label>
-          <input type="number" id="dz" min="0" max="60" step="1" value="8">
-        </div>
-        <div class="f">
           <label for="hb">Heartbeat (ms)</label>
           <input type="number" id="hb" min="0" max="10000" step="100" value="1000">
         </div>
-        <div class="chkrow">
         <div class="f chk"><input type="checkbox" id="onchange" checked><label for="onchange">Invia solo se cambia</label></div>
-        <div class="f chk"><input type="checkbox" id="invY"><label for="invY">Inverti asse Y</label></div>
-        </div>
       </div>
 
       <div class="actions">
@@ -185,36 +177,28 @@
   <!-- ── STAGE ────────────────────────────────────────── -->
   <section class="panel stage">
 
-    <div class="padwrap">
-      <div class="pad" id="pad" role="application" aria-label="Joystick analogico" tabindex="0">
-        <svg viewBox="-1 -1 2 2" aria-hidden="true">
-          <line class="grid-line" x1="-1" y1="0" x2="1" y2="0"></line>
-          <line class="grid-line" x1="0" y1="-1" x2="0" y2="1"></line>
-          <circle class="ring" cx="0" cy="0" r="0.62"></circle>
-          <circle class="ring" cx="0" cy="0" r="0.99"></circle>
-          <circle class="dz" id="dzCircle" cx="0" cy="0" r="0.08"></circle>
-          <line class="vec" id="vecLine" x1="0" y1="0" x2="0" y2="0"></line>
-        </svg>
-        <div class="knob" id="knob"></div>
+    <div class="steerwrap">
+      <div class="steer" id="steer" role="slider" tabindex="0"
+           aria-label="Angolo di sterzata" aria-valuemin="0" aria-valuemax="180" aria-valuenow="90">
+        <div class="hrail">
+          <div class="hticks" id="steerTicks"></div>
+          <div class="hfill" id="steerFill"></div>
+          <div class="hhandle" id="steerHandle"><span></span></div>
+        </div>
       </div>
-      <div class="padlbl">trascina<span class="only-wide"> · <span id="padKeys">WASD</span> · gamepad</span></div>
+      <div class="steerval" id="steerVal">90°</div>
+      <div class="padlbl" id="steerLbl">angolo</div>
+      <div class="padlbl only-wide" id="steerKeys"></div>
     </div>
 
     <div class="hud">
       <div class="stats">
-        <div class="stat"><b>x</b><span class="acc" id="oX">0.000</span></div>
-        <div class="stat"><b>y</b><span class="acc" id="oY">0.000</span></div>
-        <div class="stat"><b>modulo</b><span id="oM">0.000</span></div>
-        <div class="stat"><b>angolo</b><span id="oA">—</span></div>
+        <div class="stat"><b>angolo</b><span class="acc" id="oA">90°</span></div>
+        <div class="stat speedstat"><b id="oSpeedLbl">velocità</b><span class="acc" id="oSpeed">0</span></div>
         <div class="stat"><b>sorgente</b><span id="oSrc">idle</span></div>
-        <div class="stat speedstat"><b id="oSpeedLbl">velocità</b><span class="acc" id="oSpeed">0%</span></div>
         <div class="stat"><b>msg/s</b><span id="oRate">0</span></div>
         <div class="stat"><b>inviati</b><span id="oSent">0</span></div>
         <div class="stat"><b>rtt</b><span id="oRtt">—</span></div>
-      </div>
-      <div class="motors">
-        <div class="motor"><span>L</span><div class="track"><div class="fill" id="mL"></div></div></div>
-        <div class="motor"><span>R</span><div class="track"><div class="fill" id="mR"></div></div></div>
       </div>
       <button id="stop" class="danger" type="button">STOP</button>
     </div>
@@ -260,80 +244,71 @@
       <summary>Come si usa <span class="hint">broker, topic, snippet</span></summary>
       <div class="body">
 
-        <h3>Topic (tutti modificabili)</h3>
-        <p>Due topic, uno per lo stick e uno per la leva. Puoi anche puntarli sullo stesso e distinguerli con il campo <code>type</code>. Con <b>Sottoscrivi</b> attivo la pagina si rimette in ascolto sui propri topic: gli echi finiscono nel log e servono a misurare l'RTT.</p>
+        <h3>Topic</h3>
+        <p>Due topic: uno per lo <b>sterzo</b> (leva orizzontale) e uno per la <b>velocità</b> (leva verticale). Puoi anche puntarli sullo stesso e distinguerli con il campo <code>type</code>. Con <b>Sottoscrivi</b> attivo la pagina si rimette in ascolto sui propri topic: gli echi finiscono nel log e servono a misurare l'RTT.</p>
         <ul>
-          <li><b>Movimento</b> — vettore dello stick, alla frequenza scelta. Default <code>&lt;base&gt;/move</code>.</li>
-          <li><b>Velocità</b> — posizione della leva e senso di marcia: <code>{"speed":120,"dir":1}</code>. Si imposta in <code>config.js</code> dentro <code>lever.topic</code>.</li>
+          <li><b>Sterzo</b> — angolo della leva orizzontale, intero: <code>{"angle":55}</code> (scala 0..180, dritto 90). È il topic <i>movimento</i> (o <code>steer.topic</code> in <code>config.js</code>).</li>
+          <li><b>Velocità</b> — posizione della leva verticale e senso di marcia, interi: <code>{"speed":120,"dir":1}</code>. Si imposta in <code>config.js</code> dentro <code>lever.topic</code>.</li>
         </ul>
         <p>La riga sopra il log pubblica un payload qualsiasi su un topic qualsiasi: per il resto è un normale client MQTT.</p>
 
         <h3>Payload su misura</h3>
-        <p>Con formato <b>Raw</b> il payload è il testo che scrivi, spedito tale e quale: nessun JSON, nessuna sostituzione. Serve per i dispositivi che si aspettano una stringa fissa (<code>ON</code>, <code>1</code>, <code>toggle</code>…) e vale sia per il topic movimento sia per quello dei pulsanti.</p>
-        <p>Con formato <b>Personalizzato</b> scrivi tu il payload; i segnaposto vengono sostituiti a ogni invio:</p>
+        <p><b>Tutti i numeri pubblicati sono interi.</b> Con formato <b>Raw</b> il payload è il testo che scrivi, spedito tale e quale. Con formato <b>Personalizzato</b> scrivi tu il payload e i segnaposto vengono sostituiti a ogni invio:</p>
         <ul>
-          <li><code>{x} {y}</code> assi −1..1 · <code>{m}</code> modulo · <code>{a}</code> angolo in gradi · <code>{dir}</code> direzione a 8 vie</li>
-          <li><code>{l} {r}</code> miscelazione arcade per motori differenziali · <code>{src}</code> sorgente · <code>{t}</code> timestamp ms</li>
-          <li><code>{xi} {yi} {mi} {li} {ri}</code> stessi valori come interi −100..100 (comodi per PWM e servo)</li>
-          <li><code>{speed}</code> posizione della leva nella sua scala (con <code>max: 220</code> va da 0 a 220), <code>{speedi}</code> la stessa arrotondata a intero, <code>{speedn}</code> normalizzata 0..1</li>
-          <li><code>{dir}</code> senso di marcia: <code>1</code> avanti, <code>0</code> retromarcia · <code>{heading}</code> direzione a 8 vie dello stick (up, down-left…)</li>
+          <li><code>{angle}</code> angolo dello sterzo (intero, es. 0..180 con dritto 90) · <code>{heading}</code> <code>left</code>/<code>straight</code>/<code>right</code></li>
+          <li><code>{speed}</code> velocità (intero nella scala della leva) · <code>{dir}</code> marcia: <code>1</code> avanti, <code>0</code> retromarcia</li>
+          <li><code>{src}</code> sorgente del comando · <code>{t}</code> timestamp ms</li>
         </ul>
-        <pre>servo/pan {xi}                       → "42"
-casa/luce/set {"state":"{dir}"}      → {"state":"up-right"}
-rover/cmd {"L":{li},"R":{ri}}        → {"L":73,"R":21}</pre>
+<pre>sterzo   {"angle":{angle}}          → {"angle":55}
+velocità {"v":{speed},"r":{dir}}    → {"v":120,"r":1}
+raw      {angle}                    → "55"</pre>
 
         <h3>Comandi</h3>
         <ul>
-          <li>Stick: trascina (mouse/dito), <span class="kbd">WASD</span> o frecce, oppure lo stick sinistro di un gamepad collegato.</li>
-          <li>Levetta della velocità: si trascina, si muove con la rotellina del mouse, con i tasti indicati sotto la leva e con il grilletto o lo stick destro del gamepad. Resta dove la lasci e, se <code>scalesStick</code> è attivo, riduce già x e y in uscita.</li>
-          <li>Bottoncino <b>avanti/retro</b> sotto la leva (o il suo tasto): commuta <code>dir</code> fra <code>1</code> e <code>0</code> e ripubblica subito la velocità.</li>
-          <li><span class="kbd">Spazio</span> = STOP: azzera tutto e pubblica <code>{"cmd":"stop"}</code>. Anche cambiando scheda o perdendo il focus viene inviato lo zero.</li>
+          <li>Sterzo (leva orizzontale, a sinistra): trascina, rotellina del mouse, i tasti indicati sotto la leva o lo stick sinistro del gamepad. Con <code>spring</code> torna dritto quando la lasci.</li>
+          <li>Velocità (leva verticale, a destra): trascina, rotellina, i tasti sotto la leva, il grilletto o lo stick destro del gamepad. Resta dove la lasci.</li>
+          <li>Bottoncino <b>avanti/retro</b> sotto la leva velocità (o il suo tasto): commuta <code>dir</code> fra <code>1</code> e <code>0</code> e ripubblica subito.</li>
+          <li><span class="kbd">Spazio</span> = STOP: rimette dritto lo sterzo, azzera la velocità e pubblica lo zero. Anche cambiando scheda o perdendo il focus viene inviato lo zero.</li>
         </ul>
 
-        <h3>Personalizzare comandi e leva</h3>
-        <p>Tutto quello che riguarda i comandi sta in <code>config.js</code>, accanto alla pagina: nessun build, si salva e si ricarica. <code>lever</code> descrive la levetta (scala, scatto, tasti, gamepad, se torna a zero da sola e se riduce l'uscita dello stick), <code>axis</code> i tasti dello stick e gli assi del gamepad, <code>defaults</code> i valori con cui parte la pagina (broker, topic, formato, frequenza…).</p>
-<pre>lever: {
-  label: "velocità", unit: "%",
-  min: 0, max: 100, start: 0, step: 5,
-  spring: false,          // true = torna a zero quando la lasci
-  scalesStick: true,      // riduce già x e y in uscita
-  keys: { up: ["KeyR"], down: ["KeyF"], zero: ["KeyZ"] },
-  gamepadAxis: 3, gamepadUp: 7, gamepadDown: 6,
-  topic: "esp32_car_fralor/speed",
-  reverse: { start: 1, keys: ["KeyX"], gamepadButton: 1 }
+        <h3>Personalizzare le levette</h3>
+        <p>Tutto quello che riguarda i comandi sta in <code>config.js</code>, accanto alla pagina: nessun build, si salva e si ricarica. <code>steer</code> descrive la leva dell'angolo, <code>lever</code> quella della velocità, <code>defaults</code> i valori con cui parte la pagina (broker, topic, formato, frequenza…).</p>
+<pre>steer: {
+  label: "angolo", unit: "°",
+  min: 0, max: 180, center: 90, start: 90, step: 5,
+  spring: true,           // torna dritto quando la lasci
+  rate: 180,              // gradi al secondo tenendo un tasto
+  keys: { left: ["KeyA"], right: ["KeyD"], center: ["KeyS"] },
+  gamepadAxis: 0          // stick sinistro, orizzontale
 }</pre>
-        <p>La posizione della leva non viene ricordata fra una sessione e l'altra: alla riapertura riparte sempre da <code>start</code>, così non ti ritrovi un mezzo che scatta al primo comando.</p>
+        <p>La posizione delle leve non viene ricordata fra una sessione e l'altra: alla riapertura si riparte da <code>start</code>, così non ti ritrovi un mezzo che scatta al primo comando.</p>
         <p>Le impostazioni cambiate dall'interfaccia restano memorizzate nel browser e vincono su <code>defaults</code>: per tornare al file usa <b>Reset impostazioni</b>.</p>
-
-        <h3>Ascoltare i comandi</h3>
-        <pre>mosquitto_sub -h broker.emqx.io -p 1883 -t 'joystick/1/#' -v</pre>
 
         <h3>Consumarli in Python (paho-mqtt)</h3>
 <pre>import json, time, paho.mqtt.client as mqtt
 
-MOVE, BUTTON = "joystick/1/move", "joystick/1/button"
+STEER, SPEED = "esp32_car_fralor/move", "esp32_car_fralor/speed"
+angle, speed, dir = 0, 0, 1
 last = time.time()
 
-def on_connect(c, u, f, rc):
-    c.subscribe([(MOVE, 0), (BUTTON, 0)])
-
 def on_message(c, u, msg):
-    global last
-    d = json.loads(msg.payload)
-    if msg.topic == MOVE:
-        last = time.time()
-        drive(d["x"], d["y"])          # -1..1
+    global angle, speed, dir, last
+    d = json.loads(msg.payload); last = time.time()
+    if msg.topic == STEER:
+        angle = d["angle"]             # intero, es. -90..90
     else:
-        print(d["btn"], d["state"])
+        speed, dir = d["speed"], d["dir"]
+    drive(angle, speed, dir)
 
 c = mqtt.Client()
-c.on_connect, c.on_message = on_connect, on_message
-c.connect("broker.emqx.io", 1883, 30)
+c.on_connect = lambda c,u,f,rc: c.subscribe([(STEER,0),(SPEED,0)])
+c.on_message = on_message
+c.connect("broker.hivemq.com", 1883, 30)
 c.loop_start()
 
 while True:                            # watchdog: nessun comando da 0.6 s → fermo
     if time.time() - last > 0.6:
-        drive(0, 0)
+        drive(0, 0, 1)
     time.sleep(0.1)</pre>
 
         <h3>Che porta mettere</h3>
