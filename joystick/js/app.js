@@ -4,27 +4,30 @@
 
 /* ── configurazione (config.js) ──────────────────────── */
 const FALLBACK_CONFIG = {
+  steer: {
+    topic: "", label: "angolo", unit: "°", min: -90, max: 90, center: 0, start: 0, step: 5,
+    spring: true, rate: 180,
+    keys: { left: ["KeyA", "ArrowLeft"], right: ["KeyD", "ArrowRight"], center: ["KeyS", "ArrowDown"] },
+    gamepadAxis: 0, gamepadDeadzone: 0.12
+  },
   lever: {
-    topic: "", label: "velocità", unit: "%", min: 0, max: 100, start: 100, step: 5,
-    spring: false, scalesStick: true,
+    topic: "", label: "velocità", unit: "", min: 0, max: 100, start: 100, step: 5,
+    spring: false,
     keys: { up: ["KeyR"], down: ["KeyF"], zero: ["KeyZ"] },
     gamepadAxis: 3, gamepadUp: 7, gamepadDown: 6, gamepadRate: 80,
     reverse: { start: 1, keys: ["KeyX"], gamepadButton: 1, forwardLabel: "avanti", reverseLabel: "retro" }
-  },
-  axis: {
-    up: ["KeyW", "ArrowUp"], down: ["KeyS", "ArrowDown"],
-    left: ["KeyA", "ArrowLeft"], right: ["KeyD", "ArrowRight"],
-    gamepadAxes: [0, 1], gamepadDpad: { up: 12, down: 13, left: 14, right: 15 }, keyRamp: 0.28
   },
   stopKeys: ["Space"],
   defaults: {}
 };
 const CFG = Object.assign({}, FALLBACK_CONFIG, window.JOYSTICK_CONFIG || {});
-CFG.axis = Object.assign({}, FALLBACK_CONFIG.axis, CFG.axis || {});
+CFG.steer = Object.assign({}, FALLBACK_CONFIG.steer, CFG.steer || {});
+CFG.steer.keys = Object.assign({}, FALLBACK_CONFIG.steer.keys, CFG.steer.keys || {});
 CFG.lever = Object.assign({}, FALLBACK_CONFIG.lever, CFG.lever || {});
 CFG.lever.keys = Object.assign({}, FALLBACK_CONFIG.lever.keys, CFG.lever.keys || {});
 CFG.lever.reverse = Object.assign({}, FALLBACK_CONFIG.lever.reverse, CFG.lever.reverse || {});
-const LV = CFG.lever;
+const ST = CFG.steer, LV = CFG.lever;
+if (!(ST.max > ST.min)) { ST.min = -90; ST.max = 90; }
 if (!(LV.max > LV.min)) { LV.min = 0; LV.max = 100; }
 CFG.stopKeys = CFG.stopKeys && CFG.stopKeys.length ? CFG.stopKeys : FALLBACK_CONFIG.stopKeys;
 const DEF = CFG.defaults || {};
@@ -32,15 +35,13 @@ const DEF = CFG.defaults || {};
 /* ── helpers ─────────────────────────────────────────── */
 const $ = (s, r = document) => r.querySelector(s);
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
-const r3 = v => Math.round(v * 1000) / 1000;
-const fx = (v, n = 3) => v.toFixed(n);
 
 /* ── form refs (chiavi = id) ─────────────────────────── */
 const F = {};
 for (const id of ["host","port","path","tls","user","pass","cid","proto","keepalive","reconnect","clean",
                   "tMove","tSpeed","qos","sub","retain",
                   "fmt","addType","tplMove","tplSpeed","rawMove","rawSpeed",
-                  "rate","dz","hb","onchange","invY","remember","pubTopic","pubRetain"]) {
+                  "rate","hb","onchange","remember","pubTopic","pubRetain"]) {
   const el = $("#" + id);
   if (el) F[id] = el;                 // un campo assente non deve poter bloccare l'avvio
   else console.warn("joystick: campo #" + id + " assente nell'HTML");
@@ -70,8 +71,7 @@ const DEFAULT_FIELDS = {
   topicMove: "tMove", qos: "qos", retain: "retain", subscribe: "sub",
   format: "fmt", addType: "addType", templateMove: "tplMove", templateSpeed: "tplSpeed",
   rawMove: "rawMove", rawSpeed: "rawSpeed",
-  rateHz: "rate", deadzone: "dz", heartbeatMs: "hb", onlyOnChange: "onchange",
-  invertY: "invY"
+  rateHz: "rate", heartbeatMs: "hb", onlyOnChange: "onchange"
 };
 function applyDefaults() {
   for (const k in DEFAULT_FIELDS) {
@@ -80,9 +80,11 @@ function applyDefaults() {
     if (el.type === "checkbox") el.checked = !!v;
     else el.value = String(v);
   }
-  // il topic della leva sta dentro lever, così sta vicino a min/max/step
+  // il topic della leva velocità sta dentro lever, così sta vicino a min/max/step
   if (LV.topic) F.tSpeed.value = LV.topic;
   else if (DEF.topicSpeed) F.tSpeed.value = DEF.topicSpeed;
+  // e quello dello sterzo può stare dentro steer (di default = topic movimento)
+  if (ST.topic) F.tMove.value = ST.topic;
 }
 
 applyDefaults();          // prima il file di configurazione…
@@ -160,7 +162,7 @@ $("#btnPause").onclick = e => {
   e.currentTarget.style.borderColor = paused ? "var(--accent-2)" : "";
 };
 
-/* ── topic: uno per lo stick, uno per la leva ─────────── */
+/* ── topic: uno per lo sterzo, uno per la velocità ────── */
 function topics() {
   const move = F.tMove.value.trim(), speed = F.tSpeed.value.trim();
   return {
@@ -236,7 +238,7 @@ function connect() {
     lastKey = null; lastSpeedKey = null;
     setStatus("on", "connesso");
     btnConnect.textContent = "DISCONNETTI";
-    log("sys", "connesso · move → " + T.move);
+    log("sys", "connesso · sterzo → " + T.move);
     if (F.sub.checked && T.sub.length) {
       client.subscribe(T.sub, { qos: +F.qos.value }, err => {
         if (err) log("err", "subscribe: " + err.message);
@@ -272,7 +274,7 @@ function disconnect() {
   const T = topics();
   if (client && connected) {
     zeroAll();
-    if (T.move) pub(T.move, movePayload(0, 0, "off").payload, F.retain.checked);
+    if (T.move) pub(T.move, movePayload("off").payload, F.retain.checked);
   }
   stopTimer();
   if (client) { try { client.end(false); } catch (e) { try { client.end(true); } catch (e2) {} } }
@@ -301,68 +303,32 @@ $("#preset").onchange = e => {
   saveCfg();
 };
 
-/* ── input: pad ──────────────────────────────────────── */
-const pad = $("#pad"), knob = $("#knob"), vecLine = $("#vecLine"), dzCircle = $("#dzCircle");
-let padActive = false, padId = null;
-const padVec = { x: 0, y: 0 };
-
-function padUpdate(ev) {
-  const rect = pad.getBoundingClientRect();
-  const R = (rect.width - knob.offsetWidth) / 2 || 1;
-  let x = (ev.clientX - (rect.left + rect.width / 2)) / R;
-  let y = -(ev.clientY - (rect.top + rect.height / 2)) / R;
-  const m = Math.hypot(x, y);
-  if (m > 1) { x /= m; y /= m; }
-  padVec.x = x; padVec.y = y;
-}
-pad.addEventListener("pointerdown", ev => {
-  if (padId !== null) return;
-  padId = ev.pointerId;
-  padActive = true;
-  pad.classList.add("live");
-  try { pad.setPointerCapture(padId); } catch (e) {}
-  padUpdate(ev);
-  ev.preventDefault();
-});
-pad.addEventListener("pointermove", ev => { if (ev.pointerId === padId) { padUpdate(ev); ev.preventDefault(); } });
-function padRelease(ev) {
-  if (ev.pointerId !== padId) return;
-  try { pad.releasePointerCapture(padId); } catch (e) {}
-  padId = null; padActive = false;
-  padVec.x = padVec.y = 0;
-  pad.classList.remove("live");
-}
-pad.addEventListener("pointerup", padRelease);
-pad.addEventListener("pointercancel", padRelease);
-pad.addEventListener("lostpointercapture", padRelease);
-pad.addEventListener("contextmenu", e => e.preventDefault());
-
-/* ── input: tastiera ─────────────────────────────────── */
-const keys = new Set();
-const keyVec = { x: 0, y: 0 };
-const AX = CFG.axis;
+/* ── tasti ───────────────────────────────────────────── */
+const STKEYS = { left: ST.keys.left || [], right: ST.keys.right || [], center: ST.keys.center || [] };
+const STEERKEYS = [].concat(STKEYS.left, STKEYS.right, STKEYS.center);
 const LVKEYS = { up: LV.keys.up || [], down: LV.keys.down || [], zero: LV.keys.zero || [] };
 const LEVERKEYS = [].concat(LVKEYS.up, LVKEYS.down, LVKEYS.zero);
-const DIRKEYS = { up: AX.up || [], down: AX.down || [], left: AX.left || [], right: AX.right || [] };
-const MOVEKEYS = [].concat(DIRKEYS.up, DIRKEYS.down, DIRKEYS.left, DIRKEYS.right);
 const STOPKEYS = CFG.stopKeys;
-const held = dir => DIRKEYS[dir].some(c => keys.has(c)) ? 1 : 0;
+const RV = LV.reverse || {};
+const steerHeld = new Set();
 
 function typingIn(t) { return !!t && t.nodeType === 1 && t.matches("input,select,textarea,[contenteditable]"); }
 function activatable(t) { return !!t && t.nodeType === 1 && t.matches("button,summary,a,[role=button]"); }
+const isSteerMove = c => STKEYS.left.includes(c) || STKEYS.right.includes(c);
 
 addEventListener("keydown", e => {
   if (typingIn(e.target)) return;
   // se il focus è su un pulsante lascio che Spazio/Invio lo attivino (comportamento nativo)
   if (activatable(e.target) && (STOPKEYS.includes(e.code) || e.code === "Enter")) return;
   if (e.repeat) {
-    if (MOVEKEYS.includes(e.code) || STOPKEYS.includes(e.code)) { e.preventDefault(); return; }
+    if (isSteerMove(e.code) || STOPKEYS.includes(e.code)) { e.preventDefault(); return; }
     if (LVKEYS.up.includes(e.code))   { e.preventDefault(); nudgeLever(+leverStep()); return; }
     if (LVKEYS.down.includes(e.code)) { e.preventDefault(); nudgeLever(-leverStep()); return; }
     return;
   }
   if (STOPKEYS.includes(e.code)) { e.preventDefault(); panic(); return; }
-  if (MOVEKEYS.includes(e.code)) { keys.add(e.code); e.preventDefault(); return; }
+  if (isSteerMove(e.code)) { steerHeld.add(e.code); e.preventDefault(); return; }
+  if (STKEYS.center.includes(e.code)) { e.preventDefault(); setSteer(centerVal()); return; }
   if (LVKEYS.up.includes(e.code))   { e.preventDefault(); nudgeLever(+leverStep()); return; }
   if (LVKEYS.down.includes(e.code)) { e.preventDefault(); nudgeLever(-leverStep()); return; }
   if (LVKEYS.zero.includes(e.code)) { e.preventDefault(); setLever(LV.min); return; }
@@ -370,24 +336,11 @@ addEventListener("keydown", e => {
 });
 addEventListener("keyup", e => {
   if (typingIn(e.target)) return;
-  if (MOVEKEYS.includes(e.code)) keys.delete(e.code);
+  if (isSteerMove(e.code)) steerHeld.delete(e.code);
 });
 
-function keyTick() {
-  const tx = held("right") - held("left");
-  const ty = held("up") - held("down");
-  const n = Math.hypot(tx, ty) || 1;
-  const gx = tx / n, gy = ty / n;
-  const k = clamp(+AX.keyRamp || 0.28, 0.05, 1);   // rampa morbida
-  keyVec.x += (gx - keyVec.x) * k;
-  keyVec.y += (gy - keyVec.y) * k;
-  if (Math.abs(keyVec.x) < 1e-3) keyVec.x = 0;
-  if (Math.abs(keyVec.y) < 1e-3) keyVec.y = 0;
-}
-
 /* ── input: gamepad ──────────────────────────────────── */
-const gpVec = { x: 0, y: 0 };
-let gpActive = false, gpLast = performance.now(), gpRevPrev = false;
+let gpActive = false, gpLast = performance.now(), gpRevPrev = false, gpSteerAxis = null;
 const badge = $("#gpBadge");
 
 addEventListener("gamepadconnected", e => {
@@ -395,7 +348,7 @@ addEventListener("gamepadconnected", e => {
   log("sys", "gamepad: " + e.gamepad.id);
 });
 addEventListener("gamepaddisconnected", () => {
-  if (!(navigator.getGamepads() || []).some(Boolean)) { badge.hidden = true; gpActive = false; gpVec.x = gpVec.y = 0; }
+  if (!(navigator.getGamepads() || []).some(Boolean)) { badge.hidden = true; gpActive = false; gpSteerAxis = null; }
   log("sys", "gamepad scollegato");
 });
 
@@ -403,24 +356,17 @@ function gpTick() {
   const pads = navigator.getGamepads ? navigator.getGamepads() : [];
   let gp = null;
   for (const p of pads) if (p && p.connected) { gp = p; break; }
-  if (!gp) { gpActive = false; return; }
+  if (!gp) { gpActive = false; gpSteerAxis = null; return; }
   badge.hidden = false;
-
-  const ax = AX.gamepadAxes || [0, 1];
-  let x = gp.axes[ax[0]] || 0, y = -(gp.axes[ax[1]] || 0);
-  const D = AX.gamepadDpad || {};
+  gpActive = true;
   const dp = i => i !== undefined && gp.buttons[i] && gp.buttons[i].pressed;
-  if (dp(D.up) || dp(D.down) || dp(D.left) || dp(D.right)) {
-    const dx = (dp(D.right) ? 1 : 0) - (dp(D.left) ? 1 : 0);
-    const dy = (dp(D.up) ? 1 : 0) - (dp(D.down) ? 1 : 0);
-    const n = Math.hypot(dx, dy) || 1;
-    x = dx / n; y = dy / n;
-  }
-  const m = Math.hypot(x, y);
-  gpActive = m > 0.08;
-  gpVec.x = x; gpVec.y = y;
 
-  // la leva si muove col grilletto o con l'asse indicato, a velocità costante
+  // sterzo: asse orizzontale, assoluto
+  const sa = ST.gamepadAxis, dzn = +ST.gamepadDeadzone || 0.12;
+  gpSteerAxis = (sa !== null && sa !== undefined && gp.axes[sa] !== undefined && Math.abs(gp.axes[sa]) > dzn)
+    ? clamp(gp.axes[sa], -1, 1) : null;
+
+  // leva velocità: grilletto o asse indicato, a velocità costante
   const dt = Math.min(0.1, (performance.now() - gpLast) / 1000);
   gpLast = performance.now();
   const rate = (+LV.gamepadRate || 80) * dt;
@@ -430,6 +376,7 @@ function gpTick() {
   if (dp(LV.gamepadUp)) delta += rate;
   if (dp(LV.gamepadDown)) delta -= rate;
   if (delta) nudgeLever(delta);
+
   // tasto del gamepad che inverte la marcia, sul fronte di pressione
   const rb = RV.gamepadButton;
   if (rb !== null && rb !== undefined) {
@@ -439,7 +386,7 @@ function gpTick() {
   }
 }
 
-/* ── pulsanti su schermo, generati da config.js ──────── */
+/* ── etichette dei tasti ─────────────────────────────── */
 function keyLabel(code) {
   if (!code) return "";
   if (code.startsWith("Key")) return code.slice(3);
@@ -450,30 +397,105 @@ function keyLabel(code) {
   return code;
 }
 
-// legenda dei tasti, ricavata dalla configurazione
-$("#padKeys").textContent = [DIRKEYS.up[0], DIRKEYS.left[0], DIRKEYS.down[0], DIRKEYS.right[0]]
-  .filter(Boolean).map(keyLabel).join("");
-$("#leverLbl").textContent = LV.label || "velocità";
-$("#leverKeys").textContent = [
-  LVKEYS.up[0] && keyLabel(LVKEYS.up[0]) + " su",
-  LVKEYS.down[0] && keyLabel(LVKEYS.down[0]) + " giù",
-  LVKEYS.zero[0] && keyLabel(LVKEYS.zero[0]) + " azzera",
-  (LV.reverse && LV.reverse.keys && LV.reverse.keys[0]) && keyLabel(LV.reverse.keys[0]) + " marcia"
-].filter(Boolean).join(" · ");
-
 // dopo un click col mouse/dito tolgo il focus dal pulsante: così Spazio resta lo STOP
 document.addEventListener("pointerup", e => {
   const b = e.target && e.target.closest && e.target.closest("button");
   if (b) b.blur();
 });
 
-/* ── levetta della velocità ──────────────────────────── */
+/* ── levetta orizzontale — angolo ────────────────────── */
+const steerEl = $("#steer"), steerRail = steerEl.querySelector(".hrail"),
+      steerFill = $("#steerFill"), steerHandle = $("#steerHandle"), steerValEl = $("#steerVal");
+function centerVal() { return Math.round(clamp(+ST.center || 0, ST.min, ST.max)); }
+let steerRaw = clamp(ST.start != null ? +ST.start : centerVal(), ST.min, ST.max);
+let steerVal = Math.round(steerRaw);   // valore pubblicato: sempre intero
+let steerId = null, steerSrc = "idle";
+
+function steerNorm() { return (steerVal - ST.min) / (ST.max - ST.min); }   // 0..1
+function setSteerRaw(v) {
+  steerRaw = clamp(v, ST.min, ST.max);
+  const nv = Math.round(steerRaw);
+  if (nv === steerVal) return;
+  steerVal = nv;
+  renderSteer();
+}
+function setSteer(v) { steerRaw = clamp(v, ST.min, ST.max); setSteerRaw(steerRaw); renderSteer(); }
+function steerStep() { return +ST.step || 1; }
+function renderSteer() {
+  const p = steerNorm();
+  const cp = (centerVal() - ST.min) / (ST.max - ST.min);
+  const lo = Math.min(cp, p) * 100, hi = Math.max(cp, p) * 100;
+  steerFill.style.left = lo + "%";
+  steerFill.style.width = (hi - lo) + "%";
+  steerHandle.style.left = "calc(" + (p * 100) + "% - " + (steerHandle.offsetWidth / 2) + "px)";
+  steerValEl.textContent = steerVal + (ST.unit || "");
+  steerEl.setAttribute("aria-valuemin", ST.min);
+  steerEl.setAttribute("aria-valuemax", ST.max);
+  steerEl.setAttribute("aria-valuenow", steerVal);
+}
+function steerFromPointer(ev) {
+  const r = steerRail.getBoundingClientRect();
+  const p = clamp((ev.clientX - r.left) / r.width, 0, 1);
+  setSteer(ST.min + p * (ST.max - ST.min));
+}
+steerEl.addEventListener("pointerdown", ev => {
+  if (steerId !== null) return;
+  steerId = ev.pointerId;
+  steerEl.classList.add("live");
+  try { steerEl.setPointerCapture(steerId); } catch (e) {}
+  steerFromPointer(ev);
+  ev.preventDefault();
+});
+steerEl.addEventListener("pointermove", ev => { if (ev.pointerId === steerId) { steerFromPointer(ev); ev.preventDefault(); } });
+function steerReleaseEv(ev) {
+  if (ev.pointerId !== steerId) return;
+  try { steerEl.releasePointerCapture(steerId); } catch (e) {}
+  steerId = null;
+  steerEl.classList.remove("live");
+  if (ST.spring) setSteer(centerVal());
+}
+steerEl.addEventListener("pointerup", steerReleaseEv);
+steerEl.addEventListener("pointercancel", steerReleaseEv);
+steerEl.addEventListener("lostpointercapture", steerReleaseEv);
+steerEl.addEventListener("contextmenu", e => e.preventDefault());
+steerEl.addEventListener("wheel", ev => { ev.preventDefault(); nudgeSteer(ev.deltaY < 0 ? steerStep() : -steerStep()); }, { passive: false });
+steerEl.addEventListener("keydown", ev => {
+  const k = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[ev.key];
+  if (k) { ev.preventDefault(); nudgeSteer(k * steerStep()); }
+  else if (ev.key === "Home") { ev.preventDefault(); setSteer(ST.max); }
+  else if (ev.key === "End") { ev.preventDefault(); setSteer(ST.min); }
+  else if (ev.key === " " || ev.key === "Enter") { ev.preventDefault(); setSteer(centerVal()); }
+});
+function nudgeSteer(d) { setSteer(steerRaw + d); steerSrc = "manuale"; }
+
+// per la tastiera/gamepad: aggiornamento continuo ogni frame
+function steerFrame(dt) {
+  if (steerId !== null) { steerSrc = "sterzo"; return; }
+  if (gpSteerAxis !== null) { setSteer(ST.min + (gpSteerAxis + 1) / 2 * (ST.max - ST.min)); steerSrc = "gamepad"; return; }
+  const d = (STKEYS.right.some(c => steerHeld.has(c)) ? 1 : 0) - (STKEYS.left.some(c => steerHeld.has(c)) ? 1 : 0);
+  if (d) { setSteerRaw(steerRaw + d * (+ST.rate || (ST.max - ST.min)) * dt); steerSrc = "tastiera"; return; }
+  if (ST.spring) setSteer(centerVal());
+  steerSrc = "idle";
+}
+
+// tacche di riferimento orizzontali
+(() => {
+  const t = $("#steerTicks");
+  for (let i = 0; i <= 10; i++) {
+    const d = document.createElement("i");
+    d.style.left = (i * 10) + "%";
+    if (i % 5 === 0) d.className = "big";
+    t.appendChild(d);
+  }
+})();
+
+/* ── levetta verticale — velocità ────────────────────── */
 const leverEl = $("#lever"), railEl = leverEl.querySelector(".rail"),
       fillEl = $("#leverFill"), handleEl = $("#leverHandle"), leverValEl = $("#leverVal");
-let leverVal = clamp(+LV.start || 0, LV.min, LV.max);
+let leverRaw = clamp(+LV.start || 0, LV.min, LV.max);   // accumulatore continuo
+let leverVal = Math.round(leverRaw);                    // valore pubblicato: sempre intero
 let leverId = null;
 
-const RV = LV.reverse || {};
 const dirBtn = $("#dirBtn"), dirArrow = $("#dirArrow"), dirLabel = $("#dirLabel");
 let dirFwd = RV.start === 0 ? 0 : 1;      // 1 = avanti · 0 = retromarcia
 
@@ -499,17 +521,18 @@ dirBtn.addEventListener("click", toggleDir);
 function leverStep() { return +LV.step || 1; }
 function leverNorm() { return (leverVal - LV.min) / (LV.max - LV.min); }   // 0..1
 function setLever(v) {
-  const nv = clamp(Math.round(v * 1000) / 1000, LV.min, LV.max);
+  leverRaw = clamp(v, LV.min, LV.max);
+  const nv = Math.round(leverRaw);
   if (nv === leverVal) return;
   leverVal = nv;
   renderLever();
 }
-function nudgeLever(d) { setLever(leverVal + d); }
+function nudgeLever(d) { setLever(leverRaw + d); }
 function renderLever() {
   const p = leverNorm();
   fillEl.style.height = (p * 100) + "%";
   handleEl.style.bottom = "calc(" + (p * 100) + "% - " + (handleEl.offsetHeight / 2) + "px)";
-  const shown = Math.round(leverVal) + (LV.unit || "");
+  const shown = leverVal + (LV.unit || "");
   leverValEl.textContent = shown;
   oSpeed.textContent = shown;
   leverEl.setAttribute("aria-valuemin", LV.min);
@@ -561,17 +584,14 @@ leverEl.addEventListener("keydown", ev => {
 
 /* ── STOP ────────────────────────────────────────────── */
 function zeroAll() {
-  keys.clear();
-  keyVec.x = keyVec.y = 0;
-  padVec.x = padVec.y = 0;
-  padActive = false; padId = null;
-  pad.classList.remove("live");
+  steerHeld.clear();
+  setSteer(centerVal());
 }
 function panic() {
   zeroAll();
+  setLever(LV.min);                       // sterzo dritto, manetta a zero
   const T = topics();
-  const p = movePayload(0, 0, "stop");
-  setLever(LV.min);                       // la manetta torna a zero
+  const p = movePayload("stop");
   if (T.move && pub(T.move, p.payload, F.retain.checked)) lastKey = p.key;
   speedTick(true);                        // e la velocità a zero viene pubblicata subito
 }
@@ -581,61 +601,31 @@ addEventListener("blur", zeroAll);
 document.addEventListener("visibilitychange", () => { if (document.hidden) zeroAll(); });
 addEventListener("pagehide", () => { if (client && connected) { try { client.end(true); } catch (e) {} } });
 
-/* ── vettore corrente + payload ──────────────────────── */
-function rawVec() {
-  if (padActive) return { x: padVec.x, y: padVec.y, src: "pad" };
-  if (gpActive)  return { x: gpVec.x,  y: gpVec.y,  src: "gamepad" };
-  if (keyVec.x || keyVec.y) return { x: keyVec.x, y: keyVec.y, src: "tastiera" };
-  return { x: 0, y: 0, src: "idle" };
-}
-function outVec() {
-  const v = rawVec();
-  let x = v.x, y = v.y;
-  let m = Math.hypot(x, y);
-  if (m > 1) { x /= m; y /= m; m = 1; }
-  const dz = clamp((+F.dz.value || 0) / 100, 0, 0.9);
-  if (m <= dz) { x = 0; y = 0; m = 0; }
-  else if (dz > 0) { const s = ((m - dz) / (1 - dz)) / m; x *= s; y *= s; m = Math.hypot(x, y); }
-  const lim = LV.scalesStick ? leverNorm() : 1;
-  x *= lim; y *= lim; m *= lim;
-  if (F.invY.checked) y = -y;
-  return { x: r3(x), y: r3(y), m: r3(m), src: v.src };
-}
-
-const DIRS = ["right","up-right","up","up-left","left","down-left","down","down-right"];
-const pct = v => Math.round(v * 100);
-
-// tutte le grandezze disponibili ai template
-function moveVals(x, y, src, t) {
-  const m = Math.min(1, Math.hypot(x, y));
-  const a = m > 0 ? Math.round(Math.atan2(y, x) * 180 / Math.PI) : 0;
-  const l = r3(clamp(y + x, -1, 1)), r = r3(clamp(y - x, -1, 1));
+/* ── valori + payload (tutti interi) ─────────────────── */
+function moveVals(src, t) {
+  const angle = steerVal, c = centerVal();
   return {
-    x: r3(x), y: r3(y), m: r3(m), a: a, l: l, r: r, src: src, t: t,
-    heading: m > 0 ? DIRS[Math.round(((a + 360) % 360) / 45) % 8] : "stop",
-    xi: pct(x), yi: pct(y), mi: pct(m), li: pct(l), ri: pct(r),
-    speed: r3(leverVal), speedi: Math.round(leverVal), speedn: r3(leverNorm()),
-    dir: dirFwd
+    angle: angle, anglei: angle, a: angle,
+    heading: angle < c ? "left" : angle > c ? "right" : "straight",
+    speed: leverVal, speedi: leverVal, dir: dirFwd,
+    src: src, t: t
   };
 }
 function fillTpl(tpl, vals) {
   return String(tpl).replace(/\{(\w+)\}/g, (s, k) => (k in vals ? vals[k] : s));
 }
 
-function movePayload(x, y, src) {
-  const v = moveVals(x, y, src, Date.now());
+function movePayload(src) {
+  const v = moveVals(src, Date.now());
   const withType = F.addType.checked;
   switch (F.fmt.value) {
-    case "csv": {
-      const key = fx(v.x) + "," + fx(v.y);
+    case "csv":
+    case "tank": {
+      const key = String(v.angle);
       return { payload: key, key: key };
     }
     case "dir":
       return { payload: v.heading, key: v.heading };
-    case "tank": {
-      const o = withType ? { type: "move", l: v.l, r: v.r, t: v.t } : { l: v.l, r: v.r, t: v.t };
-      return { payload: JSON.stringify(o), key: "t" + v.l + "," + v.r };
-    }
     case "raw":
       return { payload: F.rawMove.value, key: "raw:" + F.rawMove.value };
     case "custom": {
@@ -644,20 +634,16 @@ function movePayload(x, y, src) {
       return { payload: fillTpl(tpl, v), key: fillTpl(tpl, noT) };
     }
     default: {
-      const o = withType
-        ? { type: "move", x: v.x, y: v.y, m: v.m, a: v.a, src: v.src, t: v.t }
-        : { x: v.x, y: v.y, m: v.m, a: v.a, src: v.src, t: v.t };
-      return { payload: JSON.stringify(o), key: fx(v.x) + "," + fx(v.y) };
+      const o = withType ? { type: "move", angle: v.angle, t: v.t } : { angle: v.angle, t: v.t };
+      return { payload: JSON.stringify(o), key: String(v.angle) };
     }
   }
 }
 
 function speedPayload() {
   const t = Date.now();
-  const fmt = F.fmt.value;
-  const v = outVec();
-  const vals = moveVals(v.x, v.y, v.src, t);
-  switch (fmt) {
+  const vals = moveVals("speed", t);
+  switch (F.fmt.value) {
     case "csv":
     case "dir": return vals.speedi + "," + vals.dir;
     case "raw": return F.rawSpeed.value;
@@ -681,19 +667,19 @@ function tick() {
   if (!client || !connected) return;
   const T = topics();
   if (!T.move) return;
-  const v = outVec();
-  const p = movePayload(v.x, v.y, v.src);
+  const p = movePayload(steerSrc);
   const now = performance.now();
   const hb = +F.hb.value || 0;
   const send = !F.onchange.checked || p.key !== lastKey || (hb > 0 && now - lastPubAt >= hb);
   if (!send) return;
-  // il log si limita da solo (5 righe/s), ma l'arresto si vede sempre
-  const stopping = v.m === 0 && !wasNeutral;
+  // il log si limita da solo, ma il ritorno "dritto" si vede sempre
+  const centered = steerVal === centerVal();
+  const stopping = centered && !wasNeutral;
   const quiet = now - lastTxLog < 200 && !stopping;
   if (pub(T.move, p.payload, F.retain.checked, quiet)) {
     lastKey = p.key;
     lastPubAt = now;
-    wasNeutral = v.m === 0;
+    wasNeutral = centered;
     if (!quiet) lastTxLog = now;
   }
 }
@@ -705,7 +691,7 @@ function speedTick(force) {
   const T = topics();
   if (!T.speed) return;
   const payload = speedPayload();
-  const key = Math.round(leverVal) + ":" + dirFwd;
+  const key = leverVal + ":" + dirFwd;
   const now = performance.now();
   const hb = +F.hb.value || 0;
   // la leva è un valore impostato, non un flusso: niente raffica anche in modalità continua
@@ -714,41 +700,22 @@ function speedTick(force) {
 }
 
 /* ── render ──────────────────────────────────────────── */
-const oX = $("#oX"), oY = $("#oY"), oM = $("#oM"), oA = $("#oA"), oSrc = $("#oSrc"),
-      oRate = $("#oRate"), oSent = $("#oSent"), oRtt = $("#oRtt"),
-      mL = $("#mL"), mR = $("#mR"), oSpeed = $("#oSpeed");
+const oA = $("#oA"), oSrc = $("#oSrc"),
+      oRate = $("#oRate"), oSent = $("#oSent"), oRtt = $("#oRtt"), oSpeed = $("#oSpeed");
 
-function bar(el, v) {
-  const w = Math.abs(v) * 50;
-  el.style.width = w + "%";
-  el.style.left = v >= 0 ? "50%" : (50 - w) + "%";
-}
-
+let lastFrame = performance.now();
 function render() {
-  keyTick();
-  gpTick();
-
-  const raw = rawVec();
-  const rect = pad.getBoundingClientRect();
-  const R = (rect.width - knob.offsetWidth) / 2 || 0;
-  knob.style.transform = "translate(-50%,-50%) translate(" + (raw.x * R).toFixed(1) + "px," + (-raw.y * R).toFixed(1) + "px)";
-  vecLine.setAttribute("x2", raw.x.toFixed(3));
-  vecLine.setAttribute("y2", (-raw.y).toFixed(3));
-  pad.classList.toggle("live", padActive || raw.src === "gamepad" || raw.src === "tastiera");
-
-  const v = outVec();
-  oX.textContent = fx(v.x);
-  oY.textContent = fx(v.y);
-  oM.textContent = fx(v.m);
-  oA.textContent = v.m > 0 ? Math.round(Math.atan2(v.y, v.x) * 180 / Math.PI) + "°" : "—";
-  oSrc.textContent = v.src;
-  const stalled = LV.scalesStick && leverNorm() === 0 && Math.hypot(raw.x, raw.y) > 0.05;
-  oSpeed.style.color = stalled ? "var(--danger)" : "";
-  oSpeed.title = stalled ? "velocità a zero: lo stick non produce movimento" : "";
-  bar(mL, clamp(v.y + v.x, -1, 1));
-  bar(mR, clamp(v.y - v.x, -1, 1));
-
   const now = performance.now();
+  const dt = Math.min(0.1, (now - lastFrame) / 1000);
+  lastFrame = now;
+
+  gpTick();
+  steerFrame(dt);
+
+  steerEl.classList.toggle("live", steerId !== null || steerSrc === "gamepad" || steerSrc === "tastiera");
+  oA.textContent = steerVal + "°";
+  oSrc.textContent = steerSrc;
+
   while (stats.window.length && now - stats.window[0] > 1000) stats.window.shift();
   oRate.textContent = stats.window.length;
   oSent.textContent = stats.sent;
@@ -786,7 +753,7 @@ function syncFmtUI() {
   const f = F.fmt.value;
   $("#fTplMove").hidden = $("#fTplSpeed").hidden = f !== "custom";
   $("#fRawMove").hidden = $("#fRawSpeed").hidden = f !== "raw";
-  F.addType.closest(".f").hidden = f !== "json" && f !== "tank";   // il campo type vale solo per i JSON
+  F.addType.closest(".f").hidden = f !== "json";   // il campo type vale solo per i JSON
 }
 const NEEDS_RECONNECT = ["host", "port", "path", "tls", "cid", "user", "pass", "proto", "keepalive", "reconnect", "clean"];
 const URL_FIELDS = ["host", "port", "path", "tls"];
@@ -798,10 +765,9 @@ for (const k in F) {
     saveCfg();
     refreshHint();
     if (k === "rate" && timer) startTimer();
-    if (["fmt","addType","tplMove","tplSpeed","rawMove","rawSpeed","tMove","retain"].includes(k)) lastKey = null;
+    if (["fmt","addType","tplMove","rawMove","tMove","retain"].includes(k)) lastKey = null;
     if (["fmt","addType","tplSpeed","rawSpeed","tSpeed"].includes(k)) lastSpeedKey = null;
     if (k === "fmt") syncFmtUI();
-    if (k === "dz") dzCircle.setAttribute("r", String(clamp((+F.dz.value || 0) / 100, 0, 0.9) || 0.001));
     if (k === "sub" || k === "tMove" || k === "tSpeed") resubscribe();
     if (NEEDS_RECONNECT.includes(k) && client) log("sys", "modifica applicata alla prossima connessione");
   };
@@ -811,27 +777,43 @@ for (const k in F) {
   }
 }
 
+// legende dei tasti, ricavate dalla configurazione
+$("#steerLbl").textContent = ST.label || "angolo";
+$("#steerKeys").textContent = [
+  STKEYS.left[0] && keyLabel(STKEYS.left[0]) + " sx",
+  STKEYS.right[0] && keyLabel(STKEYS.right[0]) + " dx",
+  STKEYS.center[0] && keyLabel(STKEYS.center[0]) + " dritto"
+].filter(Boolean).join(" · ");
+$("#leverLbl").textContent = LV.label || "velocità";
+$("#leverKeys").textContent = [
+  LVKEYS.up[0] && keyLabel(LVKEYS.up[0]) + " su",
+  LVKEYS.down[0] && keyLabel(LVKEYS.down[0]) + " giù",
+  LVKEYS.zero[0] && keyLabel(LVKEYS.zero[0]) + " azzera",
+  (RV.keys && RV.keys[0]) && keyLabel(RV.keys[0]) + " marcia"
+].filter(Boolean).join(" · ");
 
 refreshHint();
 refreshUrl();
 syncFmtUI();
+renderSteer();
 renderLever();
 renderDir();
-dzCircle.setAttribute("r", String(clamp((+F.dz.value || 0) / 100, 0, 0.9) || 0.001));
-if (!F.pubTopic.value) F.pubTopic.value = topics().btn || topics().move;
+if (!F.pubTopic.value) F.pubTopic.value = topics().speed || topics().move;
+
 // segnala le sovrapposizioni in config.js invece di ignorarle in silenzio
 function checkConfig() {
   for (const code of (RV.keys || [])) {
-    if (MOVEKEYS.includes(code)) log("err", "config.js: " + code + " serve sia allo stick sia alla retromarcia: vince lo stick");
+    if (STEERKEYS.includes(code)) log("err", "config.js: " + code + " serve sia allo sterzo sia alla retromarcia: vince lo sterzo");
     else if (LEVERKEYS.includes(code)) log("err", "config.js: " + code + " è sia un tasto della leva sia la retromarcia: vince la leva");
   }
   for (const code of LEVERKEYS) {
-    if (MOVEKEYS.includes(code)) log("err", "config.js: " + code + " serve sia allo stick sia alla leva: vince lo stick");
+    if (STEERKEYS.includes(code)) log("err", "config.js: " + code + " serve sia allo sterzo sia alla leva velocità: vince lo sterzo");
     else if (STOPKEYS.includes(code)) log("err", "config.js: " + code + " è sia STOP sia un tasto della leva: vince STOP");
   }
   for (const code of STOPKEYS) {
-    if (MOVEKEYS.includes(code)) log("err", "config.js: " + code + " è sia STOP sia un tasto dello stick: vince STOP");
+    if (STEERKEYS.includes(code)) log("err", "config.js: " + code + " è sia STOP sia un tasto dello sterzo: vince STOP");
   }
+  if (!(ST.max > ST.min)) log("err", "config.js: la scala dello sterzo non è valida (max deve superare min)");
   if (!(LV.max > LV.min)) log("err", "config.js: la scala della leva non è valida (max deve superare min)");
   if (!window.JOYSTICK_CONFIG) log("err", "config.js non caricato: uso la configurazione di riserva");
 }

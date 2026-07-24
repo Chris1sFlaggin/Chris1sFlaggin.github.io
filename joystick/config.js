@@ -3,6 +3,11 @@
    Questo è l'unico file da toccare per personalizzare comandi e valori
    iniziali. Niente build: salvi e ricarichi la pagina.
 
+   Due comandi, due levette:
+     · sinistra, orizzontale → l'ANGOLO di sterzata (intero) sul topic movimento
+     · destra, verticale     → la VELOCITÀ (intero) + marcia sul topic velocità
+   Tutti i numeri pubblicati sono interi.
+
    Nota: le impostazioni che cambi dall'interfaccia vengono ricordate nel
    browser e hanno la precedenza su "defaults". Il pulsante "Reset
    impostazioni" cancella la memoria e rimette i valori di questo file.
@@ -10,29 +15,56 @@
 
 window.JOYSTICK_CONFIG = {
 
-  /* ── LEVETTA DELLA VELOCITÀ ──────────────────────────────────────────────
-     La leva verticale accanto allo stick. Resta dove la lasci (come una
-     manetta vera) e stabilisce quanto va veloce il mezzo.
+  /* ── LEVETTA ORIZZONTALE — ANGOLO ────────────────────────────────────────
+     La leva a sinistra, al posto del vecchio joystick. Manda solo l'angolo
+     come numero intero sul topic del movimento.
+
+       topic        dove pubblicare l'angolo (vuoto = topic movimento)
+       label        scritta sotto la leva
+       unit         unità mostrata accanto al numero (° per i gradi)
+       min, max     estremi della scala: il valore pubblicato in {angle}
+                    è questo numero intero (es. -90 tutto a sinistra,
+                    +90 tutto a destra)
+       center       posizione "dritto" (di solito 0)
+       start        valore all'apertura (non viene ricordato: si riparte da qui)
+       step         scatto di tastiera e rotellina del mouse
+       spring       true = torna dritto (center) appena la lasci
+       rate         gradi al secondo tenendo premuto un tasto di sterzata
+       keys         tasti: sinistra, destra, dritto
+       gamepadAxis  asse orizzontale che sterza (0 = stick sinistro), assoluto
+       gamepadDeadzone  soglia sotto cui l'asse del gamepad viene ignorato    */
+  steer: {
+    topic: "",
+    label: "angolo",
+    unit: "°",
+    min: 0,
+    max: 180,
+    center: 90,
+    start: 90,
+    step: 5,
+    spring: true,
+    rate: 180,
+    keys: { left: ["KeyA", "ArrowLeft"], right: ["KeyD", "ArrowRight"], center: ["KeyS", "ArrowDown"] },
+    gamepadAxis: 0,
+    gamepadDeadzone: 0.12
+  },
+
+  /* ── LEVETTA VERTICALE — VELOCITÀ ────────────────────────────────────────
+     La leva a destra. Resta dove la lasci (come una manetta vera) e
+     stabilisce quanto va veloce il mezzo. Manda solo interi.
 
        topic        dove viene pubblicata la posizione della leva
-       label        scritta sotto la leva
-       unit         unità mostrata accanto al numero
-       min, max     estremi della scala: il valore pubblicato in {speed}
-                    è questo numero, non una percentuale
-       start        valore all'apertura della pagina (non viene ricordato
-                    fra una sessione e l'altra: si riparte sempre da qui)
+       label, unit  come sopra
+       min, max     estremi della scala: {speed} è questo intero
+       start        valore all'apertura (non viene ricordato)
        step         scatto di tastiera e rotellina del mouse
        spring       true = torna a "min" appena la lasci
-       scalesStick  true = moltiplica l'uscita dello stick, cioè x e y
-                    escono già ridotti in proporzione alla leva
        keys         tasti: su, giù, azzera
-       gamepadAxis  asse che muove la leva (3 = verticale dello stick
-                    destro), null per disattivarlo
-       gamepadUp/Down  tasti del gamepad che alzano/abbassano la leva
-                    (7 = R2, 6 = L2)
+       gamepadAxis  asse che muove la leva (3 = verticale stick destro)
+       gamepadUp/Down  tasti del gamepad che alzano/abbassano la leva (7=R2 6=L2)
        gamepadRate  quanto si muove la leva col gamepad, per secondo
-       reverse      il bottoncino avanti/retromarcia: pubblica {dir},
-                    1 = avanti (predefinito), 0 = retromarcia            */
+       reverse      bottoncino avanti/retromarcia: pubblica {dir},
+                    1 = avanti (predefinito), 0 = retromarcia                 */
   lever: {
     topic: "esp32_car_fralor/speed",
     label: "velocità",
@@ -42,7 +74,6 @@ window.JOYSTICK_CONFIG = {
     start: 120,
     step: 5,
     spring: false,
-    scalesStick: true,
     keys: { up: ["KeyR"], down: ["KeyF"], zero: ["KeyZ"] },
     gamepadAxis: 3,
     gamepadUp: 7,
@@ -57,20 +88,8 @@ window.JOYSTICK_CONFIG = {
     }
   },
 
-  /* ── STICK ───────────────────────────────────────────────────────────────
-     Tasti che muovono lo stick e mappatura del gamepad.                    */
-  axis: {
-    up:    ["KeyW", "ArrowUp"],
-    down:  ["KeyS", "ArrowDown"],
-    left:  ["KeyA", "ArrowLeft"],
-    right: ["KeyD", "ArrowRight"],
-    gamepadAxes: [0, 1],                              // stick sinistro: [asse X, asse Y]
-    gamepadDpad: { up: 12, down: 13, left: 14, right: 15 },
-    keyRamp: 0.28                                     // 1 = scatto secco, 0.1 = molto morbido
-  },
-
   /* ── STOP ────────────────────────────────────────────────────────────────
-     Azzera stick e leva e pubblica lo zero sul topic del movimento.        */
+     Rimette dritto lo sterzo, azzera la velocità e pubblica lo zero.        */
   stopKeys: ["Space"],
 
   /* ── VALORI INIZIALI ─────────────────────────────────────────────────────
@@ -97,19 +116,17 @@ window.JOYSTICK_CONFIG = {
     retain: false,
     subscribe: true,            // riascolta i propri topic: eco nel log e misura dell'RTT
 
-    // payload: "json" | "tank" | "csv" | "dir" | "custom" | "raw"
+    // payload: "json" | "csv" | "dir" | "custom" | "raw" — sempre interi
     format: "json",
     addType: false,
-    templateMove: '{"x":{x},"y":{y},"v":{speedi}}',
+    templateMove: '{"angle":{angle}}',
     templateSpeed: '{"speed":{speed}, "dir": {dir}}',
     rawMove: "1",
     rawSpeed: "1",
 
     // comportamento
     rateHz: 20,
-    deadzone: 8,                // percentuale
     heartbeatMs: 1000,          // 0 = nessun heartbeat
-    onlyOnChange: true,
-    invertY: false
+    onlyOnChange: true
   }
 };
