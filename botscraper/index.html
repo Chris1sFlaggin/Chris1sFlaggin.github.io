@@ -1,0 +1,457 @@
+---
+# front-matter vuoto: serve solo a far includere la pagina in sitemap.xml
+sitemap:
+  priority: 0.8
+  changefreq: monthly
+---
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BotScraper — trova e rimuovi i follower bot su Instagram</title>
+<meta name="description" content="BotScraper: tool da console per analizzare follower e commenti Instagram, assegnare un bot-score e ripulire l'account. Gira nel browser, nessun dato esce dal tuo PC.">
+<meta name="keywords" content="instagram bot, follower bot, bot score, instagram cleanup, unfollowers, spam comments, instagram tool">
+<meta name="theme-color" content="#121110">
+
+<meta property="og:title" content="BotScraper — trova e rimuovi i follower bot">
+<meta property="og:description" content="Analizza follower e commenti, assegna un bot-score, ripulisci. Tutto in console, nessun dato fuori dal tuo PC.">
+<meta property="og:type" content="website">
+
+<style>
+:root{
+  --sumi:#121110;
+  --sumi-2:#1a1917;
+  --sumi-3:#222020;
+  --shu:#e0402f;
+  --washi:#f2efe9;
+  --hai:#8a8782;
+  --hai-line:#8a878222;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Inter,Roboto,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --maxw:880px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(120% 80% at 80% -10%, #e0402f0d 0%, transparent 55%),
+    radial-gradient(80% 60% at 0% 110%, #ffffff05 0%, transparent 50%),
+    var(--sumi);
+  color:var(--washi);
+  font-family:var(--sans);
+  font-weight:300;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+::selection{background:var(--shu);color:var(--washi)}
+a{color:var(--shu);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 1.5rem}
+section{padding:3.5rem 0;border-bottom:1px solid var(--hai-line)}
+section:last-of-type{border-bottom:none}
+
+.eyebrow{
+  font-size:.68rem;letter-spacing:.36em;text-transform:uppercase;
+  color:var(--hai);margin-bottom:1rem;
+}
+h2{font-size:clamp(1.4rem,3.6vw,2rem);font-weight:300;letter-spacing:-.01em;line-height:1.2;margin-bottom:1rem}
+h2 em{font-style:normal;color:var(--shu)}
+h3{font-size:1.05rem;font-weight:400;margin-bottom:.4rem}
+p{color:var(--hai);max-width:62ch}
+p strong,li strong{color:var(--washi);font-weight:400}
+
+/* ---------- hero ---------- */
+.hero{padding:4.5rem 0 3.5rem;border-bottom:1px solid var(--hai-line)}
+.logo-row{display:flex;align-items:center;gap:1.1rem;margin-bottom:1.8rem}
+.seal{
+  width:3.4rem;height:3.4rem;border-radius:12px;background:var(--shu);
+  display:grid;place-items:center;flex:0 0 auto;
+  font-weight:600;font-size:1.1rem;letter-spacing:.06em;color:var(--washi);
+  box-shadow:0 12px 34px -10px #e0402f80, inset 0 0 0 1px #ffffff14;
+}
+.wordmark{font-size:clamp(1.9rem,6vw,2.7rem);font-weight:300;letter-spacing:.1em;line-height:1}
+.tagline{font-size:.66rem;letter-spacing:.3em;text-transform:uppercase;color:var(--hai);display:block;margin-top:.45rem}
+.hero p.lead{font-size:1.05rem;max-width:54ch}
+.badges{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.6rem}
+.badge{
+  font-size:.7rem;letter-spacing:.08em;color:var(--hai);
+  border:1px solid var(--hai-line);border-radius:999px;padding:.35rem .85rem;
+}
+
+/* ---------- warning ---------- */
+.warn{
+  margin-top:2rem;padding:1rem 1.2rem;border-radius:10px;
+  background:rgba(224,64,47,.08);border:1px solid rgba(224,64,47,.3);
+}
+.warn p{color:var(--washi);max-width:none;font-size:.95rem}
+
+/* ---------- steps ---------- */
+ol.steps{list-style:none;counter-reset:s;margin-top:1.5rem}
+ol.steps li{
+  counter-increment:s;position:relative;padding:.7rem 0 .7rem 2.6rem;
+  border-top:1px solid var(--hai-line);color:var(--washi);font-size:.95rem;
+}
+ol.steps li:first-child{border-top:none}
+ol.steps li::before{
+  content:counter(s);position:absolute;left:0;top:.85rem;
+  width:1.6rem;height:1.6rem;border-radius:50%;
+  border:1px solid rgba(224,64,47,.4);color:var(--shu);
+  display:grid;place-items:center;font-size:.72rem;
+}
+ol.steps li span{color:var(--hai);display:block;font-size:.88rem}
+
+/* ---------- tools / tabs ---------- */
+.tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin:1.8rem 0 1.4rem}
+.tab{
+  font-size:.8rem;letter-spacing:.05em;padding:.6rem 1.1rem;border-radius:8px;
+  border:1px solid var(--hai-line);background:#ffffff06;color:var(--washi);
+  cursor:pointer;transition:.2s ease;font-family:inherit;font-weight:300;
+}
+.tab:hover{border-color:#8a878255}
+.tab[aria-selected="true"]{
+  background:rgba(224,64,47,.14);border-color:rgba(224,64,47,.45);color:var(--washi);
+}
+.panel[hidden]{display:none}
+.panel .meta{font-size:.78rem;color:var(--hai);margin:.5rem 0 1rem;letter-spacing:.04em}
+.readonly{color:#7fb37f}
+
+.codebox{
+  position:relative;background:var(--sumi-2);border:1px solid var(--hai-line);
+  border-radius:12px;overflow:hidden;margin-top:1rem;
+}
+.codebox header{
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  padding:.7rem 1rem;border-bottom:1px solid var(--hai-line);background:#ffffff04;
+}
+.codebox header span{font-family:var(--mono);font-size:.72rem;color:var(--hai)}
+.codebox pre{
+  margin:0;padding:1rem;max-height:180px;overflow:auto;
+  font-family:var(--mono);font-size:.7rem;line-height:1.5;color:#9aa39a;
+  white-space:pre-wrap;word-break:break-all;
+}
+.btn{
+  font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;font-weight:400;
+  padding:.6rem 1.2rem;border-radius:8px;cursor:pointer;transition:.2s ease;
+  border:1px solid transparent;font-family:inherit;white-space:nowrap;
+}
+.btn-primary{background:var(--shu);color:var(--washi);box-shadow:0 8px 24px -10px #e0402f80}
+.btn-primary:hover{transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.5;cursor:wait;transform:none}
+.btn-ghost{border-color:var(--hai-line);color:var(--washi);background:#ffffff06}
+.btn-ghost:hover{border-color:var(--shu);color:var(--shu)}
+.dl{font-size:.76rem;color:var(--hai);margin-top:.7rem;display:inline-block}
+
+/* ---------- snippet ---------- */
+pre.snippet{
+  background:var(--sumi-2);border:1px solid var(--hai-line);border-radius:10px;
+  padding:1rem;overflow-x:auto;font-family:var(--mono);font-size:.74rem;
+  line-height:1.6;color:#9aa39a;margin-top:1rem;
+}
+pre.snippet .c{color:#6e6b66}
+
+/* ---------- notes grid ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem;margin-top:1.6rem}
+.card{
+  background:var(--sumi-2);border:1px solid var(--hai-line);border-radius:12px;padding:1.2rem;
+}
+.card p{font-size:.86rem}
+
+/* ---------- footer ---------- */
+footer{padding:2.5rem 0 3.5rem;color:var(--hai);font-size:.84rem}
+footer p{font-size:.84rem}
+footer .fine{margin-top:1rem;font-size:.76rem;opacity:.8}
+
+/* ---------- toast ---------- */
+#toast{
+  position:fixed;left:50%;bottom:2rem;transform:translateX(-50%) translateY(1rem);
+  background:var(--sumi-2);border:1px solid rgba(224,64,47,.45);color:var(--washi);
+  padding:.85rem 1.4rem;border-radius:10px;font-size:.85rem;z-index:10000;
+  opacity:0;pointer-events:none;transition:.25s ease;box-shadow:0 20px 50px -20px #000;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.err{border-color:#8a878255}
+
+@media (max-width:600px){
+  section{padding:2.6rem 0}
+  .codebox header{flex-direction:column;align-items:stretch}
+  .btn{width:100%}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- ======== HERO ======== -->
+  <header class="hero">
+    <div class="logo-row">
+      <span class="seal">BS</span>
+      <div>
+        <div class="wordmark">botscraper</div>
+        <span class="tagline">bot scanner · instagram</span>
+      </div>
+    </div>
+    <p class="lead">
+      Trova i <strong>follower bot</strong> di un account che gestisci, dà a ognuno un punteggio
+      da 0 a 100 e ti fa ripulire in blocco. Gira interamente nella console del browser:
+      niente da installare, <strong>nessun dato esce dal tuo PC</strong>.
+    </p>
+    <div class="badges">
+      <span class="badge">Nessuna installazione</span>
+      <span class="badge">Dati solo in locale</span>
+      <span class="badge">MIT</span>
+      <span class="badge">Fork di InstagramUnfollowers</span>
+    </div>
+    <div class="warn">
+      <p>⚠️ Usalo <strong>solo su account che gestisci con autorizzazione</strong>. Rimuovere follower
+      e cancellare commenti sono azioni irreversibili: la responsabilità dell'uso è tua.</p>
+    </div>
+  </header>
+
+  <!-- ======== COME FUNZIONA ======== -->
+  <section>
+    <div class="eyebrow">Come funziona</div>
+    <h2>Quattro passaggi, <em>zero installazioni</em></h2>
+    <ol class="steps">
+      <li>Scarica la lista follower e assegna un <strong>bot-score 0–100</strong> dai dati base:
+        username, nome, foto, profilo privato.
+        <span>Verificati e mutual (chi l'account segue indietro) sono sempre esclusi.</span></li>
+      <li><strong>Deep-scan</strong> opzionale sui soli candidati sospetti: rapporto follower/following,
+        numero di post, account creato di recente, bio.
+        <span>Scarica il profilo solo per chi è già stato segnalato, così le richieste restano poche.</span></li>
+      <li><strong>Revisione</strong>: la lista è ordinata per punteggio, sposti la soglia, controlli
+        e metti in whitelist i falsi positivi.
+        <span>La whitelist resta salvata tra una sessione e l'altra.</span></li>
+      <li><strong>Rimozione</strong> in blocco, con pause tra un'azione e l'altra per non farsi bloccare.
+        <span>4 secondi tra le azioni e una pausa più lunga ogni pochi rimossi.</span></li>
+    </ol>
+  </section>
+
+  <!-- ======== I TOOL ======== -->
+  <section>
+    <div class="eyebrow">Il codice</div>
+    <h2>Scegli il tool, <em>copia, incolla</em></h2>
+    <p>Tre strumenti separati. Copia il codice di quello che ti serve e incollalo nella console
+      di Instagram: le istruzioni complete sono qui sotto.</p>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true"  aria-controls="p-bot"      id="t-bot">Bot scanner</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="p-comments" id="t-comments">Commenti</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="p-monitor"  id="t-monitor">Monitor</button>
+    </div>
+
+    <div class="panel" id="p-bot" role="tabpanel" aria-labelledby="t-bot">
+      <h3>Bot scanner</h3>
+      <p>Analizza i follower, assegna il bot-score, permette il deep-scan dei sospetti e la
+        rimozione in blocco. È il tool principale.</p>
+      <div class="meta">Fa azioni sull'account · richiede il login come titolare</div>
+      <div class="codebox">
+        <header>
+          <span data-size>codice minificato</span>
+          <button class="btn btn-primary" data-copy="/botscraper/code/botscraper.js">Copia il codice</button>
+        </header>
+        <pre data-preview="/botscraper/code/botscraper.js">Caricamento anteprima…</pre>
+      </div>
+      <a class="dl" href="/botscraper/code/botscraper.js" download>↓ oppure scarica il file</a>
+    </div>
+
+    <div class="panel" id="p-comments" role="tabpanel" aria-labelledby="t-comments" hidden>
+      <h3>Scanner commenti</h3>
+      <p>Scansiona i commenti di tutti i post di un account, assegna un punteggio bot/spam,
+        poi ti fa rivedere ed eliminare. Opzionale: restrict, block o rimozione dell'autore.</p>
+      <div class="meta">Fa azioni sull'account · richiede il login come titolare</div>
+      <div class="codebox">
+        <header>
+          <span data-size>codice minificato</span>
+          <button class="btn btn-primary" data-copy="/botscraper/code/comments.js">Copia il codice</button>
+        </header>
+        <pre data-preview="/botscraper/code/comments.js">Caricamento anteprima…</pre>
+      </div>
+      <a class="dl" href="/botscraper/code/comments.js" download>↓ oppure scarica il file</a>
+    </div>
+
+    <div class="panel" id="p-monitor" role="tabpanel" aria-labelledby="t-monitor" hidden>
+      <h3>Monitor &amp; lead</h3>
+      <p>Trova account candidati e monitora nel tempo quelli che segui, con stima di follower
+        bot, spam e un report sullo stato di salute dell'account.</p>
+      <div class="meta"><span class="readonly">● Sola lettura</span> — non esegue nessuna azione su Instagram</div>
+      <div class="codebox">
+        <header>
+          <span data-size>codice minificato</span>
+          <button class="btn btn-primary" data-copy="/botscraper/code/monitor.js">Copia il codice</button>
+        </header>
+        <pre data-preview="/botscraper/code/monitor.js">Caricamento anteprima…</pre>
+      </div>
+      <a class="dl" href="/botscraper/code/monitor.js" download>↓ oppure scarica il file</a>
+    </div>
+  </section>
+
+  <!-- ======== USO ======== -->
+  <section>
+    <div class="eyebrow">Istruzioni</div>
+    <h2>Come si usa</h2>
+    <ol class="steps">
+      <li>Premi <strong>Copia il codice</strong> qui sopra, sul tool che ti serve.</li>
+      <li>Apri <strong>instagram.com</strong> nel browser ed entra con l'account da analizzare.
+        <span>Le azioni funzionano solo se sei loggato <em>come</em> quell'account.</span></li>
+      <li>Apri la console per sviluppatori.
+        <span>Windows e Linux: <strong>Ctrl + Shift + J</strong> — macOS: <strong>⌘ + ⌥ + I</strong></span></li>
+      <li>Incolla il codice e premi Invio.
+        <span>Se il browser chiede di scrivere <em>allow pasting</em> prima di poter incollare, fallo: è una
+          protezione di Chrome, va scritto una volta sola.</span></li>
+      <li>Compare l'interfaccia sopra Instagram: premi <strong>RUN</strong> e aspetta la scansione.
+        <span>Più follower ha l'account, più tempo serve. Non chiudere la scheda.</span></li>
+    </ol>
+  </section>
+
+  <!-- ======== PRE-FLIGHT ======== -->
+  <section>
+    <div class="eyebrow">Prima di iniziare</div>
+    <h2>Verifica che le API <em>rispondano</em></h2>
+    <p>Instagram cambia spesso le proprie API interne, e quando succede il tool smette di
+      funzionare finché non viene aggiornato. Questo controllo dura due secondi e ti dice
+      subito se puoi procedere. Incollalo in console su instagram.com loggato:</p>
+<pre class="snippet">(async () =&gt; {
+  const ds = document.cookie.match(/ds_user_id=(\d+)/)?.[1];
+  const h = { headers: { 'x-ig-app-id': '936619743392459' }, credentials: 'include' };
+  const f = await fetch(`https://www.instagram.com/api/v1/friendships/${ds}/followers/?count=5`, h)
+    .then(r =&gt; r.json());
+  console.log('FOLLOWERS →', f.users?.length, 'utenti; next', f.next_max_id);
+})();</pre>
+    <p style="margin-top:1rem">Se vedi un elenco di utenti, sei a posto.
+      Se la risposta è vuota o dà errore, gli endpoint sono cambiati: aspetta un aggiornamento
+      del tool.</p>
+  </section>
+
+  <!-- ======== NOTE ======== -->
+  <section>
+    <div class="eyebrow">Da sapere</div>
+    <h2>Note e limiti</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>I dati restano tuoi</h3>
+        <p>Tutto avviene nel browser, sulla sessione già aperta. Non c'è nessun server
+          intermedio e nessuna lista viene caricata da nessuna parte. La whitelist sta
+          nel <em>localStorage</em>.</p>
+      </div>
+      <div class="card">
+        <h3>Il punteggio è un indizio</h3>
+        <p>Il bot-score è una stima basata su segnali pubblici, non una sentenza. Controlla
+          sempre la lista prima di rimuovere: gli account nuovi o senza foto non sono
+          per forza bot.</p>
+      </div>
+      <div class="card">
+        <h3>Vai piano</h3>
+        <p>Le rimozioni sono intervallate da pause proprio per non farsi limitare.
+          Non ridurre i tempi e non lanciare più tool insieme sullo stesso account.</p>
+      </div>
+      <div class="card">
+        <h3>Può rompersi</h3>
+        <p>Si appoggia alle API interne di Instagram, che cambiano senza preavviso.
+          Se qualcosa non va, rifai il controllo qui sopra prima di ogni altra cosa.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== FOOTER ======== -->
+  <footer>
+    <p>
+      BotScraper è un fork di
+      <a href="https://github.com/davidarroyo1234/InstagramUnfollowers" target="_blank" rel="noopener">InstagramUnfollowers</a>
+      di David Arroyo, distribuito con licenza MIT, che estende con bot-score, analisi dei
+      commenti e monitoraggio.
+    </p>
+    <p class="fine">
+      Questo strumento non è affiliato, associato, autorizzato o approvato da Instagram,
+      né in alcun modo ufficialmente collegato a Instagram. Usalo a tuo rischio.
+    </p>
+    <p class="fine"><a href="/">← torna al sito</a></p>
+  </footer>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function () {
+  var toastEl = document.getElementById('toast');
+  var toastTimer;
+  function toast(msg, isErr) {
+    toastEl.textContent = msg;
+    toastEl.className = 'show' + (isErr ? ' err' : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.className = ''; }, 3200);
+  }
+
+  /* ---- tabs ---- */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      tabs.forEach(function (t) {
+        var selected = t === tab;
+        t.setAttribute('aria-selected', String(selected));
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !selected;
+      });
+    });
+  });
+
+  /* ---- cache dei bundle, così una copia dopo l'anteprima non riscarica ---- */
+  var cache = {};
+  function load(url) {
+    if (!cache[url]) {
+      cache[url] = fetch(url).then(function (r) {
+        if (!r.ok) { throw new Error('HTTP ' + r.status); }
+        return r.text();
+      });
+    }
+    return cache[url];
+  }
+
+  /* ---- anteprima + peso ---- */
+  document.querySelectorAll('pre[data-preview]').forEach(function (pre) {
+    var url = pre.getAttribute('data-preview');
+    load(url).then(function (code) {
+      pre.textContent = code.slice(0, 1500) + '\n\n…';
+      var label = pre.closest('.codebox').querySelector('[data-size]');
+      if (label) {
+        label.textContent = Math.round(code.length / 1024) + ' KB di codice minificato';
+      }
+    }).catch(function () {
+      pre.textContent = 'Anteprima non disponibile. Usa il link di download qui sotto.';
+    });
+  });
+
+  /* ---- copia ---- */
+  document.querySelectorAll('[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var url = btn.getAttribute('data-copy');
+      var original = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Copio…';
+      load(url).then(function (code) {
+        return navigator.clipboard.writeText(code);
+      }).then(function () {
+        toast('Codice copiato. Ora incollalo nella console su instagram.com');
+      }).catch(function () {
+        toast('Copia non riuscita: usa il link di download qui sotto.', true);
+      }).then(function () {
+        btn.disabled = false;
+        btn.textContent = original;
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>
