@@ -516,7 +516,18 @@ function setDir(v) {
   speedTick(true);
 }
 function toggleDir() { setDir(dirFwd ? 0 : 1); }
-dirBtn.addEventListener("click", toggleDir);
+// il click lo sintetizza solo il puntatore primario: con un dito già su una leva
+// il bottone non lo riceverebbe mai. Commuto sul pointerdown, come lo STOP, e
+// gestisco a mano Invio/Spazio visto che il click non lo uso più.
+dirBtn.addEventListener("pointerdown", ev => {
+  if (ev.button > 0) return;              // tasto destro/centrale del mouse
+  ev.preventDefault();                    // niente focus rubato né selezione
+  toggleDir();
+});
+dirBtn.addEventListener("keydown", ev => {
+  if (ev.key === " " || ev.key === "Enter") { ev.preventDefault(); toggleDir(); }
+});
+dirBtn.addEventListener("contextmenu", e => e.preventDefault());
 
 function leverStep() { return +LV.step || 1; }
 function leverNorm() { return (leverVal - LV.min) / (LV.max - LV.min); }   // 0..1

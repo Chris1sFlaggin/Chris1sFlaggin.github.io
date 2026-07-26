@@ -74,7 +74,7 @@ header:
         {% for category in sorted_categories %}
           {% assign category_name = category | first %}
           
-          {% unless category_name == 'stack' or category_name == 'heap' %}
+          {% unless category_name == 'stack' %}
           
             <div class="card category-card" data-category="{{ category_name | slugify }}">
               <div class="card-bg"></div>
@@ -96,9 +96,18 @@ header:
         
         <a href="https://chris1sflaggin.it/LCSAJdump" class="card product-card">
           <div class="card-bg" style="background-image: url('/images/LCSAJfull.png');"></div>
-          
+
           <div class="card-content product-content">
             <h3>LCSAJdump</h3>
+          </div>
+        </a>
+
+        <a href="https://github.com/chris1sflaggin/jaike" class="card product-card">
+          <div class="card-bg" style="background-image: url('/images/jake.png'); background-color: #f6e6c2; background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
+
+          <div class="card-content product-content">
+            <h3>jAIke</h3>
+            <p>Desktop familiar &amp; AI gateway</p>
           </div>
         </a>
 
