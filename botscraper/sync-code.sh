@@ -32,8 +32,8 @@ copy dist.js     botscraper.js
 copy comments.js comments.js
 copy monitor.js  monitor.js
 
-if grep -rqi kura "$DEST"; then
-  echo "ATTENZIONE: i bundle contengono ancora riferimenti a kura." >&2
+if grep -rqiE 'admin@|chris1sflaggin\.it|@edu\.' "$DEST"; then
+  echo "ATTENZIONE: i bundle contengono dati personali, non pubblicarli." >&2
   exit 1
 fi
 

@@ -56,7 +56,7 @@ window.JOYSTICK_CONFIG = {
     unit: "",
     min: 0,
     max: 220,
-    start: 120,
+    start: 0,
     step: 5,
     spring: false,
     keys: { up: ["KeyR"], down: ["KeyF"], zero: ["KeyZ"] },
