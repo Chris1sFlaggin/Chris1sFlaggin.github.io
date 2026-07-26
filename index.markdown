@@ -74,8 +74,8 @@ header:
         {% for category in sorted_categories %}
           {% assign category_name = category | first %}
           
-          {% unless category_name == 'stack' %}
-          
+          {% unless category_name == 'stack' or category_name == 'Projects' %}
+
             <div class="card category-card" data-category="{{ category_name | slugify }}">
               <div class="card-bg"></div>
               <div class="card-content">
@@ -91,18 +91,17 @@ header:
     </div>
     
 <div class="section-block">
-      <h2 class="section-title">MY PACKAGES</h2>
+      <h2 class="section-title">PROJECTS</h2>
       <div class="products-grid">
-        
-        <a href="https://chris1sflaggin.it/LCSAJdump" class="card product-card">
-          <div class="card-bg" style="background-image: url('/images/LCSAJfull.png');"></div>
 
+        <a href="{{ site.baseurl }}/botscraper/" class="card product-card project-card">
           <div class="card-content product-content">
-            <h3>LCSAJdump</h3>
+            <h3>BotScraper</h3>
+            <p>Analisi e pulizia dei follower bot su Instagram</p>
           </div>
         </a>
 
-        <a href="https://github.com/chris1sflaggin/jaike" class="card product-card">
+        <a href="https://github.com/chris1sflaggin/jaike" class="card product-card project-card">
           <div class="card-bg" style="background-image: url('/images/jake.png'); background-color: #f6e6c2; background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
 
           <div class="card-content product-content">
@@ -111,9 +110,45 @@ header:
           </div>
         </a>
 
-        <a href="https://chris1sflaggin.it/votechain" class="card product-card uni-card">
+        <a href="https://chris1sflaggin.it/votechain/" class="card product-card project-card">
           <div class="card-content product-content">
             <h3>VoteChain</h3>
+            <p>Referendum e sondaggi su blockchain</p>
+          </div>
+        </a>
+
+        <a href="{{ site.baseurl }}/joystick/" class="card product-card project-card">
+          <div class="card-content product-content">
+            <h3>Joystick MQTT</h3>
+            <p>Telecomando analogico via browser</p>
+          </div>
+        </a>
+
+        {% for post in site.categories.Projects %}
+          <a href="{{ post.url | relative_url }}" class="card product-card project-card">
+            {% if post.image %}
+              <div class="card-bg" style="background-image: url('{{ post.image | relative_url }}');"></div>
+            {% endif %}
+            <div class="card-content product-content">
+              <h3>{{ post.title }}</h3>
+              {% if post.description %}<p>{{ post.description }}</p>{% endif %}
+            </div>
+          </a>
+        {% endfor %}
+
+      </div>
+    </div>
+
+    <div class="section-block">
+      <h2 class="section-title">MY PACKAGES</h2>
+      <div class="products-grid">
+
+        <a href="https://chris1sflaggin.it/LCSAJdump" class="card product-card">
+          <div class="card-bg" style="background-image: url('/images/LCSAJfull.png');"></div>
+
+          <div class="card-content product-content">
+            <h3>LCSAJdump</h3>
+            <p>Gadget finder per exploit development</p>
           </div>
         </a>
 
@@ -285,6 +320,12 @@ header:
     margin-bottom: 1rem;
   }
   
+  /* Project cards: stessa altezza per tutti, con o senza immagine */
+  .project-card { height: 220px; }
+  .project-card .product-content { justify-content: center; }
+  .project-card .product-content h3 { font-size: 1.15rem; text-transform: none; letter-spacing: 0; }
+  .project-card .product-content p { font-size: 0.88rem; margin-bottom: 0; }
+
   /* University cards */
   .uni-card { height: 160px; background: rgba(100, 255, 218, 0.04); }
   .uni-card .product-content { justify-content: center; background: transparent; height: 100%; }
