@@ -213,9 +213,6 @@
         </div>
       </div>
       <div class="leverval" id="leverVal">0</div>
-      <button class="dirbtn" id="dirBtn" type="button" aria-pressed="false">
-        <span class="arrow" id="dirArrow">▲</span><span id="dirLabel">avanti</span>
-      </button>
       <div class="padlbl" id="leverLbl">velocità</div>
       <div class="padlbl only-wide" id="leverKeys"></div>
     </div>
@@ -248,7 +245,7 @@
         <p>Due topic: uno per lo <b>sterzo</b> (leva orizzontale) e uno per la <b>velocità</b> (leva verticale). Puoi anche puntarli sullo stesso e distinguerli con il campo <code>type</code>. Con <b>Sottoscrivi</b> attivo la pagina si rimette in ascolto sui propri topic: gli echi finiscono nel log e servono a misurare l'RTT.</p>
         <ul>
           <li><b>Sterzo</b> — angolo della leva orizzontale, intero: <code>{"angle":55}</code> (scala 0..180, dritto 90). È il topic <i>movimento</i> (o <code>steer.topic</code> in <code>config.js</code>).</li>
-          <li><b>Velocità</b> — posizione della leva verticale e senso di marcia, interi: <code>{"speed":120,"dir":1}</code>. Si imposta in <code>config.js</code> dentro <code>lever.topic</code>.</li>
+          <li><b>Velocità</b> — leva verticale bipolare (centro = fermo): modulo e verso, interi: <code>{"speed":120,"dir":1}</code> sopra il centro, <code>{"speed":120,"dir":0}</code> sotto. Il topic è <code>lever.topic</code> in <code>config.js</code>.</li>
         </ul>
         <p>La riga sopra il log pubblica un payload qualsiasi su un topic qualsiasi: per il resto è un normale client MQTT.</p>
 
@@ -266,8 +263,7 @@ raw      {angle}                    → "55"</pre>
         <h3>Comandi</h3>
         <ul>
           <li>Sterzo (leva orizzontale, a sinistra): trascina, rotellina del mouse, i tasti indicati sotto la leva o lo stick sinistro del gamepad. Con <code>spring</code> torna dritto quando la lasci.</li>
-          <li>Velocità (leva verticale, a destra): trascina, rotellina, i tasti sotto la leva, il grilletto o lo stick destro del gamepad. Resta dove la lasci.</li>
-          <li>Bottoncino <b>avanti/retro</b> sotto la leva velocità (o il suo tasto): commuta <code>dir</code> fra <code>1</code> e <code>0</code> e ripubblica subito.</li>
+          <li>Velocità (leva verticale bipolare, a destra): trascina, rotellina, i tasti sotto la leva, il grilletto o lo stick destro del gamepad. Sopra il centro va avanti (azzurra), sotto è retromarcia (rossa): il verso finisce in <code>dir</code>, senza bottoncino. Resta dove la lasci.</li>
           <li><span class="kbd">Spazio</span> = STOP: rimette dritto lo sterzo, azzera la velocità e pubblica lo zero. Anche cambiando scheda o perdendo il focus viene inviato lo zero.</li>
         </ul>
 

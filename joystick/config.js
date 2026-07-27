@@ -34,28 +34,32 @@ window.JOYSTICK_CONFIG = {
     gamepadDeadzone: 0.12
   },
 
-  /* ── LEVETTA VERTICALE — VELOCITÀ ────────────────────────────────────────
-     La leva a destra. Resta dove la lasci (come una manetta vera) e
-     stabilisce quanto va veloce il mezzo. Manda solo interi.
+  /* ── LEVETTA VERTICALE — VELOCITÀ (bipolare) ─────────────────────────────
+     La leva a destra, centrata sullo zero: sopra = avanti (azzurra),
+     sotto = retromarcia (rossa). Niente bottoncino: il verso lo dà il segno
+     della leva. Manda solo interi.
 
        topic        dove viene pubblicata la posizione della leva
        label, unit  come sopra
-       min, max     estremi della scala: {speed} è questo intero
+       min, max     estremi: giù (retromarcia piena) e su (avanti piena)
+       center       posizione di riposo/fermo (di solito 0)
        start        valore all'apertura (non viene ricordato)
        step         scatto di tastiera e rotellina del mouse
-       spring       true = torna a "min" appena la lasci
-       keys         tasti: su, giù, azzera
+       spring       true = torna al centro (fermo) appena la lasci
+       keys         tasti: su, giù, azzera (torna al centro)
        gamepadAxis  asse che muove la leva (3 = verticale stick destro)
        gamepadUp/Down  tasti del gamepad che alzano/abbassano la leva (7=R2 6=L2)
        gamepadRate  quanto si muove la leva col gamepad, per secondo
-       reverse      bottoncino avanti/retromarcia: pubblica {dir},
-                    1 = avanti (predefinito), 0 = retromarcia                 */
+
+     Nel payload: {speed} è il MODULO (sempre ≥ 0), {dir} il verso
+     (1 = avanti quando la leva è ≥ centro, 0 = retromarcia sotto).         */
   lever: {
     topic: "esp32_car_fralor/speed",
     label: "velocità",
     unit: "",
-    min: 0,
-    max: 220,
+    min: -220,                  // giù = retromarcia piena
+    max: 220,                   // su = avanti piena
+    center: 0,                  // riposo/fermo
     start: 0,
     step: 5,
     spring: false,
@@ -63,14 +67,7 @@ window.JOYSTICK_CONFIG = {
     gamepadAxis: 3,
     gamepadUp: 7,
     gamepadDown: 6,
-    gamepadRate: 80,
-    reverse: {
-      start: 1,                     // 1 = avanti · 0 = retromarcia
-      keys: ["KeyX"],               // tasto che inverte
-      gamepadButton: 1,             // tasto del gamepad che inverte (null = nessuno)
-      forwardLabel: "avanti",
-      reverseLabel: "retro"
-    }
+    gamepadRate: 80
   },
 
   /* ── STOP ────────────────────────────────────────────────────────────────

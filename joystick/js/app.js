@@ -11,11 +11,10 @@ const FALLBACK_CONFIG = {
     gamepadAxis: 0, gamepadDeadzone: 0.12
   },
   lever: {
-    topic: "", label: "velocità", unit: "", min: 0, max: 100, start: 100, step: 5,
+    topic: "", label: "velocità", unit: "", min: -100, max: 100, center: 0, start: 0, step: 5,
     spring: false,
     keys: { up: ["KeyR"], down: ["KeyF"], zero: ["KeyZ"] },
-    gamepadAxis: 3, gamepadUp: 7, gamepadDown: 6, gamepadRate: 80,
-    reverse: { start: 1, keys: ["KeyX"], gamepadButton: 1, forwardLabel: "avanti", reverseLabel: "retro" }
+    gamepadAxis: 3, gamepadUp: 7, gamepadDown: 6, gamepadRate: 80
   },
   stopKeys: ["Space"],
   defaults: {}
@@ -25,7 +24,6 @@ CFG.steer = Object.assign({}, FALLBACK_CONFIG.steer, CFG.steer || {});
 CFG.steer.keys = Object.assign({}, FALLBACK_CONFIG.steer.keys, CFG.steer.keys || {});
 CFG.lever = Object.assign({}, FALLBACK_CONFIG.lever, CFG.lever || {});
 CFG.lever.keys = Object.assign({}, FALLBACK_CONFIG.lever.keys, CFG.lever.keys || {});
-CFG.lever.reverse = Object.assign({}, FALLBACK_CONFIG.lever.reverse, CFG.lever.reverse || {});
 const ST = CFG.steer, LV = CFG.lever;
 if (!(ST.max > ST.min)) { ST.min = -90; ST.max = 90; }
 if (!(LV.max > LV.min)) { LV.min = 0; LV.max = 100; }
@@ -309,7 +307,6 @@ const STEERKEYS = [].concat(STKEYS.left, STKEYS.right, STKEYS.center);
 const LVKEYS = { up: LV.keys.up || [], down: LV.keys.down || [], zero: LV.keys.zero || [] };
 const LEVERKEYS = [].concat(LVKEYS.up, LVKEYS.down, LVKEYS.zero);
 const STOPKEYS = CFG.stopKeys;
-const RV = LV.reverse || {};
 const steerHeld = new Set();
 
 function typingIn(t) { return !!t && t.nodeType === 1 && t.matches("input,select,textarea,[contenteditable]"); }
@@ -331,8 +328,7 @@ addEventListener("keydown", e => {
   if (STKEYS.center.includes(e.code)) { e.preventDefault(); setSteer(centerVal()); return; }
   if (LVKEYS.up.includes(e.code))   { e.preventDefault(); nudgeLever(+leverStep()); return; }
   if (LVKEYS.down.includes(e.code)) { e.preventDefault(); nudgeLever(-leverStep()); return; }
-  if (LVKEYS.zero.includes(e.code)) { e.preventDefault(); setLever(LV.min); return; }
-  if ((RV.keys || []).includes(e.code)) { e.preventDefault(); toggleDir(); }
+  if (LVKEYS.zero.includes(e.code)) { e.preventDefault(); setLever(centerLV()); return; }
 });
 addEventListener("keyup", e => {
   if (typingIn(e.target)) return;
@@ -340,7 +336,7 @@ addEventListener("keyup", e => {
 });
 
 /* ── input: gamepad ──────────────────────────────────── */
-let gpActive = false, gpLast = performance.now(), gpRevPrev = false, gpSteerAxis = null;
+let gpActive = false, gpLast = performance.now(), gpSteerAxis = null;
 const badge = $("#gpBadge");
 
 addEventListener("gamepadconnected", e => {
@@ -376,14 +372,6 @@ function gpTick() {
   if (dp(LV.gamepadUp)) delta += rate;
   if (dp(LV.gamepadDown)) delta -= rate;
   if (delta) nudgeLever(delta);
-
-  // tasto del gamepad che inverte la marcia, sul fronte di pressione
-  const rb = RV.gamepadButton;
-  if (rb !== null && rb !== undefined) {
-    const now = dp(rb);
-    if (now && !gpRevPrev) toggleDir();
-    gpRevPrev = now;
-  }
 }
 
 /* ── etichette dei tasti ─────────────────────────────── */
@@ -496,38 +484,10 @@ let leverRaw = clamp(+LV.start || 0, LV.min, LV.max);   // accumulatore continuo
 let leverVal = Math.round(leverRaw);                    // valore pubblicato: sempre intero
 let leverId = null;
 
-const dirBtn = $("#dirBtn"), dirArrow = $("#dirArrow"), dirLabel = $("#dirLabel");
-let dirFwd = RV.start === 0 ? 0 : 1;      // 1 = avanti · 0 = retromarcia
-
-function renderDir() {
-  const rev = dirFwd === 0;
-  dirBtn.classList.toggle("rev", rev);
-  leverEl.classList.toggle("rev", rev);
-  dirBtn.setAttribute("aria-pressed", String(rev));
-  dirArrow.textContent = rev ? "▼" : "▲";
-  dirLabel.textContent = rev ? (RV.reverseLabel || "retro") : (RV.forwardLabel || "avanti");
-}
-function setDir(v) {
-  const nv = v ? 1 : 0;
-  if (nv === dirFwd) return;
-  dirFwd = nv;
-  renderDir();
-  lastSpeedKey = null;                    // il cambio di marcia si vede subito
-  speedTick(true);
-}
-function toggleDir() { setDir(dirFwd ? 0 : 1); }
-// il click lo sintetizza solo il puntatore primario: con un dito già su una leva
-// il bottone non lo riceverebbe mai. Commuto sul pointerdown, come lo STOP, e
-// gestisco a mano Invio/Spazio visto che il click non lo uso più.
-dirBtn.addEventListener("pointerdown", ev => {
-  if (ev.button > 0) return;              // tasto destro/centrale del mouse
-  ev.preventDefault();                    // niente focus rubato né selezione
-  toggleDir();
-});
-dirBtn.addEventListener("keydown", ev => {
-  if (ev.key === " " || ev.key === "Enter") { ev.preventDefault(); toggleDir(); }
-});
-dirBtn.addEventListener("contextmenu", e => e.preventDefault());
+// verso di marcia ricavato dal segno della leva (nessun bottoncino)
+function centerLV() { return Math.round(clamp(+LV.center || 0, LV.min, LV.max)); }
+function leverDir() { return leverVal < centerLV() ? 0 : 1; }   // 0 = retro · 1 = avanti
+function leverMag() { return Math.abs(leverVal - centerLV()); } // modulo, sempre ≥ 0
 
 function leverStep() { return +LV.step || 1; }
 function leverNorm() { return (leverVal - LV.min) / (LV.max - LV.min); }   // 0..1
@@ -541,7 +501,11 @@ function setLever(v) {
 function nudgeLever(d) { setLever(leverRaw + d); }
 function renderLever() {
   const p = leverNorm();
-  fillEl.style.height = (p * 100) + "%";
+  const cp = (centerLV() - LV.min) / (LV.max - LV.min);   // frazione del centro
+  const lo = Math.min(cp, p), hi = Math.max(cp, p);
+  fillEl.style.bottom = (lo * 100) + "%";
+  fillEl.style.height = ((hi - lo) * 100) + "%";
+  leverEl.classList.toggle("rev", leverVal < centerLV());  // sotto il centro = rossa
   handleEl.style.bottom = "calc(" + (p * 100) + "% - " + (handleEl.offsetHeight / 2) + "px)";
   const shown = leverVal + (LV.unit || "");
   leverValEl.textContent = shown;
@@ -569,7 +533,7 @@ function leverRelease(ev) {
   try { leverEl.releasePointerCapture(leverId); } catch (e) {}
   leverId = null;
   leverEl.classList.remove("live");
-  if (LV.spring) setLever(LV.min);
+  if (LV.spring) setLever(centerLV());
 }
 leverEl.addEventListener("pointerup", leverRelease);
 leverEl.addEventListener("pointercancel", leverRelease);
@@ -600,7 +564,7 @@ function zeroAll() {
 }
 function panic() {
   zeroAll();
-  setLever(LV.min);                       // sterzo dritto, manetta a zero
+  setLever(centerLV());                    // sterzo dritto, leva al centro (fermo)
   const T = topics();
   const p = movePayload("stop");
   if (T.move && pub(T.move, p.payload, F.retain.checked)) lastKey = p.key;
@@ -615,10 +579,11 @@ addEventListener("pagehide", () => { if (client && connected) { try { client.end
 /* ── valori + payload (tutti interi) ─────────────────── */
 function moveVals(src, t) {
   const angle = steerVal, c = centerVal();
+  const mag = leverMag(), dir = leverDir();
   return {
     angle: angle, anglei: angle, a: angle,
     heading: angle < c ? "left" : angle > c ? "right" : "straight",
-    speed: leverVal, speedi: leverVal, dir: dirFwd,
+    speed: mag, speedi: mag, dir: dir,   // modulo + verso (dal segno della leva)
     src: src, t: t
   };
 }
@@ -702,7 +667,7 @@ function speedTick(force) {
   const T = topics();
   if (!T.speed) return;
   const payload = speedPayload();
-  const key = leverVal + ":" + dirFwd;
+  const key = String(leverVal);           // il verso è già nel segno di leverVal
   const now = performance.now();
   const hb = +F.hb.value || 0;
   // la leva è un valore impostato, non un flusso: niente raffica anche in modalità continua
@@ -799,8 +764,7 @@ $("#leverLbl").textContent = LV.label || "velocità";
 $("#leverKeys").textContent = [
   LVKEYS.up[0] && keyLabel(LVKEYS.up[0]) + " su",
   LVKEYS.down[0] && keyLabel(LVKEYS.down[0]) + " giù",
-  LVKEYS.zero[0] && keyLabel(LVKEYS.zero[0]) + " azzera",
-  (RV.keys && RV.keys[0]) && keyLabel(RV.keys[0]) + " marcia"
+  LVKEYS.zero[0] && keyLabel(LVKEYS.zero[0]) + " fermo"
 ].filter(Boolean).join(" · ");
 
 refreshHint();
@@ -808,15 +772,10 @@ refreshUrl();
 syncFmtUI();
 renderSteer();
 renderLever();
-renderDir();
 if (!F.pubTopic.value) F.pubTopic.value = topics().speed || topics().move;
 
 // segnala le sovrapposizioni in config.js invece di ignorarle in silenzio
 function checkConfig() {
-  for (const code of (RV.keys || [])) {
-    if (STEERKEYS.includes(code)) log("err", "config.js: " + code + " serve sia allo sterzo sia alla retromarcia: vince lo sterzo");
-    else if (LEVERKEYS.includes(code)) log("err", "config.js: " + code + " è sia un tasto della leva sia la retromarcia: vince la leva");
-  }
   for (const code of LEVERKEYS) {
     if (STEERKEYS.includes(code)) log("err", "config.js: " + code + " serve sia allo sterzo sia alla leva velocità: vince lo sterzo");
     else if (STOPKEYS.includes(code)) log("err", "config.js: " + code + " è sia STOP sia un tasto della leva: vince STOP");

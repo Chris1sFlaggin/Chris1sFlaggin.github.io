@@ -169,14 +169,14 @@ button.danger{background:linear-gradient(180deg,#8f2230,#6d1926);border-color:#b
   background:linear-gradient(180deg,#0b0f15,#161c26);
   border:1px solid #2c3644;box-shadow:inset 0 2px 12px #000a;
 }
-.lfill{                                 /* riempimento della leva (.fill è delle barre motori) */
-  position:absolute;left:0;right:0;top:auto;bottom:0;width:auto;height:0;border-radius:10px;
+.lfill{                                 /* riempimento della leva, dal centro (azzurro sopra) */
+  position:absolute;left:0;right:0;top:auto;bottom:50%;width:auto;height:0;border-radius:10px;
   background:linear-gradient(180deg,#4cc9f0,#2aa8cf 55%,#1b7f9e);
-  box-shadow:0 0 18px #4cc9f02e;transition:height .04s linear;
+  box-shadow:0 0 18px #4cc9f02e;transition:height .04s linear,bottom .04s linear;
 }
 .ticks{position:absolute;inset:0;pointer-events:none}
 .ticks i{position:absolute;left:21px;width:7px;height:1px;background:#ffffff14}
-.ticks i.big{width:13px;background:#ffffff2e}
+.ticks i.big{width:13px;height:2px;background:#ffffff33}   /* il centro (0) è una tacca marcata */
 .handle{
   position:absolute;left:50%;bottom:0;margin-left:-26px;
   width:52px;height:26px;border-radius:7px;
@@ -188,15 +188,11 @@ button.danger{background:linear-gradient(180deg,#8f2230,#6d1926);border-color:#b
 .lever.live .handle{box-shadow:0 6px 14px #000b,inset 0 1px 0 #ffffff22,0 0 0 2px #4cc9f055,0 0 22px #4cc9f044}
 .lever.live .rail{border-color:#4cc9f0aa}
 .leverval{font:700 18px/1 var(--mono);color:var(--accent);margin-top:2px}
-.dirbtn{
-  display:flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;
-  font:700 12px/1 var(--mono);letter-spacing:1px;text-transform:uppercase;
-  background:#12202a;border:1px solid #2b6f86;color:#9fe6ff;
-}
-.dirbtn .arrow{font-size:13px;line-height:1}
-.dirbtn:hover{border-color:var(--accent)}
-.dirbtn.rev{background:#2a1620;border-color:#b53545;color:#ffc2ca}
-.lever.rev .lfill{background:linear-gradient(180deg,#ff8fa0,#e04a5e 55%,#a92838);box-shadow:0 0 18px #ff4d5e2e}
+.lever.rev .leverval{color:#ff8f9c}       /* numero rosso in retromarcia */
+/* sotto il centro la leva è rossa (retromarcia) */
+.lever.rev .lfill{background:linear-gradient(0deg,#ff8fa0,#e04a5e 55%,#a92838);box-shadow:0 0 18px #ff4d5e2e}
+.lever.rev.live .handle{box-shadow:0 6px 14px #000b,inset 0 1px 0 #ffffff22,0 0 0 2px #ff4d5e66,0 0 22px #ff4d5e55}
+.lever.rev.live .rail{border-color:#ff4d5eaa}
 
 @media(max-width:780px){
   .stage{grid-template-columns:1fr;grid-template-areas:"hud" "steer" "spd";gap:16px;padding:16px 14px}
