@@ -23,9 +23,10 @@ title: Chris1sFlaggin
 logo: /images/chris.jpg
 email: admin@chris1sflaggin.it
 description: # this means to ignore newlines until "baseurl:"
-  Computer Science graduate, now studying Cybersecurity at Aalborg University Copenhagen.
-  I'm a cybersecurity enthusiast and a junior pwn tutor at UniTo for CyberChallenge.it.
-  I taught in high school up until this year.
+  I'm a 22-year-old Computer Science graduate, now studying Cybersecurity at
+  Aalborg University Copenhagen.
+  I'm a cybersecurity enthusiast. I was a junior pwn tutor at UniTo for CyberChallenge.it
+  and taught in high school, both up until this year.
   Here I'll post my CTF write-ups and personal projects. Hope you enjoy your stay!
   Author of LCSAJdump.
 keywords: "ROP, JOP, LCSAJ, exploit development, cybersecurity, reverse engineering, gadget finder, write up, nas, tutorial, pwn, stack, exploit, ropper, ropGadgets, graph, search"
