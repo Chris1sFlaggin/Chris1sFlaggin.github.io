@@ -62,7 +62,7 @@ window.JOYSTICK_CONFIG = {
     center: 0,                  // riposo/fermo
     start: 0,
     step: 5,
-    spring: false,
+    spring: true,               // torna da sola al centro (fermo) quando la lasci
     keys: { up: ["KeyR"], down: ["KeyF"], zero: ["KeyZ"] },
     gamepadAxis: 3,
     gamepadUp: 7,
