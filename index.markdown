@@ -106,15 +106,17 @@ header:
       <h2 class="section-title"><span class="lang-it">PROGETTI</span><span class="lang-en">PROJECTS</span></h2>
       <div class="products-grid">
 
-        <a href="{{ site.baseurl }}/botscraper/" class="card product-card project-card">
+        <a href="{{ site.baseurl }}/botscraper/" class="card product-card project-card has-img">
+          <div class="card-bg" style="background-image: url('/images/botscraper.png'); background-color: #121110; background-size: contain; background-repeat: no-repeat; background-position: center 35%;"></div>
+
           <div class="card-content product-content">
             <h3>BotScraper</h3>
             <p><span class="lang-it">Analisi e pulizia dei follower bot su Instagram</span><span class="lang-en">Instagram bot-follower analysis and cleanup</span></p>
           </div>
         </a>
 
-        <a href="https://github.com/chris1sflaggin/jaike" class="card product-card project-card">
-          <div class="card-bg" style="background-image: url('/images/jake.png'); background-color: #f6e6c2; background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
+        <a href="https://github.com/chris1sflaggin/jaike" class="card product-card project-card has-img">
+          <div class="card-bg" style="background-image: url('/images/jaike-desktop.png'); background-size: cover; background-position: 41% 78%;"></div>
 
           <div class="card-content product-content">
             <h3>jAIke</h3>
@@ -122,14 +124,18 @@ header:
           </div>
         </a>
 
-        <a href="https://chris1sflaggin.it/votechain/" class="card product-card project-card">
+        <a href="https://chris1sflaggin.it/votechain/" class="card product-card project-card has-img">
+          <div class="card-bg" style="background-image: url('/images/votechain.png'); background-color: #0b0f18; background-size: contain; background-repeat: no-repeat; background-position: center 35%;"></div>
+
           <div class="card-content product-content">
             <h3>VoteChain</h3>
             <p><span class="lang-it">Referendum e sondaggi su blockchain</span><span class="lang-en">Blockchain-based referendums and polls</span></p>
           </div>
         </a>
 
-        <a href="{{ site.baseurl }}/joystick/" class="card product-card project-card">
+        <a href="{{ site.baseurl }}/joystick/" class="card product-card project-card has-img">
+          <div class="card-bg" style="background-image: url('/images/joystick.png'); background-size: cover; background-position: center 30%;"></div>
+
           <div class="card-content product-content">
             <h3>Joystick MQTT</h3>
             <p><span class="lang-it">Telecomando analogico via browser</span><span class="lang-en">Analog remote control in the browser</span></p>
@@ -137,7 +143,7 @@ header:
         </a>
 
         {% for post in site.categories.Projects %}
-          <a href="{{ post.url | relative_url }}" class="card product-card project-card">
+          <a href="{{ post.url | relative_url }}" class="card product-card project-card{% if post.image %} has-img{% endif %}">
             {% if post.image %}
               <div class="card-bg" style="background-image: url('{{ post.image | relative_url }}');"></div>
             {% endif %}
@@ -387,6 +393,15 @@ header:
   /* Project cards: stessa altezza per tutti, con o senza immagine */
   .project-card { height: 220px; }
   .project-card .product-content { justify-content: center; }
+  /* Con immagine il velo pieno la coprirebbe: sfuma, scuro solo sotto al testo */
+  .project-card.has-img .product-content {
+    justify-content: flex-end;
+    background: linear-gradient(to top,
+      rgba(26, 30, 37, 0.96) 0%,
+      rgba(26, 30, 37, 0.88) 30%,
+      rgba(26, 30, 37, 0.10) 75%,
+      rgba(26, 30, 37, 0) 100%);
+  }
   .project-card .product-content h3 { font-size: 1.15rem; text-transform: none; letter-spacing: 0; }
   .project-card .product-content p { font-size: 0.88rem; margin-bottom: 0; }
 
