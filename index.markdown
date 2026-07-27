@@ -49,10 +49,10 @@ header:
       <div class="description-box">
         <h1 class="desc-title">chris1sflaggin</h1>
         <p class="desc-text">
-          <span class="lang-it">Ho 22 anni e sto per laurearmi in informatica, con la tesi prevista per luglio 2026.
-          Mi occupo di cybersecurity e sono tutor di pwn all'UniTo per CyberChallenge.it.
-          Da novembre 2025 insegno anche alle superiori. Qui trovi i miei write-up CTF e i miei
-          progetti personali. Buona permanenza!</span><span class="lang-en">{{ site.description | default: "I'm a IT student with a deep passion for cybersecurity. Here I'll post my CTF write ups and my own projects. Hope you enjoy your stay! 👋" }}</span>
+          <span class="lang-it">Laureato in informatica, ora studio cybersecurity alla Aalborg University
+          di Copenaghen. Sono tutor di pwn all'UniTo per CyberChallenge.it e fino a quest'anno ho
+          insegnato alle superiori. Qui trovi i miei write-up CTF e i miei progetti personali.
+          Buona permanenza!</span><span class="lang-en">{{ site.description | default: "I'm a IT student with a deep passion for cybersecurity. Here I'll post my CTF write ups and my own projects. Hope you enjoy your stay! 👋" }}</span>
         </p>
       </div>
     </div>
