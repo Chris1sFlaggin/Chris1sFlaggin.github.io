@@ -74,6 +74,37 @@ window.JOYSTICK_CONFIG = {
      Rimette dritto lo sterzo, azzera la velocità e pubblica lo zero.        */
   stopKeys: ["Space"],
 
+  /* ── VIDEO ───────────────────────────────────────────────────────────────
+     I fotogrammi che arrivano dalla camera. L'ESP32-CAM spezza ogni foto
+     in più messaggi, ognuno con davanti un'etichetta di 4 byte:
+
+         [ frameId , totale pezzi , indice del pezzo , riservato ] + dati
+
+     La pagina rimette insieme i pezzi e mostra la foto solo quando è
+     completa: se ne manca uno butta via tutto e aspetta la prossima (li
+     conta la chip "persi"). Va bene anche chi pubblica il fotogramma
+     intero in un messaggio solo: JPEG, PNG, base64 o data URI, li
+     riconosce dai primi byte. Il video viene solo ricevuto, mai
+     pubblicato, e non passa dal log.
+
+       topic        dove arrivano i fotogrammi
+       enabled      false = non si sottoscrive nemmeno (comandi su nero)
+       chunkHeader  byte di etichetta davanti ai dati (4 = ESP32-CAM,
+                    0 = solo fotogrammi interi)
+       fit          "contain" tutto il fotogramma · "cover" riempie tagliando
+       mirror       specchia in orizzontale (camera rivolta all'indietro)
+       flip         capovolge in verticale (camera montata sottosopra)
+       staleMs      dopo quanti ms senza fotogrammi dire "segnale perso"    */
+  video: {
+    topic: "esp32_car_fralor/video",
+    enabled: true,
+    chunkHeader: 4,
+    fit: "contain",
+    mirror: false,
+    flip: false,
+    staleMs: 2000
+  },
+
   /* ── VALORI INIZIALI ─────────────────────────────────────────────────────
      Servono a far partire la pagina già configurata sul tuo broker.        */
   defaults: {

@@ -9,11 +9,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <title>Joystick MQTT — telecomando analogico via browser</title>
-<meta name="description" content="Joystick analogico nel browser che pubblica comandi MQTT su WebSocket: stick, pulsanti, tastiera e gamepad fisico. Per rover, droni, luci e qualsiasi cosa parli MQTT.">
-<meta name="keywords" content="mqtt, joystick, websocket, mqtt over websocket, telecomando, rover, raspberry pi, iot, gamepad">
+<meta name="description" content="Telecomando nel browser con i comandi sopra il video della camera: leve analogiche, tastiera e gamepad che pubblicano MQTT su WebSocket. Per rover, droni e qualsiasi cosa parli MQTT.">
+<meta name="keywords" content="mqtt, joystick, websocket, mqtt over websocket, telecomando, rover, esp32-cam, video mqtt, raspberry pi, iot, gamepad">
 <meta name="theme-color" content="#0d0f13">
 <meta property="og:title" content="Joystick MQTT">
-<meta property="og:description" content="Telecomando analogico nel browser che pubblica comandi MQTT su WebSocket.">
+<meta property="og:description" content="Telecomando nel browser: comandi analogici sopra il video della camera, tutto su MQTT via WebSocket.">
 <meta property="og:type" content="website">
 
 <script src="https://unpkg.com/mqtt@5.15.2/dist/mqtt.min.js"></script>
@@ -118,6 +118,23 @@
         </div>
       </div>
 
+      <div class="subhead">Video</div>
+      <div class="grid">
+        <div class="f wide">
+          <label for="tVideo">Topic video</label>
+          <input type="text" id="tVideo" spellcheck="false" autocapitalize="off" value="esp32_car_fralor/video">
+          <small>fotogrammi a pezzi con etichetta [id, totale, indice] · o interi (JPEG, base64, data URI) · sola ricezione, QoS 0</small>
+        </div>
+        <div class="f">
+          <label for="vidFit">Inquadratura</label>
+          <select id="vidFit">
+            <option value="contain">Adatta (tutto il fotogramma)</option>
+            <option value="cover">Riempi (taglia i bordi)</option>
+          </select>
+        </div>
+        <div class="f chk"><input type="checkbox" id="vidOn" checked><label for="vidOn">Mostra il video</label></div>
+      </div>
+
       <div class="subhead">Payload</div>
       <div class="grid">
         <div class="f">
@@ -174,47 +191,71 @@
     </details>
   </section>
 
-  <!-- ── STAGE ────────────────────────────────────────── -->
-  <section class="panel stage">
+  <!-- ── ARENA: il video con i comandi sopra ──────────── -->
+  <section class="panel stage" id="arena">
 
-    <div class="steerwrap">
-      <div class="steer" id="steer" role="slider" tabindex="0"
-           aria-label="Angolo di sterzata" aria-valuemin="0" aria-valuemax="180" aria-valuenow="90">
-        <div class="hrail">
-          <div class="hticks" id="steerTicks"></div>
-          <div class="hfill" id="steerFill"></div>
-          <div class="hhandle" id="steerHandle"><span></span></div>
-        </div>
+    <div class="feed">
+      <img id="cam" alt="" draggable="false" decoding="async"
+           src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==">
+      <div class="nosig">
+        <b id="nosigMsg">in attesa del video</b>
+        <span id="nosigTopic">esp32_car_fralor/video</span>
       </div>
-      <div class="steerval" id="steerVal">90°</div>
-      <div class="padlbl" id="steerLbl">angolo</div>
-      <div class="padlbl only-wide" id="steerKeys"></div>
     </div>
 
-    <div class="hud">
-      <div class="stats">
-        <div class="stat"><b>angolo</b><span class="acc" id="oA">90°</span></div>
-        <div class="stat speedstat"><b id="oSpeedLbl">velocità</b><span class="acc" id="oSpeed">0</span></div>
-        <div class="stat"><b>sorgente</b><span id="oSrc">idle</span></div>
-        <div class="stat"><b>msg/s</b><span id="oRate">0</span></div>
-        <div class="stat"><b>inviati</b><span id="oSent">0</span></div>
-        <div class="stat"><b>rtt</b><span id="oRtt">—</span></div>
-      </div>
-      <button id="stop" class="danger" type="button">STOP</button>
-    </div>
+    <div class="overlay">
 
-    <div class="leverwrap">
-      <div class="lever" id="lever" role="slider" tabindex="0"
-           aria-label="Velocità" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-        <div class="rail">
-          <div class="ticks" id="leverTicks"></div>
-          <div class="lfill" id="leverFill"></div>
-          <div class="handle" id="leverHandle"><span></span></div>
+      <div class="hudbar">
+        <span class="dot ovdot" id="dot2" title="stato del collegamento"></span>
+        <div class="stats">
+          <div class="stat"><b>fps</b><span id="oFps">—</span></div>
+          <div class="stat"><b>rtt</b><span id="oRtt">—</span></div>
+          <div class="stat x1"><b>angolo</b><span class="acc" id="oA">90°</span></div>
+          <div class="stat x1"><b id="oSpeedLbl">velocità</b><span class="acc" id="oSpeed">0</span></div>
+          <div class="stat x1"><b>msg/s</b><span id="oRate">0</span></div>
+          <div class="stat x2"><b>sorgente</b><span id="oSrc">idle</span></div>
+          <div class="stat x2"><b>inviati</b><span id="oSent">0</span></div>
+          <div class="stat x2"><b>kb/s</b><span id="oKbps">—</span></div>
+          <div class="stat x2"><b>persi</b><span id="oLost">0</span></div>
+        </div>
+        <div class="obtn">
+          <button id="btnFit" type="button" title="Adatta o riempi l'inquadratura">ADATTA</button>
+          <button id="btnFull" type="button" title="Schermo intero" aria-label="Schermo intero">⛶</button>
+          <button id="stop" class="danger" type="button">STOP</button>
         </div>
       </div>
-      <div class="leverval" id="leverVal">0</div>
-      <div class="padlbl" id="leverLbl">velocità</div>
-      <div class="padlbl only-wide" id="leverKeys"></div>
+
+      <div class="ctlrow">
+
+        <div class="steerwrap">
+          <div class="steer" id="steer" role="slider" tabindex="0"
+               aria-label="Angolo di sterzata" aria-valuemin="0" aria-valuemax="180" aria-valuenow="90">
+            <div class="hrail">
+              <div class="hticks" id="steerTicks"></div>
+              <div class="hfill" id="steerFill"></div>
+              <div class="hhandle" id="steerHandle"><span></span></div>
+            </div>
+          </div>
+          <div class="steerval" id="steerVal">90°</div>
+          <div class="padlbl" id="steerLbl">angolo</div>
+          <div class="padlbl only-wide" id="steerKeys"></div>
+        </div>
+
+        <div class="leverwrap">
+          <div class="lever" id="lever" role="slider" tabindex="0"
+               aria-label="Velocità" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="rail">
+              <div class="ticks" id="leverTicks"></div>
+              <div class="lfill" id="leverFill"></div>
+              <div class="handle" id="leverHandle"><span></span></div>
+            </div>
+          </div>
+          <div class="leverval" id="leverVal">0</div>
+          <div class="padlbl" id="leverLbl">velocità</div>
+          <div class="padlbl only-wide" id="leverKeys"></div>
+        </div>
+
+      </div>
     </div>
   </section>
 
@@ -246,6 +287,7 @@
         <ul>
           <li><b>Sterzo</b> — angolo della leva orizzontale, intero: <code>{"angle":55}</code> (scala 0..180, dritto 90). È il topic <i>movimento</i> (o <code>steer.topic</code> in <code>config.js</code>).</li>
           <li><b>Velocità</b> — leva verticale bipolare (centro = fermo): modulo e verso, interi: <code>{"speed":120,"dir":1}</code> sopra il centro, <code>{"speed":120,"dir":0}</code> sotto. Il topic è <code>lever.topic</code> in <code>config.js</code>.</li>
+          <li><b>Video</b> — i fotogrammi che arrivano dalla camera, spezzati in più messaggi: è <code>video.topic</code> in <code>config.js</code>. Solo ricezione: la pagina qui non pubblica mai nulla.</li>
         </ul>
         <p>La riga sopra il log pubblica un payload qualsiasi su un topic qualsiasi: per il resto è un normale client MQTT.</p>
 
@@ -262,13 +304,45 @@ raw      {angle}                    → "55"</pre>
 
         <h3>Comandi</h3>
         <ul>
-          <li>Sterzo (leva orizzontale, a sinistra): trascina, rotellina del mouse, i tasti indicati sotto la leva o lo stick sinistro del gamepad. Con <code>spring</code> torna dritto quando la lasci.</li>
-          <li>Velocità (leva verticale bipolare, a destra): trascina, rotellina, i tasti sotto la leva, il grilletto o lo stick destro del gamepad. Sopra il centro va avanti (azzurra), sotto è retromarcia (rossa): il verso finisce in <code>dir</code>, senza bottoncino. Resta dove la lasci.</li>
+          <li>Sterzo (leva orizzontale, in basso a sinistra sopra il video): trascina, rotellina del mouse, i tasti indicati sotto la leva o lo stick sinistro del gamepad. Con <code>spring</code> torna dritto quando la lasci.</li>
+          <li>Velocità (leva verticale bipolare, in basso a destra): trascina, rotellina, i tasti sotto la leva, il grilletto o lo stick destro del gamepad. Sopra il centro va avanti (azzurra), sotto è retromarcia (rossa): il verso finisce in <code>dir</code>, senza bottoncino. Resta dove la lasci.</li>
           <li><span class="kbd">Spazio</span> = STOP: rimette dritto lo sterzo, azzera la velocità e pubblica lo zero. Anche cambiando scheda o perdendo il focus viene inviato lo zero.</li>
+          <li>I comandi stanno <b>sopra l'immagine</b>, come nei giochi da telefono: il pallino in alto a sinistra è lo stato del collegamento, che a schermo intero è l'unico modo per accorgersi che il broker è caduto.</li>
         </ul>
 
+        <h3>Il video</h3>
+        <p>La pagina si mette in ascolto sul <b>topic video</b> e mostra quello che arriva sotto ai comandi. Una foto non ci sta in un messaggio solo, così l'ESP32-CAM la <b>spezza in pezzi</b> e mette davanti a ognuno un'etichetta di 4 byte:</p>
+<pre>[ frameId , totale pezzi , indice del pezzo , riservato ] + dati JPEG</pre>
+        <p>Qui i pezzi si rimettono insieme in memoria e il fotogramma compare <b>solo quando è completo</b>: se il broker ne perde uno per strada l'intera foto viene buttata e si aspetta la prossima — le foto saltate le conta la chip <b>persi</b>. Quando <code>frameId</code> cambia, i pezzi rimasti a metà vengono scartati, quindi non si vedono mai mezze immagini. Va bene anche chi pubblica il <b>fotogramma intero</b> in un messaggio solo (JPEG, PNG, base64, <code>data:image/…</code>): il formato si riconosce dai primi byte, senza toccare niente.</p>
+        <ul>
+          <li>Il video si sottoscrive sempre a <b>QoS 0</b> e non finisce nel log, che altrimenti sarebbe illeggibile. La scena prende da sola le proporzioni della camera al primo fotogramma.</li>
+          <li><b>⛶</b> porta tutto a schermo intero — sul telefono prova anche a girarlo in orizzontale — e restano solo video e comandi. Si esce con lo stesso pulsante o con <span class="kbd">Esc</span>.</li>
+          <li><b>ADATTA / RIEMPI</b> sceglie se vedere tutto il fotogramma o riempire la scena tagliando i bordi.</li>
+          <li>Le chip in alto contano <code>fps</code>, <code>kb/s</code> e <code>persi</code>. Senza fotogrammi per due secondi (<code>video.staleMs</code>) l'immagine sbiadisce e compare <b>segnale perso</b>.</li>
+          <li>Camera montata al contrario: <code>video.mirror</code> e <code>video.flip</code> in <code>config.js</code>. Etichetta di dimensione diversa (o assente): <code>video.chunkHeader</code>.</li>
+        </ul>
+<pre>// ESP32-CAM → 4 byte di etichetta + un pezzo di JPEG (PubSubClient)
+static const size_t CHUNK = 4096;
+static uint8_t pkt[4 + CHUNK];
+client.setBufferSize(CHUNK + 64);        // il default, 256 byte, non basta
+
+camera_fb_t *fb = esp_camera_fb_get();
+uint8_t total = (fb->len + CHUNK - 1) / CHUNK;
+static uint8_t frameId = 0;
+frameId++;                               // cambia a ogni foto: chi riceve butta i pezzi vecchi
+for (uint8_t i = 0; i &lt; total; i++) {
+  size_t off = (size_t)i * CHUNK;
+  size_t n = min(CHUNK, fb->len - off);
+  pkt[0] = frameId; pkt[1] = total; pkt[2] = i; pkt[3] = 0;
+  memcpy(pkt + 4, fb->buf + off, n);
+  client.publish("esp32_car_fralor/video", pkt, 4 + n);
+  client.loop();
+}
+esp_camera_fb_return(fb);</pre>
+        <p>Tieni leggeri i fotogrammi: <code>FRAMESIZE_QVGA</code> (320×240) con qualità 10÷12 sta sui 6÷12 kB, che a 10 fps fanno già circa 1 Mbit/s in salita <i>e</i> in discesa sul broker. Sui broker pubblici è tanto: più pezzi per foto significa più occasioni di perderne uno, e la chip <b>persi</b> te lo dice subito. Per il video conviene un broker tuo in LAN. Se il video non serve, togli la spunta <b>Mostra il video</b> e la pagina non si sottoscrive nemmeno.</p>
+
         <h3>Personalizzare le levette</h3>
-        <p>Tutto quello che riguarda i comandi sta in <code>config.js</code>, accanto alla pagina: nessun build, si salva e si ricarica. <code>steer</code> descrive la leva dell'angolo, <code>lever</code> quella della velocità, <code>defaults</code> i valori con cui parte la pagina (broker, topic, formato, frequenza…).</p>
+        <p>Tutto quello che riguarda i comandi sta in <code>config.js</code>, accanto alla pagina: nessun build, si salva e si ricarica. <code>steer</code> descrive la leva dell'angolo, <code>lever</code> quella della velocità, <code>video</code> la camera (topic, inquadratura, specchio) e <code>defaults</code> i valori con cui parte la pagina (broker, topic, formato, frequenza…).</p>
 <pre>steer: {
   label: "angolo", unit: "°",
   min: 0, max: 180, center: 90, start: 90, step: 5,

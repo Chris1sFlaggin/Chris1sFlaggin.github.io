@@ -17,6 +17,7 @@ const FALLBACK_CONFIG = {
     gamepadAxis: 3, gamepadUp: 7, gamepadDown: 6, gamepadRate: 80
   },
   stopKeys: ["Space"],
+  video: { topic: "", enabled: true, chunkHeader: 4, fit: "contain", mirror: false, flip: false, staleMs: 2000 },
   defaults: {}
 };
 const CFG = Object.assign({}, FALLBACK_CONFIG, window.JOYSTICK_CONFIG || {});
@@ -24,7 +25,8 @@ CFG.steer = Object.assign({}, FALLBACK_CONFIG.steer, CFG.steer || {});
 CFG.steer.keys = Object.assign({}, FALLBACK_CONFIG.steer.keys, CFG.steer.keys || {});
 CFG.lever = Object.assign({}, FALLBACK_CONFIG.lever, CFG.lever || {});
 CFG.lever.keys = Object.assign({}, FALLBACK_CONFIG.lever.keys, CFG.lever.keys || {});
-const ST = CFG.steer, LV = CFG.lever;
+CFG.video = Object.assign({}, FALLBACK_CONFIG.video, CFG.video || {});
+const ST = CFG.steer, LV = CFG.lever, VD = CFG.video;
 if (!(ST.max > ST.min)) { ST.min = -90; ST.max = 90; }
 if (!(LV.max > LV.min)) { LV.min = 0; LV.max = 100; }
 CFG.stopKeys = CFG.stopKeys && CFG.stopKeys.length ? CFG.stopKeys : FALLBACK_CONFIG.stopKeys;
@@ -38,6 +40,7 @@ const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const F = {};
 for (const id of ["host","port","path","tls","user","pass","cid","proto","keepalive","reconnect","clean",
                   "tMove","tSpeed","qos","sub","retain",
+                  "tVideo","vidOn","vidFit",
                   "fmt","addType","tplMove","tplSpeed","rawMove","rawSpeed",
                   "rate","hb","onchange","remember","pubTopic","pubRetain"]) {
   const el = $("#" + id);
@@ -83,6 +86,13 @@ function applyDefaults() {
   else if (DEF.topicSpeed) F.tSpeed.value = DEF.topicSpeed;
   // e quello dello sterzo può stare dentro steer (di default = topic movimento)
   if (ST.topic) F.tMove.value = ST.topic;
+  // il video ha una sezione tutta sua in config.js
+  if (F.tVideo) {
+    if (VD.topic) F.tVideo.value = VD.topic;
+    else if (DEF.topicVideo) F.tVideo.value = DEF.topicVideo;
+  }
+  if (F.vidOn) F.vidOn.checked = VD.enabled !== false;
+  if (F.vidFit) F.vidFit.value = VD.fit === "cover" ? "cover" : "contain";
 }
 
 applyDefaults();          // prima il file di configurazione…
@@ -160,14 +170,15 @@ $("#btnPause").onclick = e => {
   e.currentTarget.style.borderColor = paused ? "var(--accent-2)" : "";
 };
 
-/* ── topic: uno per lo sterzo, uno per la velocità ────── */
+/* ── topic: sterzo, velocità e il video in arrivo ─────── */
+function videoTopic() { return F.tVideo ? F.tVideo.value.trim() : ""; }
 function topics() {
-  const move = F.tMove.value.trim(), speed = F.tSpeed.value.trim();
-  return {
-    move: move,
-    speed: speed,
-    sub: [...new Set([move, speed].filter(Boolean))]   // ci si riascolta per eco e RTT
-  };
+  const move = F.tMove.value.trim(), speed = F.tSpeed.value.trim(), video = videoTopic();
+  // eco: ci si riascolta sui propri topic per il log e per l'RTT
+  const echo = F.sub.checked ? [...new Set([move, speed].filter(Boolean))] : [];
+  // video: sottoscrizione a parte, sempre a QoS 0 (i fotogrammi sono grossi)
+  const vid = (video && (!F.vidOn || F.vidOn.checked) && !echo.includes(video)) ? [video] : [];
+  return { move: move, speed: speed, video: video, echo: echo, vid: vid };
 }
 function refreshHint() {
   const T = topics();
@@ -176,9 +187,10 @@ function refreshHint() {
 
 /* ── stato connessione ───────────────────────────────── */
 let client = null, connected = false, subscribed = [];
-const dot = $("#dot"), statusText = $("#statusText"), btnConnect = $("#btnConnect");
+const dot = $("#dot"), dot2 = $("#dot2"), statusText = $("#statusText"), btnConnect = $("#btnConnect");
 function setStatus(cls, text) {
   dot.className = "dot" + (cls ? " " + cls : "");
+  if (dot2) dot2.className = "dot ovdot" + (cls ? " " + cls : "");   // il gemello sopra il video
   statusText.textContent = text;
 }
 
@@ -237,12 +249,8 @@ function connect() {
     setStatus("on", "connesso");
     btnConnect.textContent = "DISCONNETTI";
     log("sys", "connesso · sterzo → " + T.move);
-    if (F.sub.checked && T.sub.length) {
-      client.subscribe(T.sub, { qos: +F.qos.value }, err => {
-        if (err) log("err", "subscribe: " + err.message);
-        else { subscribed = T.sub.slice(); log("sys", "sottoscritto a " + T.sub.join(", ")); }
-      });
-    }
+    subscribed = [];
+    subscribeAll();
     startTimer();
   });
 
@@ -256,6 +264,11 @@ function connect() {
   client.on("error", e => { log("err", (e && e.message) || String(e)); setStatus("err", "errore"); });
 
   client.on("message", (topic, payload) => {
+    // i fotogrammi hanno una corsia tutta loro: né toString né log
+    if (topic === videoTopic()) {
+      if (!F.vidOn || F.vidOn.checked) onFrame(payload);
+      return;
+    }
     stats.rx++;
     const s = payload.toString();
     if (s.charCodeAt(0) === 123 /* { */) {
@@ -275,6 +288,7 @@ function disconnect() {
     if (T.move) pub(T.move, movePayload("off").payload, F.retain.checked);
   }
   stopTimer();
+  videoIdle(false);
   if (client) { try { client.end(false); } catch (e) { try { client.end(true); } catch (e2) {} } }
   client = null;
   connected = false;
@@ -314,6 +328,7 @@ function activatable(t) { return !!t && t.nodeType === 1 && t.matches("button,su
 const isSteerMove = c => STKEYS.left.includes(c) || STKEYS.right.includes(c);
 
 addEventListener("keydown", e => {
+  if (e.code === "Escape" && document.body.classList.contains("immersive")) { setImmersive(false); return; }
   if (typingIn(e.target)) return;
   // se il focus è su un pulsante lascio che Spazio/Invio lo attivino (comportamento nativo)
   if (activatable(e.target) && (STOPKEYS.includes(e.code) || e.code === "Enter")) return;
@@ -557,6 +572,193 @@ leverEl.addEventListener("keydown", ev => {
   }
 })();
 
+/* ── video: i fotogrammi che arrivano dalla camera ─────
+   L'ESP32-CAM spezza ogni foto in più messaggi, ognuno con un'etichetta
+   di 4 byte davanti ai dati: [frameId, totale, indice, riservato]. Qui i
+   pezzi si rimettono insieme e il fotogramma si mostra solo quando è
+   completo; se ne manca uno si butta via tutto e si aspetta il prossimo.
+   Chi invece pubblica il fotogramma intero (JPEG, PNG, base64 o data
+   URI, un messaggio = una foto) funziona lo stesso: si riconosce dai
+   primi byte.                                                         */
+const arena = $("#arena"), camEl = $("#cam"),
+      nosigMsg = $("#nosigMsg"), nosigSub = $("#nosigTopic"),
+      btnFit = $("#btnFit"), btnFull = $("#btnFull");
+const VSTALE = Math.max(250, +VD.staleMs || 2000);
+const VHEAD = Math.max(0, VD.chunkHeader === undefined ? 4 : +VD.chunkHeader || 0);
+const VID = { first: false, last: 0, frames: [], bytes: [], urls: [], bad: 0, lost: 0, w: 0, h: 0 };
+const CH = { id: -1, total: 0, got: 0, parts: null, done: false };
+
+const MAGIC = [
+  [[0xFF, 0xD8], "image/jpeg"],
+  [[0x89, 0x50, 0x4E, 0x47], "image/png"],
+  [[0x47, 0x49, 0x46], "image/gif"],
+  [[0x52, 0x49, 0x46, 0x46], "image/webp"]     // RIFF….WEBP
+];
+const vidDec = (typeof TextDecoder !== "undefined") ? new TextDecoder() : null;
+function asText(b) {
+  if (vidDec) { try { return vidDec.decode(b); } catch (e) {} }
+  let s = "";
+  for (let i = 0; i < b.length; i++) s += String.fromCharCode(b[i]);
+  return s;
+}
+// fotogramma intero in un solo messaggio: lo riconosco dai primi byte
+function magicSrc(b) {
+  if (b.length < 16) return "";
+  for (const [sig, mime] of MAGIC) {
+    let ok = true;
+    for (let i = 0; i < sig.length; i++) if (b[i] !== sig[i]) { ok = false; break; }
+    if (ok) return URL.createObjectURL(new Blob([b], { type: mime }));
+  }
+  return "";
+}
+// …e chi lo pubblica come testo: data URI o base64 nudo
+function textSrc(b) {
+  if (b.length < 16 || b[0] < 32 || b[0] > 126) return "";   // non è nemmeno ASCII stampabile
+  const s = asText(b).trim();
+  if (/^data:image\//i.test(s)) return s;
+  const t = s.replace(/\s+/g, "");
+  if (t.length > 64 && /^[A-Za-z0-9+/=]+$/.test(t)) return "data:image/jpeg;base64," + t;
+  return "";
+}
+
+function showFrame(src, now) {
+  if (src.charCodeAt(0) === 98 /* blob: */) {
+    VID.urls.push(src);
+    // ne tengo in vita qualcuno: il più vecchio è già stato disegnato da un pezzo
+    while (VID.urls.length > 4) URL.revokeObjectURL(VID.urls.shift());
+  }
+  camEl.src = src;
+  VID.last = now;
+  VID.frames.push(now);
+  if (!VID.first) { VID.first = true; arena.classList.add("live"); }
+}
+
+function startChunk(b, now) {
+  if (CH.parts && !CH.done) VID.lost++;      // il fotogramma di prima è rimasto a metà
+  CH.id = b[0]; CH.total = b[1]; CH.got = 0; CH.done = false;
+  CH.parts = new Array(CH.total);
+  addChunk(b, 0, now);
+}
+function addChunk(b, idx, now) {
+  if (CH.done || !CH.parts || CH.parts[idx]) return;      // doppione, o foto già mostrata
+  CH.parts[idx] = new Uint8Array(b.subarray(VHEAD));      // copia: il buffer di mqtt.js non è mio
+  if (++CH.got < CH.total) return;
+  CH.done = true;
+  showFrame(URL.createObjectURL(new Blob(CH.parts, { type: "image/jpeg" })), now);
+  CH.parts = null;
+}
+
+function onFrame(buf) {
+  if (!buf || !buf.length) return;
+  const now = performance.now();
+  VID.bytes.push([now, buf.length]);         // il traffico si conta comunque, pezzi compresi
+
+  const src = magicSrc(buf);                 // 1. un messaggio, una foto intera
+  if (src) { showFrame(src, now); return; }
+
+  if (VHEAD && buf.length > VHEAD + 1) {     // 2. un pezzo di foto, con l'etichetta davanti
+    const total = buf[1], idx = buf[2];
+    if (total && idx < total) {
+      // il primo pezzo si riconosce perché comincia con l'inizio di un JPEG
+      if (idx === 0 && buf[VHEAD] === 0xFF && buf[VHEAD + 1] === 0xD8) { startChunk(buf, now); return; }
+      if (buf[0] === CH.id && total === CH.total) { addChunk(buf, idx, now); return; }
+      // pezzo di una foto cominciata prima che arrivassi: zitto, aspetto la prossima.
+      // Se però non ho mai visto un primo pezzo valido, qui c'è dell'altro e va detto.
+      if (CH.id >= 0) return;
+    }
+  }
+
+  const txt = textSrc(buf);                  // 3. foto intera scritta in base64
+  if (txt) { showFrame(txt, now); return; }
+
+  // formato sconosciuto: arriverebbe 20 volte al secondo, lo dico col contagocce
+  if (VID.bad++ % 200 === 0)
+    log("err", "video: messaggio non riconosciuto (" + buf.length + " byte) — attesi pezzi con etichetta, JPEG o base64");
+}
+
+// al primo fotogramma la scena prende le proporzioni della camera
+camEl.addEventListener("load", () => {
+  const w = camEl.naturalWidth, h = camEl.naturalHeight;
+  if (w < 8 || h < 8 || (w === VID.w && h === VID.h)) return;   // il segnaposto trasparente non conta
+  VID.w = w; VID.h = h;
+  arena.style.setProperty("--ar", w + "/" + h);
+  log("sys", "video: " + w + "×" + h);
+});
+
+function videoIdle(hard) {
+  VID.last = 0;
+  VID.frames.length = 0;
+  VID.bytes.length = 0;
+  CH.id = -1; CH.total = 0; CH.parts = null; CH.done = false;   // pezzi a metà: si ricomincia
+  if (hard) { VID.first = false; VID.bad = 0; VID.lost = 0; arena.classList.remove("live"); }
+}
+
+function videoTick(now) {
+  while (VID.frames.length && now - VID.frames[0] > 1000) VID.frames.shift();
+  while (VID.bytes.length && now - VID.bytes[0][0] > 1000) VID.bytes.shift();
+  let bytes = 0;
+  for (let i = 0; i < VID.bytes.length; i++) bytes += VID.bytes[i][1];
+  oFps.textContent = VID.frames.length || (VID.first ? "0" : "—");
+  const kb = bytes / 1024;
+  oKbps.textContent = bytes ? (kb >= 100 ? Math.round(kb) : kb.toFixed(1)) : "—";
+  oLost.textContent = VID.lost;
+
+  const stale = !VID.last || now - VID.last > VSTALE;
+  arena.classList.toggle("stale", stale);
+  if (!stale) return;
+  const on = !F.vidOn || F.vidOn.checked;
+  const msg = !on ? "video spento"
+            : !connected ? "in attesa del broker"
+            : VID.first ? "segnale perso" : "in attesa del video";
+  const sub = !on ? "riattivalo dalla configurazione" : (videoTopic() || "(nessun topic)");
+  if (nosigMsg.textContent !== msg) nosigMsg.textContent = msg;
+  if (nosigSub.textContent !== sub) nosigSub.textContent = sub;
+}
+
+function applyVideo() {
+  const cover = F.vidFit && F.vidFit.value === "cover";
+  arena.classList.toggle("fill", !!cover);
+  if (btnFit) btnFit.textContent = cover ? "RIEMPI" : "ADATTA";
+  camEl.style.setProperty("--mx", VD.mirror ? "-1" : "1");
+  camEl.style.setProperty("--my", VD.flip ? "-1" : "1");
+}
+if (btnFit) btnFit.onclick = () => {
+  F.vidFit.value = F.vidFit.value === "cover" ? "contain" : "cover";
+  F.vidFit.dispatchEvent(new Event("change"));   // stessa strada di un cambio dal form
+};
+
+/* ── schermo intero: nativo dove c'è, sennò a CSS ────── */
+function fsElement() { return document.fullscreenElement || document.webkitFullscreenElement || null; }
+function setImmersive(on) {
+  document.body.classList.toggle("immersive", on);
+  if (btnFull) {
+    btnFull.textContent = on ? "✕" : "⛶";
+    btnFull.setAttribute("aria-label", on ? "Esci dallo schermo intero" : "Schermo intero");
+  }
+  if (on) {
+    const rq = arena.requestFullscreen || arena.webkitRequestFullscreen;
+    if (rq) {
+      try {
+        Promise.resolve(rq.call(arena)).then(() => {
+          // sul telefono ha senso solo in orizzontale, ma se il browser dice di no pazienza
+          try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock("landscape").catch(() => {}); }
+          catch (e) {}
+        }, () => {});
+      } catch (e) {}
+    }
+  } else {
+    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
+    const ex = document.exitFullscreen || document.webkitExitFullscreen;
+    if (fsElement() && ex) { try { Promise.resolve(ex.call(document)).catch(() => {}); } catch (e) {} }
+  }
+}
+if (btnFull) btnFull.onclick = () => setImmersive(!document.body.classList.contains("immersive"));
+for (const ev of ["fullscreenchange", "webkitfullscreenchange"]) {
+  document.addEventListener(ev, () => {
+    if (!fsElement() && document.body.classList.contains("immersive")) setImmersive(false);
+  });
+}
+
 /* ── STOP ────────────────────────────────────────────── */
 function zeroAll() {
   steerHeld.clear();
@@ -677,7 +879,8 @@ function speedTick(force) {
 
 /* ── render ──────────────────────────────────────────── */
 const oA = $("#oA"), oSrc = $("#oSrc"),
-      oRate = $("#oRate"), oSent = $("#oSent"), oRtt = $("#oRtt"), oSpeed = $("#oSpeed");
+      oRate = $("#oRate"), oSent = $("#oSent"), oRtt = $("#oRtt"), oSpeed = $("#oSpeed"),
+      oFps = $("#oFps"), oKbps = $("#oKbps"), oLost = $("#oLost");
 
 let lastFrame = performance.now();
 function render() {
@@ -696,6 +899,7 @@ function render() {
   oRate.textContent = stats.window.length;
   oSent.textContent = stats.sent;
   oRtt.textContent = stats.rtt === null ? "—" : stats.rtt + " ms";
+  videoTick(now);
 
   requestAnimationFrame(render);
 }
@@ -714,16 +918,28 @@ pubPayload.addEventListener("keydown", e => { if (e.key === "Enter") { e.prevent
 F.pubTopic.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); manualPub(); } });
 
 /* ── reattività config ───────────────────────────────── */
+function subOne(list, qos, what) {
+  client.subscribe(list, { qos: qos }, err => {
+    if (err) log("err", "subscribe: " + err.message);
+    else {
+      subscribed = [...new Set(subscribed.concat(list))];
+      log("sys", "sottoscritto a " + list.join(", ") + " (" + what + ")");
+    }
+  });
+}
+function subscribeAll() {
+  if (!client || !connected) return;
+  const T = topics();
+  if (T.echo.length) subOne(T.echo, +F.qos.value, "eco");
+  if (T.vid.length) subOne(T.vid, 0, "video");        // il video sempre a QoS 0
+}
 function resubscribe() {
   if (!client || !connected) return;
   if (subscribed.length) { try { client.unsubscribe(subscribed); } catch (e) {} }
   subscribed = [];
   const T = topics();
-  if (!F.sub.checked || !T.sub.length) { log("sys", "sottoscrizioni rimosse"); return; }
-  client.subscribe(T.sub, { qos: +F.qos.value }, err => {
-    if (err) log("err", "subscribe: " + err.message);
-    else { subscribed = T.sub.slice(); log("sys", "sottoscritto a " + T.sub.join(", ")); }
-  });
+  if (!T.echo.length && !T.vid.length) { log("sys", "sottoscrizioni rimosse"); return; }
+  subscribeAll();
 }
 function syncFmtUI() {
   const f = F.fmt.value;
@@ -744,7 +960,9 @@ for (const k in F) {
     if (["fmt","addType","tplMove","rawMove","tMove","retain"].includes(k)) lastKey = null;
     if (["fmt","addType","tplSpeed","rawSpeed","tSpeed"].includes(k)) lastSpeedKey = null;
     if (k === "fmt") syncFmtUI();
-    if (k === "sub" || k === "tMove" || k === "tSpeed") resubscribe();
+    if (k === "vidFit") applyVideo();
+    if (k === "tVideo" || k === "vidOn") videoIdle(true);
+    if (["sub", "tMove", "tSpeed", "tVideo", "vidOn"].includes(k)) resubscribe();
     if (NEEDS_RECONNECT.includes(k) && client) log("sys", "modifica applicata alla prossima connessione");
   };
   F[k].addEventListener("change", handler);
@@ -770,6 +988,7 @@ $("#leverKeys").textContent = [
 refreshHint();
 refreshUrl();
 syncFmtUI();
+applyVideo();
 renderSteer();
 renderLever();
 if (!F.pubTopic.value) F.pubTopic.value = topics().speed || topics().move;
